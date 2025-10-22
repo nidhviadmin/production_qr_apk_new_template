@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.bipinexports.productionqr">
+
+    <!-- Features -->
+    <uses-feature android:name="android.hardware.camera" android:required="true" />
+    <uses-feature android:name="android.hardware.camera.front" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
+
+    <!-- Permissions -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+
+    <application
+        android:usesCleartextTraffic="true"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_appicon"
+        android:label="Production QR"
+        android:roundIcon="@mipmap/ic_appicon"
+        android:supportsRtl="true"
+        android:theme="@style/App">
+        <activity android:name="com.bipinexports.productionqr.Activity.SplashScreen"
+            android:exported="true"
+            tools:ignore="Instantiatable">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name="com.bipinexports.productionqr.Activity.ScannerSelectionBarcodeActivity"/>
+        <activity android:name="com.bipinexports.productionqr.Activity.BTScannerActivity"
+            android:windowSoftInputMode="stateHidden"/>
+        <activity android:name="com.bipinexports.productionqr.Activity.ChangepasswordActivity"/>
+        <activity android:name="com.bipinexports.productionqr.Activity.LoginActivity" />
+        <activity android:name="com.bipinexports.productionqr.Activity.MainActivity"/>
+        <activity android:name="com.journeyapps.barcodescanner.CaptureActivity"
+            android:screenOrientation="unspecified"
+            tools:replace="android:screenOrientation" />
+
+        <activity android:name="com.bipinexports.productionqr.Activity.SelectJobSummaryActivity"/>
+        <activity android:name="com.bipinexports.productionqr.Activity.AssignedJobActivity"/>
+        <activity android:name="com.bipinexports.productionqr.Activity.PendingJobActivity"/>
+        <activity android:name="com.bipinexports.productionqr.Activity.InprocessJobActivity"/>
+        <activity android:name="com.bipinexports.productionqr.Activity.CompletedJobActivity"/>
+        <activity android:name="com.bipinexports.productionqr.Activity.OuputSummaryActivity"/>
+        <activity android:name="com.bipinexports.productionqr.Activity.DatewiseOutputActivity"/>
+        <activity android:name="com.bipinexports.productionqr.Activity.DailyProductionOutputActivity"/>
+        <activity android:name="com.bipinexports.productionqr.Activity.Accessory_Receipt_Activity"/>
+        <activity android:name="com.bipinexports.productionqr.Activity.Delivery_Details_Activity"/>
+        <activity android:name="com.bipinexports.productionqr.Activity.Machine_Service_Verification_Activity"/>
+        <activity android:name="com.bipinexports.productionqr.Activity.Machie_Service_Verification_Details_Activity"/>
+        <activity android:name="com.bipinexports.productionqr.Activity.Datewise_Piece_Scanned_Detail_Activity"/>
+        <activity android:name="com.bipinexports.productionqr.Activity.Datewise_Bundle_Scanned_Detail_Activity"/>
+        <activity android:name="com.bipinexports.productionqr.Activity.Piecewise_Scan_Details_Activity"/>
+        <activity android:name="com.bipinexports.productionqr.Activity.Empty_Activity"/>
+        <activity android:name="com.bipinexports.productionqr.Activity.Overall_Datewise_Piece_Scanned_Activity"/>
+        <activity android:name="com.bipinexports.productionqr.Activity.Bundle_QR_Scanner_USB_Reader_Activity"/>
+        <activity android:name="com.bipinexports.productionqr.Activity.Employee_Operation_Mapping_Details_Activity"/>
+        <activity android:name="com.bipinexports.productionqr.Activity.Employee_Bundle_Mapping_Activity"/>
+        <activity android:name="com.bipinexports.productionqr.Activity.Multiple_Bundle_QR_Scan_Activity"/>
+        <activity android:name="com.bipinexports.productionqr.Activity.Scanner_Multiple_Bundle_QR_Activity"/>
+        <activity android:name="com.bipinexports.productionqr.Activity.Accessory_Receipt_Vendorwise_Activity"/>
+        <activity android:name="com.bipinexports.productionqr.Activity.Accessory_Receipt_Jobwise_Activity"/>
+        <activity android:name="com.bipinexports.productionqr.Activity.Accessory_Receipt_Delivery_Activity"/>
+        <activity android:name="com.bipinexports.productionqr.Activity.Accessory_Delivery_Details_Activity"/>
+        <activity android:name="com.bipinexports.productionqr.Activity.Laywise_Bundle_QR_Scan_Activity"/>
+        <activity android:name="com.bipinexports.productionqr.Activity.Laywise_Multiple_Bundle_QR_Scanner_Activity"/>
+        <activity android:name="com.bipinexports.productionqr.Activity.Select_Employee_Detail_Activity"/>
+        <activity android:name="com.bipinexports.productionqr.Activity.In_Employee_Operation_Mapping_Activity"/>
+        <activity android:name="com.bipinexports.productionqr.Activity.Out_Employee_Operation_Mapping_Activity"/>
+        <activity android:name="com.bipinexports.productionqr.Activity.Absent_Employee_Operation_Mapping_Activity"/>
+        <activity android:name="com.bipinexports.productionqr.Activity.Empty_Employee_Data_Activity"/>
+        <activity android:name="com.bipinexports.productionqr.Activity.Rollwise_QR_Scan_Activity"/>
+        <activity android:name="com.bipinexports.productionqr.Activity.Rollwise_Multiple_QR_Scanner_Activity"/>
+        <activity android:name="com.bipinexports.productionqr.Activity.Rollwise_Inbuilt_Scanner_Barcode_Activity"/>
+        <activity android:name="com.bipinexports.productionqr.Activity.Fabric_Receipt_Activity"/>
+        <activity android:name="com.bipinexports.productionqr.Activity.Fabric_Delivery_Details_Activity"/>
+        <activity android:name="com.bipinexports.productionqr.Activity.Machine_QR_Scanview_Activity"/>
+        <activity android:name="com.bipinexports.productionqr.Activity.Sharptool_QR_Scanview_Activity"/>
+        <activity android:name="com.bipinexports.productionqr.Activity.In_Employee_Bundle_Scan_Activity"/>
+        <activity android:name="com.bipinexports.productionqr.Activity.Scan_Inward_Rolls_Activity"/>
+        <activity android:name="com.bipinexports.productionqr.Activity.Scan_Relaxed_Rolls_Activity"/>
+        <activity android:name="com.bipinexports.productionqr.Activity.Relax_Roll_Scanner_USB_Reader_Activity"
+                  android:windowSoftInputMode="stateHidden|adjustPan"/>
+        <activity android:name="com.bipinexports.productionqr.Activity.Roll_Delivery_USB_Reader_Activity"
+            android:windowSoftInputMode="stateHidden|adjustPan"/>
+        <activity android:name="com.bipinexports.productionqr.Activity.Pending_User_Activity"/>
+        <activity android:name="com.bipinexports.productionqr.Activity.Switch_User_Activity"/>
+
+        <provider
+            android:name=".GenericFileProvider"
+            android:authorities="com.bipinexports.productionqr.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths" />
+        </provider>
+    </application>
+
+</manifest>

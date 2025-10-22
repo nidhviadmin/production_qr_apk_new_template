@@ -1,0 +1,78 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 33
+
+    defaultConfig {
+        applicationId "com.bipinexports.productionqr"
+        minSdkVersion 24
+        targetSdkVersion 33
+        versionCode 7
+        versionName "7.4"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs {
+        config {
+            keyAlias 'key0'
+            keyPassword '111111'
+            storeFile file('C:/laragon/www/qrscan/sign.jks')
+            storePassword '111111'
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.config
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    sourceSets {
+        main {
+            res.srcDirs = ['src/main/res', 'src/main/res/Menu', 'src/main/res/drawable/Asserts1']
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+
+    // AndroidX libraries (replace old support libs)
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
+    implementation 'com.google.android.material:material:1.6.0'  // Check for the latest version
+
+    // Retrofit, Picasso, OkHttp, Gson
+    implementation 'com.squareup.picasso:picasso:2.5.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.9.0'
+    implementation 'com.google.code.gson:gson:2.8.5'
+
+    // ZXing and QR scanner
+    implementation 'com.journeyapps:zxing-android-embedded:4.2.0'
+    implementation 'com.google.zxing:core:3.0.1'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+
+    // Async HTTP
+    implementation 'com.loopj.android:android-async-http:1.4.9'
+
+    // Test dependencies
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+
+    // Annotation support
+    implementation 'org.jetbrains:annotations:15.0'
+    implementation 'androidx.core:core:1.9.0'  // Check for the latest version
+
+    // If you're using a module
+    implementation project(":DataCollectionLib")
+}

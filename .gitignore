@@ -1,0 +1,8 @@
+.git/
+.gradle/
+.idea/
+app/build/
+app/libs/
+app/release/
+gradle/
+app/app.iml

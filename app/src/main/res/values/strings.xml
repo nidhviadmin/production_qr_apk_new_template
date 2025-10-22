@@ -1,0 +1,44 @@
+<resources>
+    <string name="app_name">QrScan</string>
+    <string name="loading">Loading...</string>
+
+    <string name="assigned">Assigned</string>
+    <string name="ready">Ready</string>
+    <string name="ongoing">Ongoing</string>
+    <string name="completed">Completed</string>
+    <string name="currentpassword">Current Password</string>
+    <string name="newpassword">New Password</string>
+    <string name="retypenewpassword">Retype New Password</string>
+
+    <string name="change_password">CHANGE PASSWORD</string>
+    <string name="change_password_menu">Change Password</string>
+    <string name="submit">OK</string>
+    <string name="logout">Logout</string>
+
+    <string name="menu_settings">Settings</string>
+    <string name="barcode">Barcode</string>
+    <string name="btnAutomaticBarcode">Automatic Control</string>
+    <string name="btnClientBarcode">Client Control</string>
+    <string name="btnScannerSelectBarcode">Scanner Selection Example</string>
+    <string name="btnSwitchScanners">Switch Scanners</string>
+    <string name="txtBarcodeTitle">Press the device\'s scan button to scan a barcode.</string>
+    <string name="txtBarcode">Piece-wise QR Scan using Inbuilt Scanner</string>
+    <string name="txtUSBBarcode">Piece-wise QR Scan using USB Scanner</string>
+    <string name="txtMainTitle">Click on below buttons for options.</string>
+    <string name="txtPreamble">Preamble</string>
+    <string name="editPreamble"></string>
+    <string name="editPostamble"></string>
+    <string name="txtPostamble">Postamble</string>
+
+    <string name="USB_Bar_code">Bundle-wise QR Scan using USB Reader</string>
+    <string name="laywise_USB_Bar_code">Lay-wise Bundle QR Scan using USB Reader</string>
+
+    <string name="rollwise_USB_Bar_code">Roll-wise QR Scan using USB Reader</string>
+
+    <string name="txt_rollwise_barcode">Roll-wise QR Scan using Inbuilt Scanner</string>
+    <string name="txt_barcode_title">Press the device\'s scan button to scan a barcode.</string>
+
+    <string name="relax_roll_usb_code">Relax Roll-wise QR Scan using USB Reader</string>
+    <string name="delivery_roll_usb_code">Delivery Roll-wise QR Scan using USB Reader</string>
+
+</resources>
