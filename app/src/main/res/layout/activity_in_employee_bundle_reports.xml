@@ -5,37 +5,45 @@
     tools:context="com.bipinexports.productionqr.Activity.In_Employee_Bundle_Scan_Activity">
 
     <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/white"
-        android:gravity="center_vertical">
+        android:background="@color/colorPrimary"
+        android:clickable="false">
 
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/txtUser"
-            android:textStyle="bold"
-            android:textColor="#AB47BC"
-            android:textSize="20dp"/>
-
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="right">
+            android:padding="8dp">
 
+            <!-- Menu icon -->
             <ImageView
                 android:id="@+id/imgd"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:scaleX="0.45"
-                android:scaleY="0.45"
-                android:src="@drawable/ic_menu"/>
+                android:src="@drawable/ic_menu_icon"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:clickable="true"
+                android:focusable="true"
+                android:contentDescription="Open navigation drawer" />
 
-        </LinearLayout>
+            <!-- Username -->
+            <TextView
+                android:id="@+id/txtUser"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Hello User"
+                android:textStyle="bold"
+                android:textColor="#0f0f0f"
+                android:textSize="20sp"
+                android:layout_toEndOf="@id/imgd"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="16dp" />
 
+        </RelativeLayout>
     </androidx.appcompat.widget.Toolbar>
+
     <ProgressBar
         android:id="@+id/progress"
         android:layout_width="match_parent"

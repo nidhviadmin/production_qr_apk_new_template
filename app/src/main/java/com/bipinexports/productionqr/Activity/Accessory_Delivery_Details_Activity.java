@@ -138,23 +138,12 @@ public class Accessory_Delivery_Details_Activity extends AppCompatActivity imple
         if (isOnline()) {
             switch (v.getId()) {
                 case R.id.imgd:
-                    PopupMenu popup = new PopupMenu(Accessory_Delivery_Details_Activity.this, imageView);
-                    popup.getMenuInflater().inflate(R.menu.menu_main, popup.getMenu());
-                    popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                        public boolean onMenuItemClick(MenuItem item) {
-                            if (item.getItemId() == R.id.log) {
-                                session.logoutUser();
-                                finish();
-                            }
-                            else if (item.getItemId() == R.id.changepassword) {
-                                Intent intent = new Intent(Accessory_Delivery_Details_Activity.this, ChangepasswordActivity.class);
-                                startActivity(intent);
-                                finish();
-                            }
-                            return true;
-                        }
-                    });
-                    popup.show();
+                    Intent intent = new Intent(Accessory_Delivery_Details_Activity.this, HomeActivity.class);
+                    intent.putExtra("openDrawer", true); //
+                    intent.putExtra("username", User);
+                    intent.putExtra("userid", userid);
+                    intent.putExtra("processorid", processorid);
+                    startActivity(intent);
                     break;
                 case R.id.AddProg:
                     Accessory_Delivery_Details_Activity.custPrograssbar_new.prograssCreate(this);

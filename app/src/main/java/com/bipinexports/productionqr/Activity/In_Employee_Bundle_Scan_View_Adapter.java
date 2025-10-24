@@ -106,14 +106,16 @@ public class In_Employee_Bundle_Scan_View_Adapter extends RecyclerView.Adapter<I
         String imagePath = mDataset.get(position).getImgpath();
         String[] parts = imagePath.split("/");
         String directory = parts[0];
-        if(directory.equals("assets"))
-        {
-            Picasso.with(mContext).load(APIClient.HRMS_IMG_URL + "/" +mDataset.get(position).getImgpath()).into(holder.Emp_Imge);
+        if ("assets".equals(directory)) {
+            Picasso.get()
+                    .load(APIClient.HRMS_IMG_URL + "/" + mDataset.get(position).getImgpath())
+                    .into(holder.Emp_Imge);
+        } else {
+            Picasso.get()
+                    .load(mDataset.get(position).getImgpath())
+                    .into(holder.Emp_Imge);
         }
-        else
-        {
-            Picasso.with(mContext).load(mDataset.get(position).getImgpath()).into(holder.Emp_Imge);
-        }
+
         String mapped_cnt = mDataset.get(position).getmapped_cnt().toString();
 
         if(Integer.parseInt(mapped_cnt) > 0)

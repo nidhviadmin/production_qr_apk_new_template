@@ -7,7 +7,7 @@
     <androidx.appcompat.widget.Toolbar
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/white"
+        android:background="@color/colorPrimary"
         android:gravity="center_vertical">
 
         <TextView
@@ -15,7 +15,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/txtUser"
             android:textStyle="bold"
-            android:textColor="#AB47BC"
+            android:textColor="#0f0f0f"
             android:textSize="20dp"/>
 
         <LinearLayout

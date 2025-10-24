@@ -1,12 +1,15 @@
-apply plugin: 'com.android.application'
+plugins {
+    id 'com.android.application'
+}
 
 android {
-    compileSdkVersion 33
+    compileSdkVersion 34 // Update to latest
+    buildToolsVersion "34.0.0"
 
     defaultConfig {
         applicationId "com.bipinexports.productionqr"
         minSdkVersion 24
-        targetSdkVersion 33
+        targetSdkVersion 34 // Update to latest
         versionCode 7
         versionName "7.4"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -34,44 +37,48 @@ android {
             res.srcDirs = ['src/main/res', 'src/main/res/Menu', 'src/main/res/drawable/Asserts1']
         }
     }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    namespace 'com.bipinexports.productionqr' // Add this line
 }
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
 
-    // AndroidX libraries (replace old support libs)
-    implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    // AndroidX libraries - updated versions
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.cardview:cardview:1.0.0'
-    implementation 'androidx.recyclerview:recyclerview:1.1.0'
-    implementation 'com.google.android.material:material:1.6.0'  // Check for the latest version
+    implementation 'androidx.recyclerview:recyclerview:1.3.2'
+    implementation 'com.google.android.material:material:1.11.0'
 
-    // Retrofit, Picasso, OkHttp, Gson
-    implementation 'com.squareup.picasso:picasso:2.5.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
-    implementation 'com.squareup.okhttp3:logging-interceptor:3.9.0'
-    implementation 'com.google.code.gson:gson:2.8.5'
+    // Retrofit, Picasso, OkHttp, Gson - updated versions
+    implementation 'com.squareup.picasso:picasso:2.8'
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.12.0'
+    implementation 'com.google.code.gson:gson:2.10.1'
 
-    // ZXing and QR scanner
-    implementation 'com.journeyapps:zxing-android-embedded:4.2.0'
-    implementation 'com.google.zxing:core:3.0.1'
+    // ZXing and QR scanner - updated versions
+    implementation 'com.journeyapps:zxing-android-embedded:4.3.0'
+    implementation 'com.google.zxing:core:3.5.3'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
 
-    // Async HTTP
+    // Async HTTP - consider migrating to OkHttp/Retrofit
     implementation 'com.loopj.android:android-async-http:1.4.9'
 
-    // Test dependencies
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+    // Test dependencies - updated versions
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 
-    // Annotation support
-    implementation 'org.jetbrains:annotations:15.0'
-    implementation 'androidx.core:core:1.9.0'  // Check for the latest version
+    // Core and annotations
+    implementation 'androidx.core:core:1.12.0'
+    implementation 'org.jetbrains:annotations:24.0.1'
 
     // If you're using a module
     implementation project(":DataCollectionLib")

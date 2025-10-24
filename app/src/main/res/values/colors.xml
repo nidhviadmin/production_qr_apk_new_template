@@ -1,34 +1,26 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
-
+    <color name="colorPrimary">#ffce33</color>
+    <color name="colorPrimaryDark">#ffce33</color>
+    <color name="colorAccent">#ffce33</color>
+    <color name="colorWhite">#FFFFFF</color>
+    <color name="colorGrey">#CECECE</color>
+    <color name="colorGrey1">#888888</color>
+    <color name="colorGrey2">#5A5A5A</color>
+    <color name="colorBalck">#1d2021</color>
+    <color name="colorRad">#d71c32</color>
+    <color name="colorTranfar">#7FFBFAFA</color>
+    <color name="colorGrey0">#EFEDED</color>
     <color name="white">#ffffff</color>
-    <color name="green">#2dad50</color>
-    <color name="red">#c13a36</color>
-    <color name="blue">#008db8</color>
-    <color name="grey">#a3a3a3</color>
-    <color name="light_gray">#ebebeb</color>
-    <color name="login_text">#4f5b73</color>
-    <color name="login_line">#c8c8c8</color>
-    <color name="username">#525252</color>
-    <color name="username_line">#919095</color>
-    <color name="password">#616161</color>
-    <color name="password_line">#b3b2b6</color>
-    <color name="forgotpwd">#051738</color>
-    <color name="loginbg">#665780</color>
-    <color name="menu_text">#0f0f0f</color>
-    <color name="menu_bar">#b8b7bb</color>
-    <color name="pms_title_textcolor">#8e8e8e</color>
-    <color name="pms_textcolor">#65567d</color>
-    <color name="pms_bg">#ebebeb</color>
-    <color name="pms_btn_bg">#faab45</color>
     <color name="black">#000000</color>
-    <color name="tab_indicator">#fea329</color>
-    <color name="tab_selectedColor">#ffc45c</color>
-    <color name="indicator">#feb96c</color>
-    <color name="pp_title">#888888</color>
-    <color name="pp_value">#5c4d78</color>
+    <color name="light_gray">#ebebeb</color>
+    <color name="grey">#a3a3a3</color>
+    <color name="red">#c13a36</color>
+    <color name="green">#2dad50</color>
+    <color name="blue">#008db8</color>
+    <color name="tab_indicator">#ffce33</color>
+    <color name="menu_text">#0f0f0f</color>
     <color name="purple">#FF4081</color>
+    <color name="forgotpwd">#051738</color>
+    <color name="zxing_viewfinder_laser">#FF0000</color>
+
 </resources>

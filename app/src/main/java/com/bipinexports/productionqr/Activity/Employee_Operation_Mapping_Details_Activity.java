@@ -171,10 +171,11 @@ public class Employee_Operation_Mapping_Details_Activity extends AppCompatActivi
 
         }
         else {
-            Picasso.with(Employee_Operation_Mapping_Details_Activity.this)
+            Picasso.get()
                     .load(imgpath)
                     .into(emp_Imge);
         }
+
 
         getvalue();
         get_style_operation_data();

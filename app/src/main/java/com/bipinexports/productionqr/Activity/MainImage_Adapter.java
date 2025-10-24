@@ -83,7 +83,10 @@ public class MainImage_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         else if (holder instanceof ImageViewHolder)
         {
             ((ImageViewHolder) holder).txtTitle.setText(item.getimage_name());
-            Picasso.with(context).load(item.getimgpath()).into(((ImageViewHolder) holder).imageView);
+            Picasso.get()
+                    .load(item.getimgpath())
+                    .into(((ImageViewHolder) holder).imageView);
+
             holder.itemView.setOnClickListener(v -> listener.onItemClick(item, position));
             if (item.getCount() != null && !item.getCount().equals("0"))
             {

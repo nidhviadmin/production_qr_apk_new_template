@@ -1,75 +1,120 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical"
-    android:paddingLeft="40dp"
-    android:paddingRight="40dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/white"
+    android:fillViewport="true"
     tools:context="com.bipinexports.productionqr.Activity.LoginActivity">
 
-
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="40dp"
         android:gravity="center"
-        android:text="Login"
-        android:textColor="#AB47BC"
-        android:textSize="25dp" />
+        android:orientation="vertical"
+        android:padding="20dp">
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/input_layout_name"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        <ImageView
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_appicon1" />
 
-        <EditText
-            android:id="@+id/et1"
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawableLeft="@drawable/asset1"
-            android:drawablePadding="15dp"
-            android:hint="Username"
-            android:inputType="textPersonName" />
+            android:layout_marginTop="15dp"
+            android:fontFamily="@font/coresans_cr_medium"
+            android:gravity="center"
+            android:padding="0dp"
+            android:text="Welcome to Bipin Exports!"
+            android:textColor="@color/colorBalck"
+            android:textSize="21sp"
+            android:textStyle="bold" />
 
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/input_layout_password"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <EditText
-            android:id="@+id/et2"
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawableLeft="@drawable/asset2"
-            android:drawablePadding="15dp"
-            android:hint="Password"
-            android:inputType="textPassword" />
+            android:layout_marginTop="5dp"
+            android:fontFamily="@font/coresans_cr_medium"
+            android:textColor="@color/colorGrey1"
+            android:gravity="center"
+            android:padding="5dp"
+            android:text="Log into your account"
+            android:textSize="16sp" />
 
-    </com.google.android.material.textfield.TextInputLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="20dp"
+            android:orientation="vertical">
 
-    <Button
-        android:id="@+id/btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
-        android:layout_marginTop="20dp"
-        android:background="#AB47BC"
-        android:text="Login"
-        android:textColor="@android:color/white"
-        android:textStyle="bold" />
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/input_layout_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:hintEnabled="false">
+
+                <EditText
+                    android:id="@+id/et1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/rounded_editetext"
+                    android:drawableLeft="@drawable/ic_perm_"
+                    android:drawablePadding="10dp"
+                    android:hint="Username"
+                    android:inputType="text"
+                    android:padding="12dp"
+                    android:textColor="@color/colorGrey2"
+                    android:textColorHint="@color/colorGrey" />
+            </com.google.android.material.textfield.TextInputLayout>
 
 
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/input_layout_password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                app:hintEnabled="false">
 
+                <EditText
+                    android:id="@+id/et2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/rounded_editetext"
+                    android:drawableLeft="@drawable/ic_lock"
+                    android:drawablePadding="10dp"
+                    android:hint="Password"
+                    android:inputType="textPassword"
+                    android:padding="12dp"
+                    android:textColor="@color/colorGrey2"
+                    android:textColorHint="@color/colorGrey" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-    <ProgressBar
-        android:id="@+id/progress"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="invisible" />
-</LinearLayout>
+        </LinearLayout>
 
+        <Button
+            android:id="@+id/btn"
+            android:layout_width="150dp"
+            android:layout_height="52dp"
+            android:layout_marginTop="25dp"
+            android:background="@drawable/rounded_green2"
+            android:gravity="center"
+            android:text="Login"
+            android:textColor="@color/colorBalck"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <ProgressBar
+            android:id="@+id/progress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+</ScrollView>

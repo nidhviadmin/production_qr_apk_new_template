@@ -12,7 +12,7 @@
 
     <string name="change_password">CHANGE PASSWORD</string>
     <string name="change_password_menu">Change Password</string>
-    <string name="submit">OK</string>
+    <string name="submit">Submit</string>
     <string name="logout">Logout</string>
 
     <string name="menu_settings">Settings</string>

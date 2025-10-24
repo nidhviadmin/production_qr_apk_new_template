@@ -488,28 +488,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         if (isOnline()) {
+            Intent intent;
             switch (v.getId()) {
                 case R.id.imgd:
-                    PopupMenu popup = new PopupMenu(MainActivity.this, imageView);
-                    popup.getMenuInflater().inflate(R.menu.menu_main, popup.getMenu());
-
-                    popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                        public boolean onMenuItemClick(MenuItem item) {
-                            if (item.getItemId() == R.id.log) {
-                                session.logoutUser();
-                                finish();
-                            } else if (item.getItemId() == R.id.changepassword) {
-                                Intent intent = new Intent(MainActivity.this, ChangepasswordActivity.class);
-                                startActivity(intent);
-                                finish();
-                            }
-                            return true;
-                        }
-                    });
-                    popup.show();
+                    intent = new Intent(MainActivity.this, HomeActivity.class);
+                    intent.putExtra("openDrawer", true);
+                    intent.putExtra("username", username);
+                    intent.putExtra("userid", userid);
+                    intent.putExtra("processorid", processorid);
+                    startActivity(intent);
                     break;
+
                 case R.id.home:
-                    Intent intent = new Intent(MainActivity.this, Switch_User_Activity.class);
+                    intent = new Intent(MainActivity.this, Switch_User_Activity.class);
                     intent.putExtra("username", username);
                     intent.putExtra("processorid", processorid);
                     intent.putExtra("password", "1234");

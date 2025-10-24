@@ -55,7 +55,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         final String user = et1.getText().toString();
         final String pass = et2.getText().toString();
 
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
         {
             if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED &&

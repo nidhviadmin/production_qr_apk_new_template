@@ -101,29 +101,24 @@ public class Select_Employee_Detail_Activity extends AppCompatActivity implement
 
     public void onClick(View v) {
         if (isOnline()) {
+            HashMap<String, String> user = session.getUserDetails();
+            String username = user.get(SessionManagement.KEY_USER);
+            String userid = user.get(SessionManagement.KEY_USER_ID);
+
+            Intent intent;
+
             switch (v.getId()) {
                 case R.id.imgd:
-                    PopupMenu popup = new PopupMenu(Select_Employee_Detail_Activity.this, imageView);
-                    popup.getMenuInflater().inflate(R.menu.menu_main, popup.getMenu());
-
-                    popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                        public boolean onMenuItemClick(MenuItem item) {
-                            if (item.getItemId() == R.id.log) {
-                                session.logoutUser();
-                                finish();
-                            }
-                            else if (item.getItemId() == R.id.changepassword) {
-                                Intent intent = new Intent(Select_Employee_Detail_Activity.this, ChangepasswordActivity.class);
-                                startActivity(intent);
-                                finish();
-                            }
-                            return true;
-                        }
-                    });
-                    popup.show();
+                    intent = new Intent(Select_Employee_Detail_Activity.this, HomeActivity.class);
+                    intent.putExtra("openDrawer", true);
+                    intent.putExtra("username", username);
+                    intent.putExtra("userid", userid);
+                    intent.putExtra("processorid", processorid);
+                    startActivity(intent);
                     break;
+
                 case R.id.btn_indetails:
-                    Intent intent = new Intent(Select_Employee_Detail_Activity.this, In_Employee_Operation_Mapping_Activity.class);
+                    intent = new Intent(Select_Employee_Detail_Activity.this, In_Employee_Operation_Mapping_Activity.class);
                     intent.putExtra("selected_type", "In");
                     intent.putExtra("type", type);
                     intent.putExtra("myversionName", myversionName);
@@ -132,39 +127,36 @@ public class Select_Employee_Detail_Activity extends AppCompatActivity implement
                     startActivity(intent);
                     finish();
                     break;
-            case R.id.btn_outdetails:
-                intent = new Intent(Select_Employee_Detail_Activity.this, Out_Employee_Operation_Mapping_Activity.class);
-                intent.putExtra("selected_type", "Out");
-                intent.putExtra("type", type);
-                intent.putExtra("myversionName", myversionName);
-                intent.putExtra("userid", userid);
-                intent.putExtra("processorid", processorid);
-                startActivity(intent);
-                finish();
-                break;
-            case R.id.btn_absent_details:
-                intent = new Intent(Select_Employee_Detail_Activity.this, Absent_Employee_Operation_Mapping_Activity.class);
-                intent.putExtra("selected_type", "Absent");
-                intent.putExtra("type", type);
-                intent.putExtra("myversionName", myversionName);
-                intent.putExtra("userid", userid);
-                intent.putExtra("processorid", processorid);
-                startActivity(intent);
-                finish();
-                break;
 
+                case R.id.btn_outdetails:
+                    intent = new Intent(Select_Employee_Detail_Activity.this, Out_Employee_Operation_Mapping_Activity.class);
+                    intent.putExtra("selected_type", "Out");
+                    intent.putExtra("type", type);
+                    intent.putExtra("myversionName", myversionName);
+                    intent.putExtra("userid", userid);
+                    intent.putExtra("processorid", processorid);
+                    startActivity(intent);
+                    finish();
+                    break;
+
+                case R.id.btn_absent_details:
+                    intent = new Intent(Select_Employee_Detail_Activity.this, Absent_Employee_Operation_Mapping_Activity.class);
+                    intent.putExtra("selected_type", "Absent");
+                    intent.putExtra("type", type);
+                    intent.putExtra("myversionName", myversionName);
+                    intent.putExtra("userid", userid);
+                    intent.putExtra("processorid", processorid);
+                    startActivity(intent);
+                    finish();
+                    break;
             }
-
-        }
-        else {
+        } else {
             AlertDialog alertDialog = new AlertDialog.Builder(Select_Employee_Detail_Activity.this)
                     .setMessage("Please Check Your Internet Connection")
                     .setCancelable(false)
-                    .setNegativeButton("Exit", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface arg1, int arg0) {
-                            arg1.dismiss();
-                            finish();
-                        }
+                    .setNegativeButton("Exit", (arg1, arg0) -> {
+                        arg1.dismiss();
+                        finish();
                     }).show();
         }
     }

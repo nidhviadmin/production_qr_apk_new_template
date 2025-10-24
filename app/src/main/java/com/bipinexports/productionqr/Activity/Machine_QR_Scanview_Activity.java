@@ -289,22 +289,16 @@ public class Machine_QR_Scanview_Activity extends AppCompatActivity implements V
             switch (v.getId()) {
                 case R.id.imgd:
                     PopupMenu popup = new PopupMenu(Machine_QR_Scanview_Activity.this, imageView);
-                    popup.getMenuInflater().inflate(R.menu.menu_main, popup.getMenu());
+                    HashMap<String, String> user = session.getUserDetails();
+                    String username = user.get(SessionManagement.KEY_USER);
+                    String userid = user.get(SessionManagement.KEY_USER_ID);
 
-                    popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                        public boolean onMenuItemClick(MenuItem item) {
-                            if (item.getItemId() == R.id.log) {
-                                session.logoutUser();
-                                finish();
-                            }
-                            else if (item.getItemId() == R.id.changepassword) {
-                                Intent intent = new Intent(Machine_QR_Scanview_Activity.this, ChangepasswordActivity.class);
-                                startActivity(intent);
-                                finish();
-                            }
-                            return true;
-                        }
-                    });
+                    Intent intent = new Intent(Machine_QR_Scanview_Activity.this, HomeActivity.class);
+                    intent.putExtra("openDrawer", true);
+                    intent.putExtra("username", username);
+                    intent.putExtra("userid", userid);
+                    intent.putExtra("processorid", processorid);
+                    startActivity(intent);
                     popup.show();
                     break;
                 case R.id.FetchData:

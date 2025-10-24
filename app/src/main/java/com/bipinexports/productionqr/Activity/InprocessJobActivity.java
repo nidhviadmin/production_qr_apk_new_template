@@ -105,24 +105,16 @@ public class InprocessJobActivity extends AppCompatActivity implements View.OnCl
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.imgd:
-                PopupMenu popup = new PopupMenu(InprocessJobActivity.this, imageView);
-                popup.getMenuInflater().inflate(R.menu.menu_main, popup.getMenu());
+                HashMap<String, String> user = session.getUserDetails();
+                String username = user.get(SessionManagement.KEY_USER);
+                String userid = user.get(SessionManagement.KEY_USER_ID);
 
-                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    public boolean onMenuItemClick(MenuItem item) {
-                        if (item.getItemId() == R.id.log) {
-                            session.logoutUser();
-                            finish();
-                        }
-                        else if (item.getItemId() == R.id.changepassword) {
-                            Intent intent = new Intent(InprocessJobActivity.this, ChangepasswordActivity.class);
-                            startActivity(intent);
-                            finish();
-                        }
-                        return true;
-                    }
-                });
-                popup.show();
+                Intent intent = new Intent(InprocessJobActivity.this, HomeActivity.class);
+                intent.putExtra("openDrawer", true);
+                intent.putExtra("username", username);
+                intent.putExtra("userid", userid);
+                intent.putExtra("processorid", processorid);
+                startActivity(intent);
                 break;
         }
     }

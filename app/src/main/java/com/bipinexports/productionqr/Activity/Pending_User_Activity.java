@@ -141,17 +141,12 @@ public class Pending_User_Activity extends AppCompatActivity implements View.OnC
 
                 case R.id.imgd:
                     PopupMenu popup = new PopupMenu(Pending_User_Activity.this, imageView);
-                    popup.getMenuInflater().inflate(R.menu.menu_main, popup.getMenu());
+                    popup.getMenuInflater().inflate(R.menu.menu_chgpswd, popup.getMenu());
 
                     popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                         public boolean onMenuItemClick(MenuItem item) {
-                            if (item.getItemId() == R.id.log) {
+                            if (item.getItemId() == R.id.logout) {
                                 session.logoutUser();
-                                finish();
-                            } else if (item.getItemId() == R.id.changepassword) {
-                                Intent intent = new Intent(Pending_User_Activity.this, ChangepasswordActivity.class);
-                                startActivity(intent);
-                                finish();
                             }
                             return true;
                         }

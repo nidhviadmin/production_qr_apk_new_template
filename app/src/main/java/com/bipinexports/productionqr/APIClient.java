@@ -8,8 +8,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class APIClient {
     static Retrofit retrofit = null;
-    public static final String Base_URL = "https://qr.nidhvitec.com/qrcode/";
-    public static final String QR_URL = "https://qr.nidhvitec.com/qrcode/qrapkapi/";
+//    public static final String Base_URL = "https://qr.nidhvitec.com/qrcode/";
+//    public static final String QR_URL = "https://qr.nidhvitec.com/qrcode/qrapkapi/";
     public static final String JOB_SUMMARY_URL = "https://qr.nidhvitec.com/api/jobsummaryapkapi/";
     public static final String Accessory_Receipts_URL = "https://qr.nidhvitec.com/api/accessoryreceiptsapi/";
     public static final String A_L_APPEND_URL = "https://edm.bipinexports.co.in/lna/apkapi/machine_qr_api/";
@@ -23,7 +23,10 @@ public class APIClient {
     public static final String Employee_Budle_Mapp_URL = "https://qr.nidhvitec.com/api/employee_bundle_mapping_api/";
 
 //    public static final String Base_URL = "http://192.168.0.219/gci3qrscan/qrcode/";
+    public static final String BASE_URL = "http://192.168.0.164/gci3qrscan/qrcode/qrapkapi/";
+
 //    public static final String QR_URL = "http://192.168.0.219/gci3qrscan/qrcode/qrapkapi/";
+    public static final String QR_URL = "http://192.168.0.164/gci3qrscan/qrcode/qrapkapi/";
 //    public static final String JOB_SUMMARY_URL = "http://192.168.0.219/gci3qrscan/api/jobsummaryapkapi/";
 //    public static final String Accessory_Receipts_URL = "http://192.168.0.219/gci3qrscan/api/accessoryreceiptsapi/";
 //    public static final String A_L_APPEND_URL = "http://192.168.0.219/ci3assetsandlegals/apkapi/machine_qr_api/";

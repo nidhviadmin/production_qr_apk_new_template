@@ -108,13 +108,14 @@ public class In_Employee_Operation_Mapping_View_Adapter extends RecyclerView.Ada
         String imagePath = mDataset.get(position).getImgpath();
         String[] parts = imagePath.split("/");
         String directory = parts[0];
-        if(directory.equals("assets"))
-        {
-            Picasso.with(mContext).load(APIClient.HRMS_IMG_URL + "/" +mDataset.get(position).getImgpath()).into(holder.Emp_Imge);
-        }
-        else
-        {
-            Picasso.with(mContext).load(mDataset.get(position).getImgpath()).into(holder.Emp_Imge);
+        if ("assets".equals(directory)) {
+            Picasso.get()
+                    .load(APIClient.HRMS_IMG_URL + "/" + mDataset.get(position).getImgpath())
+                    .into(holder.Emp_Imge);
+        } else {
+            Picasso.get()
+                    .load(mDataset.get(position).getImgpath())
+                    .into(holder.Emp_Imge);
         }
 
 

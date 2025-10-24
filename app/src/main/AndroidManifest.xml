@@ -25,7 +25,7 @@
         android:label="Production QR"
         android:roundIcon="@mipmap/ic_appicon"
         android:supportsRtl="true"
-        android:theme="@style/App">
+        android:theme="@style/AppTheme2">
         <activity android:name="com.bipinexports.productionqr.Activity.SplashScreen"
             android:exported="true"
             tools:ignore="Instantiatable">
@@ -94,6 +94,10 @@
             android:windowSoftInputMode="stateHidden|adjustPan"/>
         <activity android:name="com.bipinexports.productionqr.Activity.Pending_User_Activity"/>
         <activity android:name="com.bipinexports.productionqr.Activity.Switch_User_Activity"/>
+        <activity
+            android:name="com.bipinexports.productionqr.Activity.HomeActivity"
+            android:label="Home"
+            android:theme="@style/AppTheme2"/>
 
         <provider
             android:name=".GenericFileProvider"

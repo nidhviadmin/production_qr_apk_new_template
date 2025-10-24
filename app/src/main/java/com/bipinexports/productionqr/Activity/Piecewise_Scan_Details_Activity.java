@@ -138,21 +138,16 @@ public class Piecewise_Scan_Details_Activity extends AppCompatActivity implement
             switch (v.getId()) {
                 case R.id.imgd:
                     PopupMenu popup = new PopupMenu(Piecewise_Scan_Details_Activity.this, imageView);
-                    popup.getMenuInflater().inflate(R.menu.menu_main, popup.getMenu());
-                    popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                        public boolean onMenuItemClick(MenuItem item) {
-                            if (item.getItemId() == R.id.log) {
-                                session.logoutUser();
-                                finish();
-                            }
-                            else if (item.getItemId() == R.id.changepassword) {
-                                Intent intent = new Intent(Piecewise_Scan_Details_Activity.this, ChangepasswordActivity.class);
-                                startActivity(intent);
-                                finish();
-                            }
-                            return true;
-                        }
-                    });
+                    HashMap<String, String> user = session.getUserDetails();
+                    String username = user.get(SessionManagement.KEY_USER);
+                    String userid = user.get(SessionManagement.KEY_USER_ID);
+
+                    Intent intent = new Intent(Piecewise_Scan_Details_Activity.this, HomeActivity.class);
+                    intent.putExtra("openDrawer", true);
+                    intent.putExtra("username", username);
+                    intent.putExtra("userid", userid);
+                    intent.putExtra("processorid", processorid);
+                    startActivity(intent);
                     popup.show();
                     break;
                 case R.id.AddReject:

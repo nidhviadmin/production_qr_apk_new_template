@@ -216,24 +216,12 @@ public class Sharptool_QR_Scanview_Activity extends AppCompatActivity implements
             dialog = new Dialog(Sharptool_QR_Scanview_Activity.this);
             switch (v.getId()) {
                 case R.id.imgd:
-                    PopupMenu popup = new PopupMenu(Sharptool_QR_Scanview_Activity.this, imageView);
-                    popup.getMenuInflater().inflate(R.menu.menu_main, popup.getMenu());
-
-                    popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                        public boolean onMenuItemClick(MenuItem item) {
-                            if (item.getItemId() == R.id.log) {
-                                session.logoutUser();
-                                finish();
-                            }
-                            else if (item.getItemId() == R.id.changepassword) {
-                                Intent intent = new Intent(Sharptool_QR_Scanview_Activity.this, ChangepasswordActivity.class);
-                                startActivity(intent);
-                                finish();
-                            }
-                            return true;
-                        }
-                    });
-                    popup.show();
+                    Intent intent = new Intent(Sharptool_QR_Scanview_Activity.this, HomeActivity.class);
+                    intent.putExtra("openDrawer", true); //
+                    intent.putExtra("username", username);
+                    intent.putExtra("userid", userid);
+                    intent.putExtra("processorid", processorid);
+                    startActivity(intent);
                     break;
 
                 case R.id.btnCancel:

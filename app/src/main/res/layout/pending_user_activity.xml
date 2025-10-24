@@ -4,78 +4,76 @@
     android:layout_height="match_parent"
     tools:context=".Activity.Pending_User_Activity">
 
+    <!-- Toolbar -->
     <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/white"
-        android:gravity="center_vertical">
+        android:background="@color/colorPrimary">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/txtUser"
-            android:textStyle="bold"
-            android:textColor="#AB47BC"
-            android:textSize="20dp"/>
-
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="right">
+            android:padding="8dp">
 
+            <!-- Menu icon on LEFT -->
             <ImageView
                 android:id="@+id/imgd"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:scaleX="0.45"
-                android:scaleY="0.45"
-                android:src="@drawable/ic_menu"/>
+                android:src="@drawable/ic_menu_icon"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"/>
 
-        </LinearLayout>
+            <!-- Username text next to menu -->
+            <TextView
+                android:id="@+id/txtUser"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Hello User"
+                android:textStyle="bold"
+                android:textColor="#0f0f0f"
+                android:textSize="20sp"
+                android:layout_toEndOf="@id/imgd"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="36dp"/>
 
+            <!-- Notification icon on RIGHT -->
+            <ImageView
+                android:id="@+id/img_noti"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:src="@drawable/ic_notification"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"/>
+        </RelativeLayout>
     </androidx.appcompat.widget.Toolbar>
 
+    <!-- SwipeRefreshLayout with pending text -->
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swiperefresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="110dp"
-        android:id="@+id/swiperefresh">
+        android:layout_below="@id/toolbar"
+        android:layout_marginTop="8dp">
 
-        <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_margin="10dp"
-        android:orientation="vertical"
-        android:padding="10dp">
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/coresans_cr_medium"
-            android:orientation="vertical">
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="10dp">
 
-            <LinearLayout
+            <TextView
+                android:id="@+id/pending_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="300dp"
-                android:padding="2dp">
-
-                <TextView
-                    android:id="@+id/pending_text"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:textColor="@color/colorPrimaryDark"
-                    android:text=""
-                    android:textStyle="bold"
-                    android:gravity="center_vertical|center_horizontal"
-                    android:layout_marginLeft="20dp"
-                    android:textSize="20dp" />
-            </LinearLayout>
-
+                android:text=""
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:layout_marginTop="300dp"/>
         </LinearLayout>
-
-    </LinearLayout>
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
