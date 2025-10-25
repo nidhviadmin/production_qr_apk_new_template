@@ -74,18 +74,7 @@ public class ChangepasswordActivity extends AppCompatActivity implements View.On
         {
             switch (v.getId()) {
                 case R.id.imgd:
-                    PopupMenu popup = new PopupMenu(ChangepasswordActivity.this, imageView);
-                    popup.getMenuInflater().inflate(R.menu.menu_chgpswd, popup.getMenu());
-                    popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                        public boolean onMenuItemClick(MenuItem item) {
-                            if (item.getItemId() == R.id.logout) {
-                                session.logoutUser();
-                                finish();
-                            }
-                            return true;
-                        }
-                    });
-                    popup.show();
+                    onBackPressed();
                     break;
                 case R.id.btnSubmitPassword:
                     session = new SessionManagement(getApplicationContext());

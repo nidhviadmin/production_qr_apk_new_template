@@ -33,7 +33,7 @@ import java.util.HashMap;
 
 import retrofit2.Call;
 
-public class Select_Employee_Detail_Activity extends AppCompatActivity implements View.OnClickListener, GetResult.MyListener {
+public class Select_Employee_Detail_Activity extends BaseActivity implements View.OnClickListener, GetResult.MyListener {
 
     String Id, User;
 
@@ -52,17 +52,24 @@ public class Select_Employee_Detail_Activity extends AppCompatActivity implement
     SwipeRefreshLayout swipeRefreshLayout;
     public static CustPrograssbar_new custPrograssbar_new;
 
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_select_employee_details);
+        setContentView(R.layout.activity_base);  // Changed to base layout
+        setupDrawer();  // Setup drawer before using it
 
-        imageView = (ImageView) findViewById(R.id.imgd);
-        gridView = (GridView) this.findViewById(R.id.grid);
-        progress = (ProgressBar) findViewById(R.id.progress);
+        // Inflate your actual content into the content_frame
+        View content = getLayoutInflater().inflate(R.layout.activity_select_employee_details,
+                findViewById(R.id.content_frame), true);
+
+        // Find views from the inflated content
+        imageView = content.findViewById(R.id.imgd);
+        gridView = content.findViewById(R.id.grid);
+        progress = content.findViewById(R.id.progress);
         progress.setVisibility(View.GONE);
 
         custPrograssbar_new = new CustPrograssbar_new();
-        txtUser = (TextView) findViewById(R.id.txtUser);
+        txtUser = content.findViewById(R.id.txtUser);
 
         session = new SessionManagement(getApplicationContext());
         HashMap<String, String> user = session.getUserDetails();
@@ -77,17 +84,18 @@ public class Select_Employee_Detail_Activity extends AppCompatActivity implement
         myversionName = getIntent().getStringExtra("myversionName");
         imageView.setOnClickListener(this);
 
-        btn_indetails =  findViewById(R.id.btn_indetails);
-        btn_outdetails =  findViewById(R.id.btn_outdetails);
-        btn_absent_details =  findViewById(R.id.btn_absent_details);
+        btn_indetails = content.findViewById(R.id.btn_indetails);
+        btn_outdetails = content.findViewById(R.id.btn_outdetails);
+        btn_absent_details = content.findViewById(R.id.btn_absent_details);
 
-        txt_Employee_In_Count = findViewById(R.id.txt_Employee_In_Count);
-        txt_Employee_Out_Count = findViewById(R.id.txt_Employee_Out_Count);
-        txt_Employee_Absent_Count = findViewById(R.id.txt_Employee_Absent_Count);
+        txt_Employee_In_Count = content.findViewById(R.id.txt_Employee_In_Count);
+        txt_Employee_Out_Count = content.findViewById(R.id.txt_Employee_Out_Count);
+        txt_Employee_Absent_Count = content.findViewById(R.id.txt_Employee_Absent_Count);
 
         getvalue();
         get_Emp_Details();
-        swipeRefreshLayout = findViewById(R.id.swiperefresh);
+
+        swipeRefreshLayout = content.findViewById(R.id.swiperefresh);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -96,7 +104,6 @@ public class Select_Employee_Detail_Activity extends AppCompatActivity implement
             }
         });
         swipeRefreshLayout.setColorSchemeColors(Color.BLACK);
-
     }
 
     public void onClick(View v) {
@@ -109,12 +116,7 @@ public class Select_Employee_Detail_Activity extends AppCompatActivity implement
 
             switch (v.getId()) {
                 case R.id.imgd:
-                    intent = new Intent(Select_Employee_Detail_Activity.this, HomeActivity.class);
-                    intent.putExtra("openDrawer", true);
-                    intent.putExtra("username", username);
-                    intent.putExtra("userid", userid);
-                    intent.putExtra("processorid", processorid);
-                    startActivity(intent);
+                    toggleDrawer();
                     break;
 
                 case R.id.btn_indetails:

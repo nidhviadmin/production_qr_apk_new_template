@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 
-public class PendingJobActivity extends AppCompatActivity implements View.OnClickListener {
+public class PendingJobActivity extends BaseActivity implements View.OnClickListener {
 
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
@@ -41,12 +41,19 @@ public class PendingJobActivity extends AppCompatActivity implements View.OnClic
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_pendingjob);
+        setContentView(R.layout.activity_base);
+        setupDrawer();
+
+        View content = getLayoutInflater().inflate(
+                R.layout.activity_pendingjob,
+                findViewById(R.id.content_frame),
+                true
+        );
 
         weekwisedataobj = getIntent().getStringExtra("weekwisedataobj");
 
-        txtUser = findViewById(R.id.txtUser);
-        imageView = findViewById(R.id.imgd);
+        txtUser = content.findViewById(R.id.txtUser);
+        imageView = content.findViewById(R.id.imgd);
 
         session = new SessionManagement(getApplicationContext());
         HashMap<String, String> user = session.getUserDetails();
@@ -56,7 +63,7 @@ public class PendingJobActivity extends AppCompatActivity implements View.OnClic
         imageView.setOnClickListener(this);
         processorid = getIntent().getStringExtra("processorid");
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
+        mRecyclerView = (RecyclerView) content.findViewById(R.id.my_recycler_view);
         mRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -115,16 +122,7 @@ public class PendingJobActivity extends AppCompatActivity implements View.OnClic
         switch (v.getId()) {
             case R.id.imgd:
                 PopupMenu popup = new PopupMenu(PendingJobActivity.this, imageView);
-                HashMap<String, String> user = session.getUserDetails();
-                String username = user.get(SessionManagement.KEY_USER);
-                String userid = user.get(SessionManagement.KEY_USER_ID);
-
-                Intent intent = new Intent(PendingJobActivity.this, HomeActivity.class);
-                intent.putExtra("openDrawer", true);
-                intent.putExtra("username", username);
-                intent.putExtra("userid", userid);
-                intent.putExtra("processorid", processorid);
-                startActivity(intent);
+                toggleDrawer();
                 popup.show();
                 break;
         }

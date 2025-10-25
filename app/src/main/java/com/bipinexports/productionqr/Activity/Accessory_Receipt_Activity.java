@@ -32,8 +32,9 @@ import java.util.Iterator;
 import retrofit2.Call;
 
 
-public class Accessory_Receipt_Activity extends AppCompatActivity implements View.OnClickListener, GetResult.MyListener {
+public class Accessory_Receipt_Activity extends BaseActivity implements View.OnClickListener, GetResult.MyListener {
 
+    private View content;
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -64,20 +65,20 @@ public class Accessory_Receipt_Activity extends AppCompatActivity implements Vie
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_fabric_receipt);
+        setContentView(R.layout.activity_base);
+        setupDrawer();
 
-        txtUser = findViewById(R.id.txtUser);
-        imageView = findViewById(R.id.imgd);
-        progress = (ProgressBar) findViewById(R.id.progress);
-//        progress.setVisibility(View.VISIBLE);
+        content = getLayoutInflater().inflate(
+                R.layout.activity_fabric_receipt,
+                findViewById(R.id.content_frame),
+                true);
 
+        txtUser = (TextView) content.findViewById(R.id.txtUser);
+        imageView = (ImageView) content.findViewById(R.id.imgd);
+        progress = (ProgressBar) content.findViewById(R.id.progress);
         custPrograssbar = new CustPrograssbar();
 
-        txtUser = (TextView) findViewById(R.id.txtUser);
-
-        session = new SessionManagement(getApplicationContext());
         HashMap<String, String> user = session.getUserDetails();
-        String name = user.get(SessionManagement.KEY_USER);
         this.Id = user.get(SessionManagement.KEY_PROCESSOR_ID);
         processorid = user.get(SessionManagement.KEY_PROCESSOR_ID);
         userid = user.get(SessionManagement.KEY_USER_ID);
@@ -93,7 +94,6 @@ public class Accessory_Receipt_Activity extends AppCompatActivity implements Vie
         getvalue();
         fetch_accessory_receipt_Details();
     }
-
 
     private ArrayList<Accessory_Receipt_Data_Object> getDataSet() {
 //        ArrayList results = new ArrayList<Accessory_Receipt_Data_Object>();
@@ -140,7 +140,7 @@ public class Accessory_Receipt_Activity extends AppCompatActivity implements Vie
 
         JSONObject jsonObject = new JSONObject();
         try {
-            
+
             jsonObject.put("userid", userid);
             jsonObject.put("contractorid", processorid);
             jsonObject.put("limit", endindex);
@@ -151,7 +151,7 @@ public class Accessory_Receipt_Activity extends AppCompatActivity implements Vie
             GetResult getResult = new GetResult();
             getResult.setMyListener(this);
             getResult.callForLogin(call, "pendingdeliveries");
-        } 
+        }
         catch (JSONException e) {
             e.printStackTrace();
         }
@@ -166,7 +166,7 @@ public class Accessory_Receipt_Activity extends AppCompatActivity implements Vie
 
         JSONObject jsonObject = new JSONObject();
         try {
-            
+
             jsonObject.put("userid", userid);
             jsonObject.put("contractorid", processorid);
             jsonObject.put("limit", endindex);
@@ -177,7 +177,7 @@ public class Accessory_Receipt_Activity extends AppCompatActivity implements Vie
             GetResult getResult = new GetResult();
             getResult.setMyListener(this);
             getResult.callForLogin(call, "pending_deliveries");
-        } 
+        }
         catch (JSONException e) {
             e.printStackTrace();
         }
@@ -193,12 +193,7 @@ public class Accessory_Receipt_Activity extends AppCompatActivity implements Vie
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.imgd:
-                Intent intent = new Intent(Accessory_Receipt_Activity.this, HomeActivity.class);
-                intent.putExtra("openDrawer", true); //
-                intent.putExtra("username", User);
-                intent.putExtra("userid", userid);
-                intent.putExtra("processorid", processorid);
-                startActivity(intent);
+                toggleDrawer();
                 break;
         }
     }
@@ -230,7 +225,8 @@ public class Accessory_Receipt_Activity extends AppCompatActivity implements Vie
 
                     accessory_data_obj = jsonObject.getJSONObject("data").toString();
 
-                    mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
+                    mRecyclerView = (RecyclerView) content.findViewById(R.id.my_recycler_view);
+
                     mRecyclerView.setHasFixedSize(true);
                     mLayoutManager = new LinearLayoutManager(Accessory_Receipt_Activity.this);
                     mRecyclerView.setLayoutManager(mLayoutManager);
@@ -311,24 +307,24 @@ public class Accessory_Receipt_Activity extends AppCompatActivity implements Vie
                     }
 
                     new AlertDialog.Builder(Accessory_Receipt_Activity.this)
-                        .setMessage(message)
-                        .setCancelable(false)
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface arg1, int arg0) {
-                                arg1.dismiss();
-                            }
-                        }).show();
+                            .setMessage(message)
+                            .setCancelable(false)
+                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface arg1, int arg0) {
+                                    arg1.dismiss();
+                                }
+                            }).show();
                 }
-                else 
+                else
                 {
                     new AlertDialog.Builder(Accessory_Receipt_Activity.this)
-                        .setMessage(message)
-                        .setCancelable(false)
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface arg1, int arg0) {
-                                arg1.dismiss();
-                            }
-                        }).show();
+                            .setMessage(message)
+                            .setCancelable(false)
+                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface arg1, int arg0) {
+                                    arg1.dismiss();
+                                }
+                            }).show();
                 }
             }
             else if (callNo.equalsIgnoreCase("pending_deliveries")) {
@@ -372,24 +368,24 @@ public class Accessory_Receipt_Activity extends AppCompatActivity implements Vie
                         // Do nothing
                     }
                     new AlertDialog.Builder(Accessory_Receipt_Activity.this)
-                        .setMessage(message)
-                        .setCancelable(false)
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface arg1, int arg0) {
-                                arg1.dismiss();
-                            }
-                        }).show();
+                            .setMessage(message)
+                            .setCancelable(false)
+                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface arg1, int arg0) {
+                                    arg1.dismiss();
+                                }
+                            }).show();
                 }
-                else 
+                else
                 {
                     new AlertDialog.Builder(Accessory_Receipt_Activity.this)
-                        .setMessage(message)
-                        .setCancelable(false)
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface arg1, int arg0) {
-                                arg1.dismiss();
-                            }
-                        }).show();
+                            .setMessage(message)
+                            .setCancelable(false)
+                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface arg1, int arg0) {
+                                    arg1.dismiss();
+                                }
+                            }).show();
                 }
             }
         }

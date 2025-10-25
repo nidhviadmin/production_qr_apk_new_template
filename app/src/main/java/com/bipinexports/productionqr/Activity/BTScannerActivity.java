@@ -53,8 +53,9 @@ import java.util.Locale;
 
 import retrofit2.Call;
 
-public class BTScannerActivity extends AppCompatActivity implements View.OnClickListener, GetResult.MyListener {
+public class BTScannerActivity extends BaseActivity implements View.OnClickListener, GetResult.MyListener {
 
+    private View content;
     EditText txtScanData;
     ImageView imageView;
     TextView txtUser;
@@ -80,11 +81,18 @@ public class BTScannerActivity extends AppCompatActivity implements View.OnClick
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_bt_scanner);
+        setContentView(R.layout.activity_base);
+        setupDrawer();
 
-        imageView = findViewById(R.id.imgd);
-        imageView.setOnClickListener(this);
-        txtUser = findViewById(R.id.txtUser);
+        content = getLayoutInflater().inflate(
+                R.layout.activity_bt_scanner,
+                findViewById(R.id.content_frame),
+                true
+        );
+
+        txtUser = content.findViewById(R.id.txtUser);
+        txtScanData = content.findViewById(R.id.txtScanData);
+        txtScanData.requestFocus();
 
         session = new SessionManagement(getApplicationContext());
         HashMap<String, String> user = session.getUserDetails();
@@ -97,33 +105,25 @@ public class BTScannerActivity extends AppCompatActivity implements View.OnClick
         username = getIntent().getStringExtra("name");
 
         versioncode();
-
         hideKeyboard();
-        txtScanData = (EditText) findViewById(R.id.txtScanData);
-        txtScanData.requestFocus();
 
-        txtScanData.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if ((event.getAction() == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_ENTER)
-                            || keyCode == KeyEvent.KEYCODE_TAB)
-                {
-                    hideKeyboard();
-                    String scan_data = txtScanData.getText().toString();
-                    if(scan_data!= null && scan_data!="" && scan_data.length() > 0 && scan_data!="null" && scan_data!="NULL")
-                    {
-                        handleScanData(txtScanData.getText().toString());
-                        txtScanData.setText("");
-                        return true;
-                    }
-                    else
-                    {
-                        txtScanData.setText("");
-                        return false;
-                    }
+        content.findViewById(R.id.imgd).setOnClickListener(this);
+
+        txtScanData.setOnKeyListener((v, keyCode, event) -> {
+            if ((event.getAction() == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_ENTER)
+                    || keyCode == KeyEvent.KEYCODE_TAB) {
+                hideKeyboard();
+                String scan_data = txtScanData.getText().toString();
+                if(scan_data != null && !scan_data.isEmpty() && !scan_data.equalsIgnoreCase("null")) {
+                    handleScanData(scan_data);
+                    txtScanData.setText("");
+                    return true;
+                } else {
+                    txtScanData.setText("");
+                    return false;
                 }
-                return false;
             }
+            return false;
         });
     }
 
@@ -259,31 +259,8 @@ public class BTScannerActivity extends AppCompatActivity implements View.OnClick
 
     @Override
     public void onClick(View v) {
-        if (isOnline())
-        {
-            switch (v.getId()) {
-                case R.id.imgd:
-                    PopupMenu popup = new PopupMenu(BTScannerActivity.this, imageView);
-                    popup.getMenuInflater().inflate(R.menu.menu_chgpswd, popup.getMenu());
-                    popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                        public boolean onMenuItemClick(MenuItem item) {
-                            if (item.getItemId() == R.id.logout) {
-                                session.logoutUser();
-                                finish();
-                            }
-                            return true;
-                        }
-                    });
-                    popup.show();
-                    break;
-                default:
-                    break;
-            }
-        }
-        else {
-            Snackbar snackbar = Snackbar
-                    .make(v, "No internet connection!", Snackbar.LENGTH_LONG);
-            snackbar.show();
+        if (v.getId() == R.id.imgd) {
+            toggleDrawer();
         }
     }
 
@@ -291,8 +268,6 @@ public class BTScannerActivity extends AppCompatActivity implements View.OnClick
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
     }
-
-
 
     private void downloadFile(String sUrl) {
 
@@ -344,7 +319,6 @@ public class BTScannerActivity extends AppCompatActivity implements View.OnClick
         };
         registerReceiver(receiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
     }
-
 
     public void installApkFromStorage(Context context, String apkFileName) {
         // Define the authority for your File Provider

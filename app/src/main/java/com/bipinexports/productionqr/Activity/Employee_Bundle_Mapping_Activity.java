@@ -33,7 +33,7 @@ import java.util.HashMap;
 
 import retrofit2.Call;
 
-public class Employee_Bundle_Mapping_Activity extends AppCompatActivity implements View.OnClickListener, GetResult.MyListener {
+public class Employee_Bundle_Mapping_Activity extends BaseActivity implements View.OnClickListener, GetResult.MyListener {
 
     SessionManagement session;
     ProgressBar progress;
@@ -50,13 +50,21 @@ public class Employee_Bundle_Mapping_Activity extends AppCompatActivity implemen
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.empty_activity);
-        progress = (ProgressBar) findViewById(R.id.progress);
+//        setContentView(R.layout.empty_activity);
+        setContentView(R.layout.activity_base);
+        setupDrawer();
+
+        View content = getLayoutInflater().inflate(
+                R.layout.empty_activity,
+                findViewById(R.id.content_frame),
+                true
+        );
+        progress = (ProgressBar) content.findViewById(R.id.progress);
         progress.setVisibility(View.GONE);
         custPrograssbar = new CustPrograssbar();
 
-        txtUser = findViewById(R.id.txtUser);
-        imageView = findViewById(R.id.imgd);
+        txtUser = content.findViewById(R.id.txtUser);
+        imageView = content.findViewById(R.id.imgd);
 
         session = new SessionManagement(getApplicationContext());
         HashMap<String, String> user = session.getUserDetails();
@@ -286,16 +294,7 @@ public class Employee_Bundle_Mapping_Activity extends AppCompatActivity implemen
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.imgd:
-                HashMap<String, String> user = session.getUserDetails();
-                String username = user.get(SessionManagement.KEY_USER);
-                String userid = user.get(SessionManagement.KEY_USER_ID);
-
-                Intent intent = new Intent(Employee_Bundle_Mapping_Activity.this, HomeActivity.class);
-                intent.putExtra("openDrawer", true);
-                intent.putExtra("username", username);
-                intent.putExtra("userid", userid);
-                intent.putExtra("processorid", processorid);
-                startActivity(intent);
+                toggleDrawer();
                 break;
         }
     }

@@ -33,22 +33,22 @@ import java.util.Iterator;
 import retrofit2.Call;
 
 
-public class DailyProductionOutputActivity extends AppCompatActivity implements View.OnClickListener, GetResult.MyListener {
+public class DailyProductionOutputActivity extends BaseActivity implements View.OnClickListener, GetResult.MyListener {
 
+    private View content;
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
-    private static String LOG_TAG = "CardViewActivity";
 
     SessionManagement session;
-    TextView txtUser;
+    TextView txtUser, txtDate;
     ImageView imageView;
     String dailydataobj;
     JSONObject dailyoutputjsonobj;
     String processorid, selecteddate;
     String userid, User, Id;
     ProgressBar progress;
-    TextView txtDate;
+
 
     private boolean loading = true;
     int totalItemCount;
@@ -63,25 +63,28 @@ public class DailyProductionOutputActivity extends AppCompatActivity implements 
     ArrayList results = new ArrayList<DailyOutputDataObject>();
     int i = 0;
 
-
     String fromdate, todate, fromday, frommonth, fromyear, today, tomonth, toyear;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_dailyproductionoutput);
+        setContentView(R.layout.activity_base);
+        setupDrawer();
 
+        content = getLayoutInflater().inflate(
+                R.layout.activity_dailyproductionoutput,
+                findViewById(R.id.content_frame),
+                true
+        );
 
-        txtUser = findViewById(R.id.txtUser);
-        imageView = findViewById(R.id.imgd);
-        progress = (ProgressBar) findViewById(R.id.progress);
+        txtUser = content.findViewById(R.id.txtUser);
+        txtDate = content.findViewById(R.id.txtDate);
+        imageView = content.findViewById(R.id.imgd);
+        progress = content.findViewById(R.id.progress);
         progress.setVisibility(View.VISIBLE);
-
-        txtUser = (TextView) findViewById(R.id.txtUser);
 
         session = new SessionManagement(getApplicationContext());
         HashMap<String, String> user = session.getUserDetails();
-        String name = user.get(SessionManagement.KEY_USER);
         this.Id = user.get(SessionManagement.KEY_PROCESSOR_ID);
         processorid = user.get(SessionManagement.KEY_PROCESSOR_ID);
         userid = user.get(SessionManagement.KEY_USER_ID);
@@ -100,15 +103,11 @@ public class DailyProductionOutputActivity extends AppCompatActivity implements 
         tomonth = getIntent().getStringExtra("tomonth");
         toyear = getIntent().getStringExtra("toyear");
 
-        txtDate = (TextView) findViewById(R.id.txtDate);
-        txtDate.setText("OutputDate  - " +selecteddate);
-
+        txtDate.setText("OutputDate  - " + selecteddate);
         imageView.setOnClickListener(this);
-
 
         getvalue();
         fetchDailyoutputDetails();
-
     }
 
     private ArrayList<DailyOutputDataObject> getDataSet() {
@@ -148,20 +147,10 @@ public class DailyProductionOutputActivity extends AppCompatActivity implements 
     }
 
 
+    @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.imgd:
-                HashMap<String, String> user = session.getUserDetails();
-                String username = user.get(SessionManagement.KEY_USER);
-                String userid = user.get(SessionManagement.KEY_USER_ID);
-
-                Intent intent = new Intent(DailyProductionOutputActivity.this, HomeActivity.class);
-                intent.putExtra("openDrawer", true);
-                intent.putExtra("username", username);
-                intent.putExtra("userid", userid);
-                intent.putExtra("processorid", processorid);
-                startActivity(intent);
-                break;
+        if (v.getId() == R.id.imgd) {
+            toggleDrawer();
         }
     }
 
@@ -228,6 +217,7 @@ public class DailyProductionOutputActivity extends AppCompatActivity implements 
         modelClass.setmID(userid);
         progress.setVisibility(View.INVISIBLE);
     }
+
     @Override
     public void onBackPressed() {
         session = new SessionManagement(getApplicationContext());

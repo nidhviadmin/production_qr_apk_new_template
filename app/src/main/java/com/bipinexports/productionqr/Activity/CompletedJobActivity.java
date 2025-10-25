@@ -23,12 +23,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 
-public class CompletedJobActivity extends AppCompatActivity implements View.OnClickListener {
+public class CompletedJobActivity extends BaseActivity implements View.OnClickListener {
 
+    private View content;
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
-    private static String LOG_TAG = "CardViewActivity";
 
     SessionManagement session;
     TextView txtUser;
@@ -40,12 +40,18 @@ public class CompletedJobActivity extends AppCompatActivity implements View.OnCl
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_completedjob);
+        setContentView(R.layout.activity_base);
+        setupDrawer();
+
+        content = getLayoutInflater().inflate(
+                R.layout.activity_completedjob,
+                findViewById(R.id.content_frame),
+                true);
 
         weekwisedataobj = getIntent().getStringExtra("weekwisedataobj");
 
-        txtUser = findViewById(R.id.txtUser);
-        imageView = findViewById(R.id.imgd);
+        txtUser = content.findViewById(R.id.txtUser);
+        imageView = content.findViewById(R.id.imgd);
 
         session = new SessionManagement(getApplicationContext());
         HashMap<String, String> user = session.getUserDetails();
@@ -55,14 +61,13 @@ public class CompletedJobActivity extends AppCompatActivity implements View.OnCl
         imageView.setOnClickListener(this);
         processorid = getIntent().getStringExtra("processorid");
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
+        mRecyclerView = content.findViewById(R.id.my_recycler_view);
         mRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mAdapter = new CompletedViewAdapter(getDataSet());
-        mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.setAdapter(mAdapter);}
 
-    }
     @Override
     protected void onResume() {
         super.onResume();
@@ -102,20 +107,10 @@ public class CompletedJobActivity extends AppCompatActivity implements View.OnCl
         return results;
     }
 
+    @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.imgd:
-                HashMap<String, String> user = session.getUserDetails();
-                String username = user.get(SessionManagement.KEY_USER);
-                String userid = user.get(SessionManagement.KEY_USER_ID);
-
-                Intent intent = new Intent(CompletedJobActivity.this, HomeActivity.class);
-                intent.putExtra("openDrawer", true);
-                intent.putExtra("username", username);
-                intent.putExtra("userid", userid);
-                intent.putExtra("processorid", processorid);
-                startActivity(intent);
-                break;
+        if (v.getId() == R.id.imgd) {
+            toggleDrawer();
         }
     }
 

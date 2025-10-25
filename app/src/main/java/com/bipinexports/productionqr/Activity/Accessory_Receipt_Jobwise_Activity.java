@@ -4,14 +4,10 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -23,23 +19,20 @@ import com.bipinexports.productionqr.R;
 import com.bipinexports.productionqr.SessionManagement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-
 import retrofit2.Call;
 
+public class Accessory_Receipt_Jobwise_Activity extends BaseActivity implements View.OnClickListener, GetResult.MyListener {
 
-public class Accessory_Receipt_Jobwise_Activity extends AppCompatActivity implements View.OnClickListener, GetResult.MyListener {
-
+    private View content;
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
-    private static String LOG_TAG = "CardViewActivity";
 
     SessionManagement session;
     TextView txtUser;
@@ -55,9 +48,8 @@ public class Accessory_Receipt_Jobwise_Activity extends AppCompatActivity implem
     int endindex = 10;
     String pendingcount;
 
-    String  vendorname, vendorid, quantity, vendor_del_count;
+    String vendorname, vendorid, quantity, vendor_del_count;
     TextView text_Vendor_Name, text_qty, text_del_count;
-
 
     public static CustPrograssbar_new custPrograssbar_new;
 
@@ -67,19 +59,22 @@ public class Accessory_Receipt_Jobwise_Activity extends AppCompatActivity implem
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_accessory_receipt_jobwise);
+        setContentView(R.layout.activity_base);
+        setupDrawer();
 
-        txtUser = findViewById(R.id.txtUser);
-        imageView = findViewById(R.id.imgd);
-        progress = (ProgressBar) findViewById(R.id.progress);
+        content = getLayoutInflater().inflate(
+                R.layout.activity_accessory_receipt_jobwise,
+                findViewById(R.id.content_frame),
+                true);
+
+        txtUser = content.findViewById(R.id.txtUser);
+        imageView = content.findViewById(R.id.imgd);
+        progress = content.findViewById(R.id.progress);
 
         custPrograssbar_new = new CustPrograssbar_new();
 
-        txtUser = (TextView) findViewById(R.id.txtUser);
-
         session = new SessionManagement(getApplicationContext());
         HashMap<String, String> user = session.getUserDetails();
-        String name = user.get(SessionManagement.KEY_USER);
         this.Id = user.get(SessionManagement.KEY_PROCESSOR_ID);
         processorid = user.get(SessionManagement.KEY_PROCESSOR_ID);
         userid = user.get(SessionManagement.KEY_USER_ID);
@@ -96,30 +91,25 @@ public class Accessory_Receipt_Jobwise_Activity extends AppCompatActivity implem
         vendor_del_count = getIntent().getStringExtra("del_count");
         totalItemCount = Integer.parseInt(pendingcount);
 
-        text_Vendor_Name = findViewById(R.id.text_Vendor_Name);
-        text_qty = findViewById(R.id.text_qty);
-        text_del_count = findViewById(R.id.text_del_count);
+        text_Vendor_Name = content.findViewById(R.id.text_Vendor_Name);
+        text_qty = content.findViewById(R.id.text_qty);
+        text_del_count = content.findViewById(R.id.text_del_count);
 
         text_Vendor_Name.setText(vendorname);
         text_qty.setText(quantity);
         text_del_count.setText(vendor_del_count);
 
-        if(Integer.parseInt(vendor_del_count) == 0)
-        {
-            int dd = Integer.parseInt(vendor_del_count)-1;
+        if (Integer.parseInt(vendor_del_count) == 0) {
+            int dd = Integer.parseInt(vendor_del_count) - 1;
             vendor_del_count = String.valueOf(dd);
             onBackPressed();
-        }
-        else {
-
+        } else {
             getvalue();
             fetch_accessory_vendorwise_job_Details();
         }
     }
 
-
     private ArrayList<Accessory_Receipt_Jobwise_Data_Object> getDataSet() {
-//        ArrayList results = new ArrayList<Accessory_Receipt_Jobwise_Data_Object>();
         try {
             JSONObject jsonObj = new JSONObject(accessory_data_obj);
             acessory_joborder_jsonobj = jsonObj.getJSONObject("joborders");
@@ -139,7 +129,6 @@ public class Accessory_Receipt_Jobwise_Activity extends AppCompatActivity implem
                     i++;
                 }
             }
-
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -148,7 +137,7 @@ public class Accessory_Receipt_Jobwise_Activity extends AppCompatActivity implem
 
     private void fetch_accessory_vendorwise_job_Details() {
 
-        Accessory_Receipt_Jobwise_Activity.custPrograssbar_new.prograssCreate(this);
+        custPrograssbar_new.prograssCreate(this);
 
         session = new SessionManagement(getApplicationContext());
         HashMap<String, String> user = session.getUserDetails();
@@ -157,7 +146,6 @@ public class Accessory_Receipt_Jobwise_Activity extends AppCompatActivity implem
 
         JSONObject jsonObject = new JSONObject();
         try {
-
             jsonObject.put("userid", userid);
             jsonObject.put("contractorid", processorid);
             jsonObject.put("vendorid", vendorid);
@@ -169,8 +157,7 @@ public class Accessory_Receipt_Jobwise_Activity extends AppCompatActivity implem
             GetResult getResult = new GetResult();
             getResult.setMyListener(this);
             getResult.callForLogin(call, "pendingdeliveries");
-        }
-        catch (JSONException e) {
+        } catch (JSONException e) {
             e.printStackTrace();
         }
     }
@@ -182,15 +169,11 @@ public class Accessory_Receipt_Jobwise_Activity extends AppCompatActivity implem
         progress.setVisibility(View.INVISIBLE);
     }
 
+    @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.imgd:
-                Intent intent = new Intent(Accessory_Receipt_Jobwise_Activity.this, HomeActivity.class);
-                intent.putExtra("openDrawer", true); //
-                intent.putExtra("username", User);
-                intent.putExtra("userid", userid);
-                intent.putExtra("processorid", processorid);
-                startActivity(intent);
+                toggleDrawer();
                 break;
         }
     }
@@ -213,81 +196,61 @@ public class Accessory_Receipt_Jobwise_Activity extends AppCompatActivity implem
     public void callback(JsonObject result, String callNo) {
         try {
             progress.setVisibility(View.GONE);
-            Accessory_Receipt_Jobwise_Activity.custPrograssbar_new.closePrograssBar();
+            custPrograssbar_new.closePrograssBar();
             if (callNo.equalsIgnoreCase("pendingdeliveries")) {
                 JSONObject jsonObject = new JSONObject(result.toString());
                 String mStatus = jsonObject.optString("status");
                 String message = jsonObject.optString("message");
 
-                Accessory_Receipt_Jobwise_Activity.custPrograssbar_new.closePrograssBar();
                 if (mStatus.equals("success")) {
-
                     accessory_data_obj = jsonObject.getJSONObject("data").toString();
 
-                    mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
+                    mRecyclerView = content.findViewById(R.id.my_recycler_view);
                     mRecyclerView.setHasFixedSize(true);
-                    mLayoutManager = new LinearLayoutManager(Accessory_Receipt_Jobwise_Activity.this);
+                    mLayoutManager = new LinearLayoutManager(this);
                     mRecyclerView.setLayoutManager(mLayoutManager);
                     mAdapter = new Accessory_Receipt_Jobwise_View_Adapter(getDataSet());
                     mRecyclerView.setAdapter(mAdapter);
 
-                    ((Accessory_Receipt_Jobwise_View_Adapter) mAdapter).setOnItemClickListener(new Accessory_Receipt_Jobwise_View_Adapter.MyClickListener() {
-                        @Override
-                        public void onItemClick(int position, View v) {
-                            int orderid =((Accessory_Receipt_Jobwise_View_Adapter) mAdapter).getOrderid(position);
+                    ((Accessory_Receipt_Jobwise_View_Adapter) mAdapter).setOnItemClickListener((position, v) -> {
+                        int orderid = ((Accessory_Receipt_Jobwise_View_Adapter) mAdapter).getOrderid(position);
+                        String quantity = ((Accessory_Receipt_Jobwise_View_Adapter) mAdapter).getQuantity(String.valueOf(position));
+                        String joborderno = ((Accessory_Receipt_Jobwise_View_Adapter) mAdapter).getJoborderno(String.valueOf(position));
+                        String stylename = ((Accessory_Receipt_Jobwise_View_Adapter) mAdapter).getStylename(String.valueOf(position));
+                        String del_count = ((Accessory_Receipt_Jobwise_View_Adapter) mAdapter).getCount(String.valueOf(position));
 
-                            String quantity =((Accessory_Receipt_Jobwise_View_Adapter) mAdapter).getQuantity(new String(String.valueOf(position)));
-                            String joborderno =((Accessory_Receipt_Jobwise_View_Adapter) mAdapter).getJoborderno(new String(String.valueOf(position)));
-                            String stylename =((Accessory_Receipt_Jobwise_View_Adapter) mAdapter).getStylename(new String(String.valueOf(position)));
-                            String del_count =((Accessory_Receipt_Jobwise_View_Adapter) mAdapter).getCount(new String(String.valueOf(position)));
-
-                            Intent intent = new Intent(Accessory_Receipt_Jobwise_Activity.this, Accessory_Receipt_Delivery_Activity.class);
-                            intent.putExtra("vendors", vendors);
-                            intent.putExtra("pendingcount", pendingcount);
-                            intent.putExtra("processorid", processorid);
-                            intent.putExtra("vendorname", vendorname);
-                            intent.putExtra("vendor_del_count", vendor_del_count);
-                            intent.putExtra("joborderno", joborderno);
-                            intent.putExtra("stylename", stylename);
-                            intent.putExtra("vendorid", vendorid);
-                            intent.putExtra("orderid", String.valueOf(orderid));
-                            intent.putExtra("quantity", quantity);
-                            intent.putExtra("del_count", del_count);
-                            startActivity(intent);
-                            finish();
-                        }
+                        Intent intent = new Intent(Accessory_Receipt_Jobwise_Activity.this, Accessory_Receipt_Delivery_Activity.class);
+                        intent.putExtra("vendors", vendors);
+                        intent.putExtra("pendingcount", pendingcount);
+                        intent.putExtra("processorid", processorid);
+                        intent.putExtra("vendorname", vendorname);
+                        intent.putExtra("vendor_del_count", vendor_del_count);
+                        intent.putExtra("joborderno", joborderno);
+                        intent.putExtra("stylename", stylename);
+                        intent.putExtra("vendorid", vendorid);
+                        intent.putExtra("orderid", String.valueOf(orderid));
+                        intent.putExtra("quantity", quantity);
+                        intent.putExtra("del_count", del_count);
+                        startActivity(intent);
+                        finish();
                     });
-                }
-                else if (mStatus.equals("nodatafound")) {
-                    if(mAdapter == null)
-                    {
-                        // Do nothing
-                    }
 
-                    new AlertDialog.Builder(Accessory_Receipt_Jobwise_Activity.this)
-                        .setMessage(message)
-                        .setCancelable(false)
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface arg1, int arg0) {
-                                arg1.dismiss();
-                            }
-                        }).show();
-                }
-                else
-                {
-                    new AlertDialog.Builder(Accessory_Receipt_Jobwise_Activity.this)
-                        .setMessage(message)
-                        .setCancelable(false)
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface arg1, int arg0) {
-                                arg1.dismiss();
-                            }
-                        }).show();
+                } else if (mStatus.equals("nodatafound")) {
+                    new AlertDialog.Builder(this)
+                            .setMessage(message)
+                            .setCancelable(false)
+                            .setPositiveButton("OK", (arg1, arg0) -> arg1.dismiss())
+                            .show();
+                } else {
+                    new AlertDialog.Builder(this)
+                            .setMessage(message)
+                            .setCancelable(false)
+                            .setPositiveButton("OK", (arg1, arg0) -> arg1.dismiss())
+                            .show();
                 }
             }
-
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

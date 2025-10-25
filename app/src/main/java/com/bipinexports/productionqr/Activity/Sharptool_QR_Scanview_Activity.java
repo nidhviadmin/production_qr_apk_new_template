@@ -61,7 +61,7 @@ import retrofit2.Call;
 
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
-public class Sharptool_QR_Scanview_Activity extends AppCompatActivity implements View.OnClickListener, GetResult.MyListener {
+public class Sharptool_QR_Scanview_Activity extends BaseActivity implements View.OnClickListener, GetResult.MyListener {
 
     String Id, User;
     SessionManagement session;
@@ -109,7 +109,12 @@ public class Sharptool_QR_Scanview_Activity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_multiple_sharptool_qr_scan);
+        setContentView(R.layout.activity_base);
+
+        setupDrawer();
+
+        View content = getLayoutInflater().inflate(R.layout.activity_multiple_sharptool_qr_scan,
+                findViewById(R.id.content_frame), true);
 
         if ( Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission( getApplicationContext(), Manifest.permission.CAMERA ) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.CAMERA}, 212);
@@ -125,16 +130,16 @@ public class Sharptool_QR_Scanview_Activity extends AppCompatActivity implements
 
         custPrograssbar = new CustPrograssbar();
 
-        imageView = (ImageView) findViewById(R.id.imgd);
-        txtUser = (TextView) findViewById(R.id.txtUser);
+        imageView = content.findViewById(R.id.imgd);
+        txtUser = content.findViewById(R.id.txtUser);
 
-        linear_programdata = findViewById(R.id.linear_programdata);
+        linear_programdata =  content.findViewById(R.id.linear_programdata);
         linear_programdata.setVisibility(View.GONE);
 
-        linear_layout_btn = findViewById(R.id.linear_layout_btn);
+        linear_layout_btn =  content.findViewById(R.id.linear_layout_btn);
         linear_layout_btn.setVisibility(View.GONE);
 
-        btnCancel = findViewById(R.id.btnCancel);
+        btnCancel =  content.findViewById(R.id.btnCancel);
         session = new SessionManagement(getApplicationContext());
         HashMap<String, String> user = session.getUserDetails();
         String name = user.get(SessionManagement.KEY_USER);
@@ -216,12 +221,7 @@ public class Sharptool_QR_Scanview_Activity extends AppCompatActivity implements
             dialog = new Dialog(Sharptool_QR_Scanview_Activity.this);
             switch (v.getId()) {
                 case R.id.imgd:
-                    Intent intent = new Intent(Sharptool_QR_Scanview_Activity.this, HomeActivity.class);
-                    intent.putExtra("openDrawer", true); //
-                    intent.putExtra("username", username);
-                    intent.putExtra("userid", userid);
-                    intent.putExtra("processorid", processorid);
-                    startActivity(intent);
+                    toggleDrawer();
                     break;
 
                 case R.id.btnCancel:

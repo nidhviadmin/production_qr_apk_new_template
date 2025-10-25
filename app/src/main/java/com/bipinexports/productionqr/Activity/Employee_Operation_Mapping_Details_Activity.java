@@ -53,7 +53,7 @@ import retrofit2.Call;
 import static com.bipinexports.productionqr.APIClient.HRMS_IMG_URL;
 import static java.lang.Boolean.FALSE;
 
-public class Employee_Operation_Mapping_Details_Activity extends AppCompatActivity implements View.OnClickListener, GetResult.MyListener {
+public class Employee_Operation_Mapping_Details_Activity extends BaseActivity implements View.OnClickListener, GetResult.MyListener {
 
 
     private static String LOG_TAG = "CardViewActivity";
@@ -103,15 +103,24 @@ public class Employee_Operation_Mapping_Details_Activity extends AppCompatActivi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_employee_operation_mapping_details);
+//        setContentView(R.layout.activity_employee_operation_mapping_details);
 
-        txtUser = findViewById(R.id.txtUser);
-        imageView = findViewById(R.id.imgd);
-        progress = (ProgressBar) findViewById(R.id.progress);
+        setContentView(R.layout.activity_base);
+        setupDrawer();
+
+        View content = getLayoutInflater().inflate(
+                R.layout.activity_employee_operation_mapping_details,
+                findViewById(R.id.content_frame),
+                true
+        );
+
+        txtUser = content.findViewById(R.id.txtUser);
+        imageView = content.findViewById(R.id.imgd);
+        progress = (ProgressBar) content.findViewById(R.id.progress);
 //        progress.setVisibility(View.VISIBLE);
         custPrograssbar_new = new CustPrograssbar_new();
 
-        txtUser = (TextView) findViewById(R.id.txtUser);
+        txtUser = (TextView) content.findViewById(R.id.txtUser);
 
         session = new SessionManagement(getApplicationContext());
         HashMap<String, String> user = session.getUserDetails();
@@ -142,12 +151,12 @@ public class Employee_Operation_Mapping_Details_Activity extends AppCompatActivi
 
         imageView.setOnClickListener(this);
 
-        EmpCode = findViewById(R.id.txtEmpCode);
-        txtEmpName = findViewById(R.id.txtEmpName);
-        txtSection =findViewById(R.id.txtSection);
-        txtDesignation = findViewById(R.id.txtDesignation);
-        txtProcess = findViewById(R.id.txtProcess);
-        txtOperation = findViewById(R.id.txtOperation);
+        EmpCode = content.findViewById(R.id.txtEmpCode);
+        txtEmpName = content.findViewById(R.id.txtEmpName);
+        txtSection =content.findViewById(R.id.txtSection);
+        txtDesignation = content.findViewById(R.id.txtDesignation);
+        txtProcess = content.findViewById(R.id.txtProcess);
+        txtOperation = content.findViewById(R.id.txtOperation);
 
         EmpCode.setText(empcode);
         txtEmpName.setText(empname);
@@ -156,8 +165,8 @@ public class Employee_Operation_Mapping_Details_Activity extends AppCompatActivi
         txtProcess.setText(process);
         txtOperation.setText(operation);
 
-        btnUpdate = findViewById(R.id.btnUpdate);
-        btnCancel = findViewById(R.id.btnCancel);
+        btnUpdate = content.findViewById(R.id.btnUpdate);
+        btnCancel = content.findViewById(R.id.btnCancel);
 
         btnUpdate.setVisibility(View.GONE);
         btnCancel.setVisibility(View.GONE);
@@ -165,7 +174,7 @@ public class Employee_Operation_Mapping_Details_Activity extends AppCompatActivi
         btnUpdate.setOnClickListener(this);
         btnCancel.setOnClickListener(this);
 
-        emp_Imge = findViewById(R.id.emp_Imge);
+        emp_Imge = content.findViewById(R.id.emp_Imge);
 
         if (imgpath == null || imgpath.equals("")) {
 
@@ -217,24 +226,7 @@ public class Employee_Operation_Mapping_Details_Activity extends AppCompatActivi
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.imgd:
-                PopupMenu popup = new PopupMenu(Employee_Operation_Mapping_Details_Activity.this, imageView);
-                popup.getMenuInflater().inflate(R.menu.menu_main, popup.getMenu());
-
-                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    public boolean onMenuItemClick(MenuItem item) {
-                        if (item.getItemId() == R.id.log) {
-                            session.logoutUser();
-                            finish();
-                        }
-                        else if (item.getItemId() == R.id.changepassword) {
-                            Intent intent = new Intent(Employee_Operation_Mapping_Details_Activity.this, ChangepasswordActivity.class);
-                            startActivity(intent);
-                            finish();
-                        }
-                        return true;
-                    }
-                });
-                popup.show();
+                toggleDrawer();
                 break;
             case R.id.btnUpdate:
                 Update_employee_operation();

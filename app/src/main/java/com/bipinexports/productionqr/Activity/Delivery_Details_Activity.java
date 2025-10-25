@@ -42,8 +42,9 @@ import java.util.List;
 
 import retrofit2.Call;
 
-public class Delivery_Details_Activity extends AppCompatActivity implements View.OnClickListener, GetResult.MyListener {
+public class Delivery_Details_Activity extends BaseActivity implements View.OnClickListener, GetResult.MyListener {
 
+    private View content;
     String Id, User;
 
     SessionManagement session;
@@ -61,23 +62,31 @@ public class Delivery_Details_Activity extends AppCompatActivity implements View
     TextView text_PO_No, text_PO_Date, text_Vendor_Name, text_DC_No, text_DC_Date, text_Job_Ref, text_Accessory_Name;
     TextView txtUser;
 
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_delivery_details);
+        setContentView(R.layout.activity_base);
+        setupDrawer();
 
-        imageView = (ImageView) findViewById(R.id.imgd);
-        gridView = (GridView) this.findViewById(R.id.grid);
-        progress = (ProgressBar) findViewById(R.id.progress);
+        content = getLayoutInflater().inflate(
+                R.layout.activity_delivery_details,
+                findViewById(R.id.content_frame),
+                true
+        );
+
+
+        imageView = content.findViewById(R.id.imgd);
+        gridView = content.findViewById(R.id.grid);
+        progress = content.findViewById(R.id.progress);
         progress.setVisibility(View.VISIBLE);
 
         delivery = getIntent().getStringExtra("delivery");
         pendingcount = getIntent().getStringExtra("pendingcount");
 
-        txtUser = (TextView) findViewById(R.id.txtUser);
+        txtUser = content.findViewById(R.id.txtUser);
 
         session = new SessionManagement(getApplicationContext());
         HashMap<String, String> user = session.getUserDetails();
-        String name = user.get(SessionManagement.KEY_USER);
         this.Id = user.get(SessionManagement.KEY_PROCESSOR_ID);
         processorid = user.get(SessionManagement.KEY_PROCESSOR_ID);
         userid = user.get(SessionManagement.KEY_USER_ID);
@@ -94,16 +103,15 @@ public class Delivery_Details_Activity extends AppCompatActivity implements View
         dcdate = getIntent().getStringExtra("dcdate");
         type = getIntent().getStringExtra("type");
 
-
         imageView.setOnClickListener(this);
 
-        text_PO_No = findViewById(R.id.text_PO_No);
-        text_PO_Date = findViewById(R.id.text_PO_Date);
-        text_Vendor_Name = findViewById(R.id.text_Vendor_Name);
-        text_DC_No = findViewById(R.id.text_DC_No);
-        text_DC_Date = findViewById(R.id.text_DC_Date);
-        text_Job_Ref = findViewById(R.id.text_Job_Ref);
-        text_Accessory_Name = findViewById(R.id.text_Accessory_Name);
+        text_PO_No = content.findViewById(R.id.text_PO_No);
+        text_PO_Date = content.findViewById(R.id.text_PO_Date);
+        text_Vendor_Name = content.findViewById(R.id.text_Vendor_Name);
+        text_DC_No = content.findViewById(R.id.text_DC_No);
+        text_DC_Date = content.findViewById(R.id.text_DC_Date);
+        text_Job_Ref = content.findViewById(R.id.text_Job_Ref);
+        text_Accessory_Name = content.findViewById(R.id.text_Accessory_Name);
 
         text_PO_No.setText(pono);
         text_PO_Date.setText(podate);
@@ -114,9 +122,10 @@ public class Delivery_Details_Activity extends AppCompatActivity implements View
 
         getvalue();
         get_deliverydetails();
-        AddProg = findViewById(R.id.AddProg);
+
+        AddProg = content.findViewById(R.id.AddProg);
+        AddReject = content.findViewById(R.id.AddReject);
         AddProg.setOnClickListener(this);
-        AddReject = findViewById(R.id.AddReject);
         AddReject.setOnClickListener(this);
         AddProg.setVisibility(View.INVISIBLE);
         AddReject.setVisibility(View.INVISIBLE);
@@ -126,16 +135,7 @@ public class Delivery_Details_Activity extends AppCompatActivity implements View
         if (isOnline()) {
             switch (v.getId()) {
                 case R.id.imgd:
-                    HashMap<String, String> user = session.getUserDetails();
-                    String username = user.get(SessionManagement.KEY_USER);
-                    String userid = user.get(SessionManagement.KEY_USER_ID);
-
-                    Intent intent = new Intent(Delivery_Details_Activity.this, HomeActivity.class);
-                    intent.putExtra("openDrawer", true);
-                    intent.putExtra("username", username);
-                    intent.putExtra("userid", userid);
-                    intent.putExtra("processorid", processorid);
-                    startActivity(intent);
+                    toggleDrawer();
                     break;
                 case R.id.AddProg:
                     progress.setVisibility(View.VISIBLE);

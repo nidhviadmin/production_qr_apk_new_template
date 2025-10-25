@@ -35,7 +35,7 @@ import java.util.Iterator;
 
 import retrofit2.Call;
 
-public class Machine_Service_Verification_Activity extends AppCompatActivity implements View.OnClickListener, GetResult.MyListener {
+public class Machine_Service_Verification_Activity extends BaseActivity implements View.OnClickListener, GetResult.MyListener {
 
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
@@ -63,15 +63,23 @@ public class Machine_Service_Verification_Activity extends AppCompatActivity imp
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_mac_service_verification);
+//        setContentView(R.layout.activity_mac_service_verification);
+        setContentView(R.layout.activity_base);
+        setupDrawer();
 
-        txtUser = findViewById(R.id.txtUser);
-        imageView = findViewById(R.id.imgd);
-        progress = (ProgressBar) findViewById(R.id.progress);
+        View content = getLayoutInflater().inflate(
+                R.layout.activity_mac_service_verification,
+                findViewById(R.id.content_frame),
+                true
+        );
+
+        txtUser = content.findViewById(R.id.txtUser);
+        imageView = content.findViewById(R.id.imgd);
+        progress = (ProgressBar) content.findViewById(R.id.progress);
 
         custPrograssbar = new CustPrograssbar();
 
-        txtUser = (TextView) findViewById(R.id.txtUser);
+        txtUser = (TextView) content.findViewById(R.id.txtUser);
 
         session = new SessionManagement(getApplicationContext());
         HashMap<String, String> user = session.getUserDetails();
@@ -162,16 +170,7 @@ public class Machine_Service_Verification_Activity extends AppCompatActivity imp
         switch (v.getId()) {
             case R.id.imgd:
                 PopupMenu popup = new PopupMenu(Machine_Service_Verification_Activity.this, imageView);
-                HashMap<String, String> user = session.getUserDetails();
-                String username = user.get(SessionManagement.KEY_USER);
-                String userid = user.get(SessionManagement.KEY_USER_ID);
-
-                Intent intent = new Intent(Machine_Service_Verification_Activity.this, HomeActivity.class);
-                intent.putExtra("openDrawer", true);
-                intent.putExtra("username", username);
-                intent.putExtra("userid", userid);
-                intent.putExtra("processorid", processorid);
-                startActivity(intent);
+                toggleDrawer();
                 popup.show();
                 break;
         }

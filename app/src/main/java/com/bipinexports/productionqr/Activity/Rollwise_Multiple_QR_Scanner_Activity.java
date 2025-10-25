@@ -63,7 +63,7 @@ import java.util.Locale;
 
 import retrofit2.Call;
 
-public class Rollwise_Multiple_QR_Scanner_Activity extends AppCompatActivity implements View.OnClickListener, GetResult.MyListener {
+public class Rollwise_Multiple_QR_Scanner_Activity extends BaseActivity implements View.OnClickListener, GetResult.MyListener {
 
     EditText txtScanData;
     ImageView imageView;
@@ -125,11 +125,16 @@ public class Rollwise_Multiple_QR_Scanner_Activity extends AppCompatActivity imp
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
-        setContentView(R.layout.activity_bt_scanner_multiple_qr_rollwise);
+        setContentView(R.layout.activity_base);  // Changed to base layout
+        setupDrawer();  // Setup drawer before using it
 
-        imageView = findViewById(R.id.imgd);
+        // Inflate your actual content into the content_frame
+        View content = getLayoutInflater().inflate(R.layout.activity_bt_scanner_multiple_qr_rollwise,
+                findViewById(R.id.content_frame), true);
+
+        imageView = content.findViewById(R.id.imgd);
         imageView.setOnClickListener(this);
-        txtUser = findViewById(R.id.txtUser);
+        txtUser = content.findViewById(R.id.txtUser);
 
         session = new SessionManagement(getApplicationContext());
         HashMap<String, String> user = session.getUserDetails();
@@ -149,28 +154,28 @@ public class Rollwise_Multiple_QR_Scanner_Activity extends AppCompatActivity imp
 
         versioncode();
 
-        txtJobNo = findViewById(R.id.txtJobNo);
-        txtShipCode = findViewById(R.id.txtShipCode);
-        text_Color = findViewById(R.id.text_Color);
-        txtStyle = findViewById(R.id.txtStyle);
+        txtJobNo = content.findViewById(R.id.txtJobNo);
+        txtShipCode = content.findViewById(R.id.txtShipCode);
+        text_Color = content.findViewById(R.id.text_Color);
+        txtStyle = content.findViewById(R.id.txtStyle);
 
-        liner_bundle_details = findViewById(R.id.liner_bundle_details);
+        liner_bundle_details = content.findViewById(R.id.liner_bundle_details);
         liner_bundle_details.setVisibility(View.GONE);
 
-        linear_programdata = findViewById(R.id.linear_programdata);
+        linear_programdata = content.findViewById(R.id.linear_programdata);
         linear_programdata.setVisibility(View.GONE);
 
-        linear_layout_btn = findViewById(R.id.linear_layout_btn);
+        linear_layout_btn = content.findViewById(R.id.linear_layout_btn);
         linear_layout_btn.setVisibility(View.GONE);
-        btnOk = findViewById(R.id.btnOk);
-        btnCancel = findViewById(R.id.btnCancel);
+        btnOk = content.findViewById(R.id.btnOk);
+        btnCancel = content.findViewById(R.id.btnCancel);
 
         btnOk.setOnClickListener(this);
         btnCancel.setOnClickListener(this);
         btnOk.setVisibility(View.GONE);
 
         hideKeyboard();
-        txtScanData = findViewById(R.id.txtScanData);
+        txtScanData = content.findViewById(R.id.txtScanData);
         txtScanData.requestFocus();
 
         // Delay hiding the keyboard to ensure focus is set
@@ -203,7 +208,6 @@ public class Rollwise_Multiple_QR_Scanner_Activity extends AppCompatActivity imp
             }
         });
     }
-
     private void versioncode() {
         if(isOnline()) {
             Context context = this;
@@ -342,16 +346,7 @@ public class Rollwise_Multiple_QR_Scanner_Activity extends AppCompatActivity imp
             switch (v.getId()) {
                 case R.id.imgd:
                     PopupMenu popup = new PopupMenu(Rollwise_Multiple_QR_Scanner_Activity.this, imageView);
-                    HashMap<String, String> user = session.getUserDetails();
-                    String username = user.get(SessionManagement.KEY_USER);
-                    String userid = user.get(SessionManagement.KEY_USER_ID);
-
-                    Intent intent = new Intent(Rollwise_Multiple_QR_Scanner_Activity.this, HomeActivity.class);
-                    intent.putExtra("openDrawer", true);
-                    intent.putExtra("username", username);
-                    intent.putExtra("userid", userid);
-                    intent.putExtra("processorid", processorid);
-                    startActivity(intent);
+                    toggleDrawer();
                     popup.show();
                     break;
                 case R.id.btnOk:

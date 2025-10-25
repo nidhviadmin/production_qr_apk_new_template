@@ -35,9 +35,10 @@ import java.util.Iterator;
 import retrofit2.Call;
 
 
-public class Accessory_Receipt_Delivery_Activity extends AppCompatActivity implements View.OnClickListener, GetResult.MyListener {
-
+public class Accessory_Receipt_Delivery_Activity extends BaseActivity implements View.OnClickListener, GetResult.MyListener {
     private RecyclerView mRecyclerView;
+
+    private View content;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private static String LOG_TAG = "CardViewActivity";
@@ -72,16 +73,21 @@ public class Accessory_Receipt_Delivery_Activity extends AppCompatActivity imple
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_accessory_receipt_delivery);
+        setContentView(R.layout.activity_base);
+        setupDrawer();
 
-        txtUser = findViewById(R.id.txtUser);
-        imageView = findViewById(R.id.imgd);
-        progress = (ProgressBar) findViewById(R.id.progress);
+        content = getLayoutInflater().inflate(
+                R.layout.activity_accessory_receipt_delivery,
+                findViewById(R.id.content_frame),
+                true
+        );
+
+        txtUser = content.findViewById(R.id.txtUser);
+        imageView = content.findViewById(R.id.imgd);
+        progress = content.findViewById(R.id.progress);
 
         custPrograssbar_new = new CustPrograssbar_new();
         Accessory_Receipt_Delivery_Activity.custPrograssbar_new.prograssCreate(this);
-
-        txtUser = (TextView) findViewById(R.id.txtUser);
 
         session = new SessionManagement(getApplicationContext());
         HashMap<String, String> user = session.getUserDetails();
@@ -101,16 +107,16 @@ public class Accessory_Receipt_Delivery_Activity extends AppCompatActivity imple
         vendor_del_count = getIntent().getStringExtra("vendor_del_count");
         joborderno = getIntent().getStringExtra("joborderno");
         stylename = getIntent().getStringExtra("stylename");
-        orderid =  getIntent().getStringExtra("orderid");
-        del_count =  getIntent().getStringExtra("del_count");
+        orderid = getIntent().getStringExtra("orderid");
+        del_count = getIntent().getStringExtra("del_count");
 
         totalItemCount = Integer.parseInt(del_count);
 
-        text_Vendor_Name = findViewById(R.id.text_Vendor_Name);
-        text_Job_Order_No = findViewById(R.id.text_Job_Order_No);
-        text_Style_Name = findViewById(R.id.text_Style_Name);
-        text_qty = findViewById(R.id.text_qty);
-        text_delivery_count = findViewById(R.id.text_delivery_count);
+        text_Vendor_Name = content.findViewById(R.id.text_Vendor_Name);
+        text_Job_Order_No = content.findViewById(R.id.text_Job_Order_No);
+        text_Style_Name = content.findViewById(R.id.text_Style_Name);
+        text_qty = content.findViewById(R.id.text_qty);
+        text_delivery_count = content.findViewById(R.id.text_delivery_count);
 
         text_Vendor_Name.setText(vendorname);
         text_Job_Order_No.setText(joborderno);
@@ -118,19 +124,15 @@ public class Accessory_Receipt_Delivery_Activity extends AppCompatActivity imple
         text_qty.setText(del_quantity);
         text_delivery_count.setText(del_count);
 
-        if(Integer.parseInt(del_count) == 0)
-        {
-            int dd = Integer.parseInt(vendor_del_count)-1;
+        if (Integer.parseInt(del_count) == 0) {
+            int dd = Integer.parseInt(vendor_del_count) - 1;
             vendor_del_count = String.valueOf(dd);
             onBackPressed();
-        }
-        else
-        {
+        } else {
             getvalue();
             fetch_accessory_receipt_Details();
         }
     }
-
 
     private ArrayList<Accessory_Receipt_Delivery_Data_Object> getDataSet() {
 //        ArrayList results = new ArrayList<Accessory_Receipt_Delivery_Data_Object>();
@@ -230,15 +232,11 @@ public class Accessory_Receipt_Delivery_Activity extends AppCompatActivity imple
         progress.setVisibility(View.INVISIBLE);
     }
 
+    @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.imgd:
-                Intent intent = new Intent(Accessory_Receipt_Delivery_Activity.this, HomeActivity.class);
-                intent.putExtra("openDrawer", true); //
-                intent.putExtra("username", User);
-                intent.putExtra("userid", userid);
-                intent.putExtra("processorid", processorid);
-                startActivity(intent);
+                toggleDrawer();
                 break;
         }
     }

@@ -35,14 +35,14 @@ import java.util.Iterator;
 
 import retrofit2.Call;
 
-public class Absent_Employee_Operation_Mapping_Activity extends AppCompatActivity implements View.OnClickListener, GetResult.MyListener {
+public class Absent_Employee_Operation_Mapping_Activity extends BaseActivity implements View.OnClickListener, GetResult.MyListener {
 
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private static String LOG_TAG = "CardViewActivity";
 
-    SessionManagement session;
+//    SessionManagement session;
     TextView txtUser;
     ImageView imageView;
     String employee_data_obj;
@@ -60,16 +60,17 @@ public class Absent_Employee_Operation_Mapping_Activity extends AppCompatActivit
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_absent_employee_operation_mapping);
+        setContentView(R.layout.activity_base);
+        setupDrawer();
 
-        txtUser = findViewById(R.id.txtUser);
-        imageView = findViewById(R.id.imgd);
-        progress = (ProgressBar) findViewById(R.id.progress);
+        View content = getLayoutInflater().inflate(R.layout.activity_absent_employee_operation_mapping,
+                findViewById(R.id.content_frame), true);
+
+        txtUser = content.findViewById(R.id.txtUser);
+        imageView = content.findViewById(R.id.imgd);
+        progress = content.findViewById(R.id.progress);
         custPrograssbar_new = new CustPrograssbar_new();
 
-        txtUser = (TextView) findViewById(R.id.txtUser);
-
-        session = new SessionManagement(getApplicationContext());
         HashMap<String, String> user = session.getUserDetails();
         String name = user.get(SessionManagement.KEY_USER);
         this.Id = user.get(SessionManagement.KEY_PROCESSOR_ID);
@@ -81,18 +82,17 @@ public class Absent_Employee_Operation_Mapping_Activity extends AppCompatActivit
         type = getIntent().getStringExtra("type");
         myversionName = getIntent().getStringExtra("myversionName");
         selected_type = getIntent().getStringExtra("selected_type");
+
         imageView.setOnClickListener(this);
 
         getvalue();
         fetch_employee_Details();
-        swipeRefreshLayout = findViewById(R.id.swiperefresh);
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                swipeRefreshLayout.setRefreshing(false);
-                results = new ArrayList<Out_Employee_Data_Object>();
-                fetch_employee_Details();
-            }
+
+        swipeRefreshLayout = content.findViewById(R.id.swiperefresh);
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            swipeRefreshLayout.setRefreshing(false);
+            results = new ArrayList<Out_Employee_Data_Object>();
+            fetch_employee_Details();
         });
         swipeRefreshLayout.setColorSchemeColors(Color.BLACK);
     }
@@ -155,7 +155,7 @@ public class Absent_Employee_Operation_Mapping_Activity extends AppCompatActivit
             clearfunc();
         }
         else {
-            session = new SessionManagement(getApplicationContext());
+//            session = new SessionManagement(getApplicationContext());
             HashMap<String, String> user = session.getUserDetails();
             processorid = user.get(SessionManagement.KEY_PROCESSOR_ID);
             userid = user.get(SessionManagement.KEY_USER_ID);
@@ -188,12 +188,7 @@ public class Absent_Employee_Operation_Mapping_Activity extends AppCompatActivit
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.imgd:
-                Intent intent = new Intent(Absent_Employee_Operation_Mapping_Activity.this, HomeActivity.class);
-                intent.putExtra("openDrawer", true); //
-                intent.putExtra("username", User);
-                intent.putExtra("userid", userid);
-                intent.putExtra("processorid", processorid);
-                startActivity(intent);
+                toggleDrawer();
                 break;
         }
     }

@@ -71,7 +71,7 @@ import java.util.Map;
 import retrofit2.Call;
 
 
-public class ScannerSelectionBarcodeActivity extends AppCompatActivity implements
+public class ScannerSelectionBarcodeActivity extends BaseActivity implements
         BarcodeReader.BarcodeListener, BarcodeReader.TriggerListener, View.OnClickListener, GetResult.MyListener {
 
     private com.honeywell.aidc.AidcManager mAidcManager;
@@ -102,7 +102,12 @@ public class ScannerSelectionBarcodeActivity extends AppCompatActivity implement
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_selection_barcode);
+        setContentView(R.layout.activity_base);  // Changed to base layout
+        setupDrawer();  // Setup drawer before using it
+
+        // Inflate your actual content into the content_frame
+        View content = getLayoutInflater().inflate(R.layout.activity_selection_barcode,
+                findViewById(R.id.content_frame), true);
 
         versioncode();
 
@@ -117,9 +122,9 @@ public class ScannerSelectionBarcodeActivity extends AppCompatActivity implement
         userid = getIntent().getStringExtra("userid");
         username = getIntent().getStringExtra("name");
 
-        imageView = findViewById(R.id.imgd);
+        imageView = content.findViewById(R.id.imgd);
         imageView.setOnClickListener(this);
-        txtUser = findViewById(R.id.txtUser);
+        txtUser = content.findViewById(R.id.txtUser);
 
         session = new SessionManagement(getApplicationContext());
         HashMap<String, String> user = session.getUserDetails();
@@ -192,16 +197,7 @@ public class ScannerSelectionBarcodeActivity extends AppCompatActivity implement
             switch (v.getId()) {
                 case R.id.imgd:
                     PopupMenu popup = new PopupMenu(ScannerSelectionBarcodeActivity.this, imageView);
-                    HashMap<String, String> user = session.getUserDetails();
-                    String username = user.get(SessionManagement.KEY_USER);
-                    String userid = user.get(SessionManagement.KEY_USER_ID);
-
-                    Intent intent = new Intent(ScannerSelectionBarcodeActivity.this, HomeActivity.class);
-                    intent.putExtra("openDrawer", true);
-                    intent.putExtra("username", username);
-                    intent.putExtra("userid", userid);
-                    intent.putExtra("processorid", processorid);
-                    startActivity(intent);
+                    toggleDrawer();
                     popup.show();
                     break;
                 default:

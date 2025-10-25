@@ -52,7 +52,7 @@ import java.util.Locale;
 
 import retrofit2.Call;
 
-public class Roll_Delivery_USB_Reader_Activity extends AppCompatActivity implements View.OnClickListener, GetResult.MyListener {
+public class Roll_Delivery_USB_Reader_Activity extends BaseActivity implements View.OnClickListener, GetResult.MyListener {
 
     EditText txtScanData;
     ImageView imageView;
@@ -92,11 +92,19 @@ public class Roll_Delivery_USB_Reader_Activity extends AppCompatActivity impleme
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
-        setContentView(R.layout.activity_roll_delivery_usb);
 
-        imageView = findViewById(R.id.imgd);
+        setContentView(R.layout.activity_base);
+        setupDrawer();
+
+        View content = getLayoutInflater().inflate(
+                R.layout.activity_roll_delivery_usb,
+                findViewById(R.id.content_frame),
+                true
+        );
+
+        imageView = content.findViewById(R.id.imgd);
         imageView.setOnClickListener(this);
-        txtUser = findViewById(R.id.txtUser);
+        txtUser = content.findViewById(R.id.txtUser);
         custPrograssbar = new CustPrograssbar();
 
         session = new SessionManagement(getApplicationContext());
@@ -111,47 +119,46 @@ public class Roll_Delivery_USB_Reader_Activity extends AppCompatActivity impleme
 
         versioncode();
         hideKeyboard();
-        imageView.setOnClickListener(this);
 
-        txtJobNo = findViewById(R.id.txtJobNo);
-        txtShipCode = findViewById(R.id.txtShipCode);
-        text_Color = findViewById(R.id.text_Color);
-        txtStyle = findViewById(R.id.txtStyle);
-        txtTitle = findViewById(R.id.txtTitle);
+        txtJobNo = content.findViewById(R.id.txtJobNo);
+        txtShipCode = content.findViewById(R.id.txtShipCode);
+        text_Color = content.findViewById(R.id.text_Color);
+        txtStyle = content.findViewById(R.id.txtStyle);
+        txtTitle = content.findViewById(R.id.txtTitle);
         txtTitle.setVisibility(View.GONE);
 
-        text_partname = findViewById(R.id.text_partname);
-        text_rackname = findViewById(R.id.text_rackname);
-        text_rollno = findViewById(R.id.text_rollno);
-        text_rollcode = findViewById(R.id.text_rollcode);
-        text_weight = findViewById(R.id.text_weight);
-        text_4point = findViewById(R.id.text_4point);
-        text_relaxed_by = findViewById(R.id.text_relaxed_by);
-        text_relaxed_on = findViewById(R.id.text_relaxed_on);
+        text_partname = content.findViewById(R.id.text_partname);
+        text_rackname = content.findViewById(R.id.text_rackname);
+        text_rollno = content.findViewById(R.id.text_rollno);
+        text_rollcode = content.findViewById(R.id.text_rollcode);
+        text_weight = content.findViewById(R.id.text_weight);
+        text_4point = content.findViewById(R.id.text_4point);
+        text_relaxed_by = content.findViewById(R.id.text_relaxed_by);
+        text_relaxed_on = content.findViewById(R.id.text_relaxed_on);
 
-        liner_bundle_details = findViewById(R.id.liner_bundle_details);
-        layout_text_4point = findViewById(R.id.layout_text_4point);
-        layout_text_relaxed_by= findViewById(R.id.layout_text_relaxed_by);
+        liner_bundle_details = content.findViewById(R.id.liner_bundle_details);
+        layout_text_4point = content.findViewById(R.id.layout_text_4point);
+        layout_text_relaxed_by = content.findViewById(R.id.layout_text_relaxed_by);
         layout_text_relaxed_by.setVisibility(View.GONE);
-        layout_text_relaxed_on= findViewById(R.id.layout_text_relaxed_on);
-        linear_layout_btn = findViewById(R.id.linear_layout_btn);
+        layout_text_relaxed_on = content.findViewById(R.id.layout_text_relaxed_on);
+        linear_layout_btn = content.findViewById(R.id.linear_layout_btn);
 
-        btnOk = findViewById(R.id.btnOk);
-        btnCancel = findViewById(R.id.btnCancel);
-        btn_scan_again = findViewById(R.id.btn_scan_again);
+        btnOk = content.findViewById(R.id.btnOk);
+        btnCancel = content.findViewById(R.id.btnCancel);
+        btn_scan_again = content.findViewById(R.id.btn_scan_again);
 
         liner_bundle_details.setVisibility(View.GONE);
         layout_text_4point.setVisibility(View.GONE);
         layout_text_relaxed_on.setVisibility(View.GONE);
         linear_layout_btn.setVisibility(View.GONE);
 
-        txtScanData = findViewById(R.id.txtScanData);
+        txtScanData = content.findViewById(R.id.txtScanData);
         txtScanData.requestFocus();
-        txtScanData.setInputType(InputType.TYPE_NULL); // hardware‑scanner mode
+        txtScanData.setInputType(InputType.TYPE_NULL);
 
         txtScanData.setOnEditorActionListener((v, actionId, event) -> {
             String data = txtScanData.getText().toString().trim();
-            if (data.isEmpty()) return true;    
+            if (data.isEmpty()) return true;
 
             if (multiclick) {
                 multiclick = false;
@@ -161,17 +168,14 @@ public class Roll_Delivery_USB_Reader_Activity extends AppCompatActivity impleme
                 hideExtraViews();
             }
 
-            // Clear for next scan
             txtScanData.setText("");
             txtScanData.requestFocus();
 
-            // (Optional) hide keyboard even though we’re TYPE_NULL
             InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
             if (imm != null) imm.hideSoftInputFromWindow(txtScanData.getWindowToken(), 0);
 
-            return true;  // we consumed the action
+            return true;
         });
-
 
         btnOk.setOnClickListener(this);
         btnCancel.setOnClickListener(this);
@@ -303,16 +307,7 @@ public class Roll_Delivery_USB_Reader_Activity extends AppCompatActivity impleme
             switch (v.getId()) {
                 case R.id.imgd:
                     PopupMenu popup = new PopupMenu(Roll_Delivery_USB_Reader_Activity.this, imageView);
-                    HashMap<String, String> user = session.getUserDetails();
-                    String username = user.get(SessionManagement.KEY_USER);
-                    String userid = user.get(SessionManagement.KEY_USER_ID);
-
-                    Intent intent = new Intent(Roll_Delivery_USB_Reader_Activity.this, HomeActivity.class);
-                    intent.putExtra("openDrawer", true);
-                    intent.putExtra("username", username);
-                    intent.putExtra("userid", userid);
-                    intent.putExtra("processorid", processorid);
-                    startActivity(intent);
+                    toggleDrawer();
                     popup.show();
                     break;
                 case R.id.btnOk:

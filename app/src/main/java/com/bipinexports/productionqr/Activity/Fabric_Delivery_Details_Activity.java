@@ -87,7 +87,7 @@ import static com.bipinexports.productionqr.Common.QR_URL;
 import static java.lang.Boolean.TRUE;
 import static java.lang.StrictMath.round;
 
-public class Fabric_Delivery_Details_Activity extends AppCompatActivity implements View.OnClickListener, GetResult.MyListener {
+public class Fabric_Delivery_Details_Activity extends BaseActivity implements View.OnClickListener, GetResult.MyListener {
 
     String Id, User;
 
@@ -152,7 +152,15 @@ public class Fabric_Delivery_Details_Activity extends AppCompatActivity implemen
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_fabric_delivery_details);
+//        setContentView(R.layout.activity_fabric_delivery_details);
+        setContentView(R.layout.activity_base);
+        setupDrawer();
+
+        View content = getLayoutInflater().inflate(
+                R.layout.activity_fabric_delivery_details,
+                findViewById(R.id.content_frame),
+                true
+        );
 
         if ( Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission( getApplicationContext(), Manifest.permission.CAMERA ) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.CAMERA}, 212);
@@ -166,9 +174,9 @@ public class Fabric_Delivery_Details_Activity extends AppCompatActivity implemen
             requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 212);
         }
 
-        imageView = (ImageView) findViewById(R.id.imgd);
+        imageView = (ImageView) content.findViewById(R.id.imgd);
         gridView = (GridView) this.findViewById(R.id.grid);
-        progress = (ProgressBar) findViewById(R.id.progress);
+        progress = (ProgressBar) content.findViewById(R.id.progress);
         progress.setVisibility(View.GONE);
 
         custPrograssbar_new = new CustPrograssbar_new();
@@ -179,7 +187,7 @@ public class Fabric_Delivery_Details_Activity extends AppCompatActivity implemen
         delivery = getIntent().getStringExtra("delivery");
         pendingcount = getIntent().getStringExtra("pendingcount");
 
-        txtUser = (TextView) findViewById(R.id.txtUser);
+        txtUser = (TextView) content.findViewById(R.id.txtUser);
 
         session = new SessionManagement(getApplicationContext());
         HashMap<String, String> user = session.getUserDetails();
@@ -204,22 +212,22 @@ public class Fabric_Delivery_Details_Activity extends AppCompatActivity implemen
 
         imageView.setOnClickListener(this);
 
-        Fabric_Spec = findViewById(R.id.Fabric_Spec);
+        Fabric_Spec = content.findViewById(R.id.Fabric_Spec);
 
-        text_DC_No = findViewById(R.id.text_DC_No);
-        text_DC_Date = findViewById(R.id.text_DC_Date);
-        text_Job_Ref = findViewById(R.id.text_Job_Ref);
-        text_Goods_from = findViewById(R.id.text_Goods_from);
-        Notes = findViewById(R.id.Notes);
-        text_Style = findViewById(R.id.text_Style);
+        text_DC_No = content.findViewById(R.id.text_DC_No);
+        text_DC_Date = content.findViewById(R.id.text_DC_Date);
+        text_Job_Ref = content.findViewById(R.id.text_Job_Ref);
+        text_Goods_from = content.findViewById(R.id.text_Goods_from);
+        Notes = content.findViewById(R.id.Notes);
+        text_Style = content.findViewById(R.id.text_Style);
 
-        imgTagPic1 = findViewById(R.id.imgTagPic1);
-        imgTagPic2 = findViewById(R.id.imgTagPic2);
-        imgTagPic3 = findViewById(R.id.imgTagPic3);
-        imgTagPic4 = findViewById(R.id.imgTagPic4);
+        imgTagPic1 = content.findViewById(R.id.imgTagPic1);
+        imgTagPic2 = content.findViewById(R.id.imgTagPic2);
+        imgTagPic3 = content.findViewById(R.id.imgTagPic3);
+        imgTagPic4 = content.findViewById(R.id.imgTagPic4);
 
-        txtPercentage = findViewById(R.id.txtPercentage);
-        txtTagImgDesc = findViewById(R.id.txtTagImgDesc);
+        txtPercentage = content.findViewById(R.id.txtPercentage);
+        txtTagImgDesc = content.findViewById(R.id.txtTagImgDesc);
 
         for (int i = 1; i <= 4; i++) { //You might have to change that slightly depending on where you want to start/end counting
             int res = getResources().getIdentifier("imgTagPic"+i, "id", getPackageName()); //This line is necessary to "convert" a string (e.g. "i1", "i2" etc.) to a resource ID
@@ -233,18 +241,18 @@ public class Fabric_Delivery_Details_Activity extends AppCompatActivity implemen
 
 
         imageView.setOnClickListener(this);
-        recordicon = findViewById(R.id.recordicon);
-        playicon = findViewById(R.id.playicon);
+        recordicon = content.findViewById(R.id.recordicon);
+        playicon = content.findViewById(R.id.playicon);
         playicon.setEnabled(false);
         playicon.setVisibility(View.INVISIBLE);
 
-        song_seekbartext = findViewById(R.id.song_seekbartext);
+        song_seekbartext = content.findViewById(R.id.song_seekbartext);
 
-        seekBar = (SeekBar) findViewById(R.id.song_seekbar);
+        seekBar = (SeekBar) content.findViewById(R.id.song_seekbar);
         seekBar.setVisibility(View.INVISIBLE);
         song_seekbartext.setVisibility(View.INVISIBLE);
 
-        mycm = (Chronometer) findViewById(R.id.simpleChronometer);
+        mycm = (Chronometer) content.findViewById(R.id.simpleChronometer);
         mycm.setVisibility(View.INVISIBLE);
 
         text_DC_No.setText(dcno);
@@ -254,23 +262,23 @@ public class Fabric_Delivery_Details_Activity extends AppCompatActivity implemen
         text_Goods_from.setText(vendorname);
 
 
-        text_Fabric_Type = findViewById(R.id.text_Fabric_Type);
-        text_Reference = findViewById(R.id.text_Reference);
-        text_Yarn_Details = findViewById(R.id.text_Yarn_Details);
-        text_Color = findViewById(R.id.text_Color);
-        text_Gauge = findViewById(R.id.text_Gauge);
-        text_Rolls_and_weight = findViewById(R.id.text_Rolls_and_weight);
+        text_Fabric_Type = content.findViewById(R.id.text_Fabric_Type);
+        text_Reference = content.findViewById(R.id.text_Reference);
+        text_Yarn_Details = content.findViewById(R.id.text_Yarn_Details);
+        text_Color = content.findViewById(R.id.text_Color);
+        text_Gauge = content.findViewById(R.id.text_Gauge);
+        text_Rolls_and_weight = content.findViewById(R.id.text_Rolls_and_weight);
 
         getvalue();
         get_deliverydetails();
 
-        AddProg = findViewById(R.id.AddProg);
+        AddProg = content.findViewById(R.id.AddProg);
         AddProg.setOnClickListener(this);
 
-        AddReject = findViewById(R.id.AddReject);
+        AddReject = content.findViewById(R.id.AddReject);
         AddReject.setOnClickListener(this);
 
-        Go_Back = findViewById(R.id.Go_Back);
+        Go_Back = content.findViewById(R.id.Go_Back);
         Go_Back.setOnClickListener(this);
         recordicon.setOnClickListener(this);
         playicon.setOnClickListener(this);
@@ -281,16 +289,7 @@ public class Fabric_Delivery_Details_Activity extends AppCompatActivity implemen
         if (isOnline()) {
             switch (v.getId()) {
                 case R.id.imgd:
-                    HashMap<String, String> user = session.getUserDetails();
-                    String username = user.get(SessionManagement.KEY_USER);
-                    String userid = user.get(SessionManagement.KEY_USER_ID);
-
-                    Intent intent = new Intent(Fabric_Delivery_Details_Activity.this, HomeActivity.class);
-                    intent.putExtra("openDrawer", true);
-                    intent.putExtra("username", username);
-                    intent.putExtra("userid", userid);
-                    intent.putExtra("processorid", processorid);
-                    startActivity(intent);
+                    toggleDrawer();
                     break;
                 case R.id.imgTagPic1:
                     current_id = 1;

@@ -32,7 +32,7 @@ import java.util.HashMap;
 
 import retrofit2.Call;
 
-public class Machie_Service_Verification_Details_Activity extends AppCompatActivity implements View.OnClickListener, GetResult.MyListener {
+public class Machie_Service_Verification_Details_Activity extends BaseActivity implements View.OnClickListener, GetResult.MyListener {
 
     String Id, User;
 
@@ -53,11 +53,20 @@ public class Machie_Service_Verification_Details_Activity extends AppCompatActiv
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_mac_service_verify_details);
+//        setContentView(R.layout.activity_mac_service_verify_details);
+        setContentView(R.layout.activity_base);
+        setupDrawer();
 
-        imageView = (ImageView) findViewById(R.id.imgd);
+        View content = getLayoutInflater().inflate(
+                R.layout.activity_mac_service_verify_details,
+                findViewById(R.id.content_frame),
+                true
+        );
+
+
+        imageView = (ImageView) content.findViewById(R.id.imgd);
         gridView = (GridView) this.findViewById(R.id.grid);
-        progress = (ProgressBar) findViewById(R.id.progress);
+        progress = (ProgressBar) content.findViewById(R.id.progress);
         progress.setVisibility(View.VISIBLE);
 
         mac_service_verification = getIntent().getStringExtra("mac_service_verification");
@@ -65,7 +74,7 @@ public class Machie_Service_Verification_Details_Activity extends AppCompatActiv
 
         currcount = Integer.parseInt(mac_service_verification_count);
 
-        txtUser = (TextView) findViewById(R.id.txtUser);
+        txtUser = (TextView) content.findViewById(R.id.txtUser);
 
         session = new SessionManagement(getApplicationContext());
         HashMap<String, String> user = session.getUserDetails();
@@ -88,28 +97,28 @@ public class Machie_Service_Verification_Details_Activity extends AppCompatActiv
 
         imageView.setOnClickListener(this);
 
-        text_MachineNo = findViewById(R.id.text_MachineNo);
-        text_Machine_Type = findViewById(R.id.text_Machine_Type);
-        text_Vendor_Name = findViewById(R.id.text_Vendor_Name);
-        text_Line_No = findViewById(R.id.text_Line_No);
-        text_Recruiter = findViewById(R.id.text_Recruiter);
-        text_Service_Date = findViewById(R.id.text_Service_Date);
-        Service_Refer_no = findViewById(R.id.Service_Refer_no);
-        text_Service_Reason = findViewById(R.id.text_Service_Reason);
-        text_Notes = findViewById(R.id.text_Notes);
-        text_Requested_By = findViewById(R.id.text_Requested_By);
-        text_Requested_On = findViewById(R.id.text_Requested_On);
-        text_Approval_Rejection = findViewById(R.id.text_Approval_Rejection);
+        text_MachineNo = content.findViewById(R.id.text_MachineNo);
+        text_Machine_Type = content.findViewById(R.id.text_Machine_Type);
+        text_Vendor_Name = content.findViewById(R.id.text_Vendor_Name);
+        text_Line_No = content.findViewById(R.id.text_Line_No);
+        text_Recruiter = content.findViewById(R.id.text_Recruiter);
+        text_Service_Date = content.findViewById(R.id.text_Service_Date);
+        Service_Refer_no = content.findViewById(R.id.Service_Refer_no);
+        text_Service_Reason = content.findViewById(R.id.text_Service_Reason);
+        text_Notes = content.findViewById(R.id.text_Notes);
+        text_Requested_By = content.findViewById(R.id.text_Requested_By);
+        text_Requested_On = content.findViewById(R.id.text_Requested_On);
+        text_Approval_Rejection = content.findViewById(R.id.text_Approval_Rejection);
 
         getvalue();
         get_mac_service_details();
-        AddProg = findViewById(R.id.AddProg);
+        AddProg = content.findViewById(R.id.AddProg);
         AddProg.setOnClickListener(this);
 
-        AddReject = findViewById(R.id.AddReject);
+        AddReject = content.findViewById(R.id.AddReject);
         AddReject.setOnClickListener(this);
 
-        GoBack = findViewById(R.id.GoBack);
+        GoBack = content.findViewById(R.id.GoBack);
         GoBack.setOnClickListener(this);
     }
 
@@ -118,16 +127,7 @@ public class Machie_Service_Verification_Details_Activity extends AppCompatActiv
             switch (v.getId()) {
                 case R.id.imgd:
                     PopupMenu popup = new PopupMenu(Machie_Service_Verification_Details_Activity.this, imageView);
-                    HashMap<String, String> user = session.getUserDetails();
-                    String username = user.get(SessionManagement.KEY_USER);
-                    String userid = user.get(SessionManagement.KEY_USER_ID);
-
-                    Intent intent = new Intent(Machie_Service_Verification_Details_Activity.this, HomeActivity.class);
-                    intent.putExtra("openDrawer", true);
-                    intent.putExtra("username", username);
-                    intent.putExtra("userid", userid);
-                    intent.putExtra("processorid", processorid);
-                    startActivity(intent);
+                    toggleDrawer();
                     popup.show();
                     break;
                 case R.id.AddProg:

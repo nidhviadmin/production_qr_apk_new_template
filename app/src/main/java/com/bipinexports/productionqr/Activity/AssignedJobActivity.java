@@ -1,16 +1,11 @@
 package com.bipinexports.productionqr.Activity;
 
 import android.content.Intent;
-
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import android.view.MenuItem;
 import android.view.View;
-
 import android.widget.ImageView;
-import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import com.bipinexports.productionqr.AssignedDataObject;
@@ -24,12 +19,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
-public class AssignedJobActivity extends AppCompatActivity implements View.OnClickListener {
+public class AssignedJobActivity extends BaseActivity implements View.OnClickListener {
 
+    private View content;
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
-    private static String LOG_TAG = "CardViewActivity";
 
     SessionManagement session;
     TextView txtUser;
@@ -41,12 +36,19 @@ public class AssignedJobActivity extends AppCompatActivity implements View.OnCli
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_assignedjob);
+        setContentView(R.layout.activity_base);
+        setupDrawer();
+
+        content = getLayoutInflater().inflate(
+                R.layout.activity_assignedjob,
+                findViewById(R.id.content_frame),
+                true
+        );
 
         weekwisedataobj = getIntent().getStringExtra("weekwisedataobj");
 
-        txtUser = findViewById(R.id.txtUser);
-        imageView = findViewById(R.id.imgd);
+        txtUser = content.findViewById(R.id.txtUser);
+        imageView = content.findViewById(R.id.imgd);
 
         session = new SessionManagement(getApplicationContext());
         HashMap<String, String> user = session.getUserDetails();
@@ -56,22 +58,15 @@ public class AssignedJobActivity extends AppCompatActivity implements View.OnCli
         imageView.setOnClickListener(this);
         processorid = getIntent().getStringExtra("processorid");
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
+        mRecyclerView = content.findViewById(R.id.my_recycler_view);
         mRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mAdapter = new AssignedViewAdapter(getDataSet());
         mRecyclerView.setAdapter(mAdapter);
 
-    }
-    @Override
-    protected void onResume() {
-        super.onResume();
-        ((AssignedViewAdapter) mAdapter).setOnItemClickListener(new AssignedViewAdapter.MyClickListener() {
-            @Override
-            public void onItemClick(int position, View v) {
-
-            }
+        ((AssignedViewAdapter) mAdapter).setOnItemClickListener((position, v) -> {
+            // handle item click if needed
         });
     }
 
@@ -96,7 +91,10 @@ public class AssignedJobActivity extends AppCompatActivity implements View.OnCli
                     i++;
                 }
             }
-            AssignedDataObject obj = new AssignedDataObject(0, 0, "Grand Total", jsonObj.optString("grandtotalbundlecnt"), jsonObj.optString("grandtotalbundleqty"), jsonObj.optString("grandtotalprice"));
+            AssignedDataObject obj = new AssignedDataObject(0, 0, "Grand Total",
+                    jsonObj.optString("grandtotalbundlecnt"),
+                    jsonObj.optString("grandtotalbundleqty"),
+                    jsonObj.optString("grandtotalprice"));
             results.add(i, obj);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -104,29 +102,17 @@ public class AssignedJobActivity extends AppCompatActivity implements View.OnCli
         return results;
     }
 
+    @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.imgd:
-                HashMap<String, String> user = session.getUserDetails();
-                String username = user.get(SessionManagement.KEY_USER);
-                String userid = user.get(SessionManagement.KEY_USER_ID);
-
-                Intent intent = new Intent(AssignedJobActivity.this, HomeActivity.class);
-                intent.putExtra("openDrawer", true);
-                intent.putExtra("username", username);  // use 'username' instead of 'User'
-                intent.putExtra("userid", userid);
-                intent.putExtra("processorid", processorid);
-                startActivity(intent);
-                break;
+        if (v.getId() == R.id.imgd) {
+            toggleDrawer(); // open/close drawer
         }
     }
 
-
     @Override
     public void onBackPressed() {
-        session = new SessionManagement(getApplicationContext());
         HashMap<String, String> user = session.getUserDetails();
-        Intent intent = new Intent(AssignedJobActivity.this, SelectJobSummaryActivity.class);
+        Intent intent = new Intent(this, SelectJobSummaryActivity.class);
         intent.putExtra("name", user.get(SessionManagement.KEY_USER));
         intent.putExtra("userid", user.get(SessionManagement.KEY_USER_ID));
         intent.putExtra("processorid", user.get(SessionManagement.KEY_PROCESSOR_ID));

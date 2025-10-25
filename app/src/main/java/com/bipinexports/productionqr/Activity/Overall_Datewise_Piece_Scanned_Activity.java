@@ -46,7 +46,7 @@ import java.util.Locale;
 import retrofit2.Call;
 
 
-public class Overall_Datewise_Piece_Scanned_Activity extends AppCompatActivity implements View.OnClickListener, GetResult.MyListener {
+public class Overall_Datewise_Piece_Scanned_Activity extends BaseActivity implements View.OnClickListener, GetResult.MyListener {
 
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
@@ -101,16 +101,24 @@ public class Overall_Datewise_Piece_Scanned_Activity extends AppCompatActivity i
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_overall_datewise_piece_scan_list);
+//        setContentView(R.layout.activity_overall_datewise_piece_scan_list);
+        setContentView(R.layout.activity_base);
+        setupDrawer();
 
-        txtUser = findViewById(R.id.txtUser);
-        imageView = findViewById(R.id.imgd);
-        progress = (ProgressBar) findViewById(R.id.progress);
+        View content = getLayoutInflater().inflate(
+                R.layout.activity_overall_datewise_piece_scan_list,
+                findViewById(R.id.content_frame),
+                true
+        );
+
+        txtUser = content.findViewById(R.id.txtUser);
+        imageView = content.findViewById(R.id.imgd);
+        progress = (ProgressBar) content.findViewById(R.id.progress);
 //        progress.setVisibility(View.VISIBLE);
 
         custPrograssbar = new CustPrograssbar();
 
-        txtUser = (TextView) findViewById(R.id.txtUser);
+        txtUser = (TextView) content.findViewById(R.id.txtUser);
 
         session = new SessionManagement(getApplicationContext());
         HashMap<String, String> user = session.getUserDetails();
@@ -122,7 +130,7 @@ public class Overall_Datewise_Piece_Scanned_Activity extends AppCompatActivity i
         userid = getIntent().getStringExtra("userid");
         username = getIntent().getStringExtra("name");
 
-        txt_empty = findViewById(R.id.txt_empty);
+        txt_empty = content.findViewById(R.id.txt_empty);
 
         imageView.setOnClickListener(this);
 
@@ -131,10 +139,10 @@ public class Overall_Datewise_Piece_Scanned_Activity extends AppCompatActivity i
         SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
         String formattedDate = df.format(c);
 
-        txtFromDate = findViewById(R.id.txtFromDate);
-        txttoDate = findViewById(R.id.txttoDate);
-        FetchData  = findViewById(R.id.FetchData);
-        txt_Section = findViewById(R.id.txt_Section);
+        txtFromDate = content.findViewById(R.id.txtFromDate);
+        txttoDate = content.findViewById(R.id.txttoDate);
+        FetchData  = content.findViewById(R.id.FetchData);
+        txt_Section = content.findViewById(R.id.txt_Section);
 
         type = getIntent().getStringExtra("type");
         if (type.equals("Data")) {
@@ -177,16 +185,7 @@ public class Overall_Datewise_Piece_Scanned_Activity extends AppCompatActivity i
         switch (v.getId()) {
             case R.id.imgd:
                 PopupMenu popup = new PopupMenu(Overall_Datewise_Piece_Scanned_Activity.this, imageView);
-                HashMap<String, String> user = session.getUserDetails();
-                String username = user.get(SessionManagement.KEY_USER);
-                String userid = user.get(SessionManagement.KEY_USER_ID);
-
-                Intent intent = new Intent(Overall_Datewise_Piece_Scanned_Activity.this, HomeActivity.class);
-                intent.putExtra("openDrawer", true);
-                intent.putExtra("username", username);
-                intent.putExtra("userid", userid);
-                intent.putExtra("processorid", processorid);
-                startActivity(intent);
+                toggleDrawer();
                 popup.show();
                 break;
             case R.id.txtFromDate:

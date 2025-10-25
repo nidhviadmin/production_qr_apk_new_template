@@ -38,7 +38,7 @@ import java.util.HashMap;
 
 import retrofit2.Call;
 
-public class OuputSummaryActivity extends AppCompatActivity implements View.OnClickListener, GetResult.MyListener {
+public class OuputSummaryActivity extends BaseActivity implements View.OnClickListener, GetResult.MyListener {
 
     String Id, User;
 
@@ -76,14 +76,22 @@ public class OuputSummaryActivity extends AppCompatActivity implements View.OnCl
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_output_summary);
+//        setContentView(R.layout.activity_output_summary);
+        setContentView(R.layout.activity_base);
+        setupDrawer();
 
-        imageView = (ImageView) findViewById(R.id.imgd);
+        View content = getLayoutInflater().inflate(
+                R.layout.activity_output_summary,
+                findViewById(R.id.content_frame),
+                true
+        );
+
+        imageView = (ImageView) content.findViewById(R.id.imgd);
         gridView = (GridView) this.findViewById(R.id.grid);
-        progress = (ProgressBar) findViewById(R.id.progress);
+        progress = (ProgressBar) content.findViewById(R.id.progress);
         progress.setVisibility(View.VISIBLE);
 
-        txtUser = (TextView) findViewById(R.id.txtUser);
+        txtUser = (TextView) content.findViewById(R.id.txtUser);
 
         session = new SessionManagement(getApplicationContext());
         HashMap<String, String> user = session.getUserDetails();
@@ -97,21 +105,21 @@ public class OuputSummaryActivity extends AppCompatActivity implements View.OnCl
         imageView.setOnClickListener(this);
 
 
-        txtFromDate = findViewById(R.id.txtFromDate);
-        txttoDate = findViewById(R.id.txttoDate);
-        FetchData  = findViewById(R.id.FetchData);
+        txtFromDate = content.findViewById(R.id.txtFromDate);
+        txttoDate = content.findViewById(R.id.txttoDate);
+        FetchData  = content.findViewById(R.id.FetchData);
 
         txtFromDate.setOnClickListener(this);
         txttoDate.setOnClickListener(this);
 
 
-        btn_OutputSummary =  findViewById(R.id.btn_OutputSummary);
+        btn_OutputSummary =  content.findViewById(R.id.btn_OutputSummary);
 
-        txtOutputBundleCount = findViewById(R.id.txtOutputBundleCount);
-        txtOutputbundleqty = findViewById(R.id.txtOutputbundleqty);
-        txtOutputPrice = findViewById(R.id.txtOutputPrice);
+        txtOutputBundleCount = content.findViewById(R.id.txtOutputBundleCount);
+        txtOutputbundleqty = content.findViewById(R.id.txtOutputbundleqty);
+        txtOutputPrice = content.findViewById(R.id.txtOutputPrice);
 
-        overallcard = (LinearLayout) findViewById(R.id.overallcard);
+        overallcard = (LinearLayout) content.findViewById(R.id.overallcard);
         overallcard.setVisibility(View.INVISIBLE);
         getvalue();
 
@@ -125,16 +133,7 @@ public class OuputSummaryActivity extends AppCompatActivity implements View.OnCl
             switch (v.getId()) {
                 case R.id.imgd:
                     PopupMenu popup = new PopupMenu(OuputSummaryActivity.this, imageView);
-                    HashMap<String, String> user = session.getUserDetails();
-                    String username = user.get(SessionManagement.KEY_USER);
-                    String userid = user.get(SessionManagement.KEY_USER_ID);
-
-                    Intent intent = new Intent(OuputSummaryActivity.this, HomeActivity.class);
-                    intent.putExtra("openDrawer", true);
-                    intent.putExtra("username", username);
-                    intent.putExtra("userid", userid);
-                    intent.putExtra("processorid", processorid);
-                    startActivity(intent);
+                    toggleDrawer();
                     popup.show();
                     break;
                 case R.id.txtFromDate:

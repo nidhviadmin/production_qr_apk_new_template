@@ -66,7 +66,7 @@ import retrofit2.Call;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
 
-public class Multiple_Bundle_QR_Scan_Activity extends AppCompatActivity implements View.OnClickListener, GetResult.MyListener {
+public class Multiple_Bundle_QR_Scan_Activity extends BaseActivity implements View.OnClickListener, GetResult.MyListener {
 
     String Id, User;
     SessionManagement session;
@@ -127,7 +127,15 @@ public class Multiple_Bundle_QR_Scan_Activity extends AppCompatActivity implemen
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_multiple_bundle_qr_scan);
+//        setContentView(R.layout.activity_multiple_bundle_qr_scan);
+        setContentView(R.layout.activity_base);
+        setupDrawer();
+
+        View content = getLayoutInflater().inflate(
+                R.layout.activity_multiple_bundle_qr_scan,
+                findViewById(R.id.content_frame),
+                true
+        );
 
         if ( Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission( getApplicationContext(), Manifest.permission.CAMERA ) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.CAMERA}, 212);
@@ -143,27 +151,27 @@ public class Multiple_Bundle_QR_Scan_Activity extends AppCompatActivity implemen
 
         custPrograssbar = new CustPrograssbar();
 
-        imageView = (ImageView) findViewById(R.id.imgd);
-        txtUser = (TextView) findViewById(R.id.txtUser);
+        imageView = (ImageView) content.findViewById(R.id.imgd);
+        txtUser = (TextView) content.findViewById(R.id.txtUser);
 
-        txtJobNo = findViewById(R.id.txtJobNo);
-        txtShipCode = findViewById(R.id.txtShipCode);
-        text_Part_Name =findViewById(R.id.text_Part_Name);
-        text_Size_Name = findViewById(R.id.text_Size_Name);
-        txtStyle = findViewById(R.id.txtStyle);
-        txtStyleRef = findViewById(R.id.text_Color);
+        txtJobNo = content.findViewById(R.id.txtJobNo);
+        txtShipCode = content.findViewById(R.id.txtShipCode);
+        text_Part_Name =content.findViewById(R.id.text_Part_Name);
+        text_Size_Name = content.findViewById(R.id.text_Size_Name);
+        txtStyle = content.findViewById(R.id.txtStyle);
+        txtStyleRef = content.findViewById(R.id.text_Color);
 
-        liner_bundle_details = findViewById(R.id.liner_bundle_details);
+        liner_bundle_details = content.findViewById(R.id.liner_bundle_details);
         liner_bundle_details.setVisibility(View.GONE);
 
-        linear_programdata = findViewById(R.id.linear_programdata);
+        linear_programdata = content.findViewById(R.id.linear_programdata);
         linear_programdata.setVisibility(View.GONE);
 
-        linear_layout_btn = findViewById(R.id.linear_layout_btn);
+        linear_layout_btn = content.findViewById(R.id.linear_layout_btn);
         linear_layout_btn.setVisibility(View.GONE);
 
-        btnOk = findViewById(R.id.btnOk);
-        btnCancel = findViewById(R.id.btnCancel);
+        btnOk = content.findViewById(R.id.btnOk);
+        btnCancel = content.findViewById(R.id.btnCancel);
         session = new SessionManagement(getApplicationContext());
         HashMap<String, String> user = session.getUserDetails();
         String name = user.get(SessionManagement.KEY_USER);
@@ -181,7 +189,7 @@ public class Multiple_Bundle_QR_Scan_Activity extends AppCompatActivity implemen
         imageView.setOnClickListener(this);
         Scanning();
 
-        FetchData = findViewById(R.id.FetchData);
+        FetchData = content.findViewById(R.id.FetchData);
 
         btnOk.setOnClickListener(this);
         btnCancel.setOnClickListener(this);
@@ -334,16 +342,7 @@ public class Multiple_Bundle_QR_Scan_Activity extends AppCompatActivity implemen
             switch (v.getId()) {
                 case R.id.imgd:
                     PopupMenu popup = new PopupMenu(Multiple_Bundle_QR_Scan_Activity.this, imageView);
-                    HashMap<String, String> user = session.getUserDetails();
-                    String username = user.get(SessionManagement.KEY_USER);
-                    String userid = user.get(SessionManagement.KEY_USER_ID);
-
-                    Intent intent = new Intent(Multiple_Bundle_QR_Scan_Activity.this, HomeActivity.class);
-                    intent.putExtra("openDrawer", true);
-                    intent.putExtra("username", username);
-                    intent.putExtra("userid", userid);
-                    intent.putExtra("processorid", processorid);
-                    startActivity(intent);
+                    toggleDrawer();
                     popup.show();
                     break;
                 case R.id.FetchData:

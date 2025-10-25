@@ -15,7 +15,7 @@ import com.bipinexports.productionqr.SessionManagement;
 
 import java.util.HashMap;
 
-public class Empty_Activity extends AppCompatActivity implements View.OnClickListener{
+public class Empty_Activity extends BaseActivity implements View.OnClickListener{
 
     SessionManagement session;
     ProgressBar progress;
@@ -34,12 +34,20 @@ public class Empty_Activity extends AppCompatActivity implements View.OnClickLis
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.empty_activity);
-        progress = (ProgressBar) findViewById(R.id.progress);
+//        setContentView(R.layout.empty_activity);
+        setContentView(R.layout.activity_base);
+        setupDrawer();
+
+        View content = getLayoutInflater().inflate(
+                R.layout.empty_activity,
+                findViewById(R.id.content_frame),
+                true
+        );
+        progress = (ProgressBar) content.findViewById(R.id.progress);
         progress.setVisibility(View.GONE);
 
-        txtUser = findViewById(R.id.txtUser);
-        imageView = findViewById(R.id.imgd);
+        txtUser = content.findViewById(R.id.txtUser);
+        imageView = content.findViewById(R.id.imgd);
 
         session = new SessionManagement(getApplicationContext());
         HashMap<String, String> user = session.getUserDetails();
@@ -64,15 +72,7 @@ public class Empty_Activity extends AppCompatActivity implements View.OnClickLis
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.imgd:
-                HashMap<String, String> user = session.getUserDetails();
-                String username = user.get(SessionManagement.KEY_USER);
-                String userid = user.get(SessionManagement.KEY_USER_ID);
-
-                Intent intent = new Intent(Empty_Activity.this, HomeActivity.class);
-                intent.putExtra("openDrawer", true);
-                intent.putExtra("username", username);
-                intent.putExtra("userid", userid);
-                startActivity(intent);
+                toggleDrawer();
                 break;
         }
     }

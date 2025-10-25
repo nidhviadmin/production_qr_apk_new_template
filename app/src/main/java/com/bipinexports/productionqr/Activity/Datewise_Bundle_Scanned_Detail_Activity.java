@@ -42,8 +42,9 @@ import java.util.Locale;
 import retrofit2.Call;
 
 
-public class Datewise_Bundle_Scanned_Detail_Activity extends AppCompatActivity implements View.OnClickListener, GetResult.MyListener {
+public class Datewise_Bundle_Scanned_Detail_Activity extends BaseActivity implements View.OnClickListener, GetResult.MyListener {
 
+    private View content;
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -90,60 +91,50 @@ public class Datewise_Bundle_Scanned_Detail_Activity extends AppCompatActivity i
     TextView txt_jobref, text_shipcode;
     int offset =0;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_datewise_bundle_scan_list);
+        setContentView(R.layout.activity_base);
+        setupDrawer();
 
-        txtUser = findViewById(R.id.txtUser);
-        imageView = findViewById(R.id.imgd);
-        progress = (ProgressBar) findViewById(R.id.progress);
-//        progress.setVisibility(View.VISIBLE);
+        content = getLayoutInflater().inflate(
+                R.layout.activity_datewise_bundle_scan_list,
+                findViewById(R.id.content_frame),
+                true);
+
+        txtUser = content.findViewById(R.id.txtUser);
+        imageView = content.findViewById(R.id.imgd);
+        progress = content.findViewById(R.id.progress);
+        txt_empty = content.findViewById(R.id.txt_empty);
+        txt_jobref = content.findViewById(R.id.txt_jobref);
+        text_shipcode = content.findViewById(R.id.text_shipcode);
 
         custPrograssbar = new CustPrograssbar();
-
-        txtUser = (TextView) findViewById(R.id.txtUser);
-
         session = new SessionManagement(getApplicationContext());
         HashMap<String, String> user = session.getUserDetails();
         this.User = user.get(SessionManagement.KEY_USER);
-
-        setImei();
 
         processorid = getIntent().getStringExtra("processorid");
         userid = getIntent().getStringExtra("userid");
         username = getIntent().getStringExtra("name");
 
-        txt_empty = findViewById(R.id.txt_empty);
-
         imageView.setOnClickListener(this);
 
+        // Set date formatting
         Date c = Calendar.getInstance().getTime();
-        System.out.println("Current time => " + c);
         SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
         String formattedDate = df.format(c);
 
         loading = true;
-        totalItemCount=0;
+        totalItemCount = 0;
         startindex = 0;
         endindex = 10;
-        endpos = 50;
         finalloading = true;
-        grandtotreach = false;
         progress.setVisibility(View.VISIBLE);
-
-        txt_jobref = findViewById(R.id.txt_jobref);
-        text_shipcode= findViewById(R.id.text_shipcode);
 
         startdate = getIntent().getStringExtra("fromdate");
         enddate = getIntent().getStringExtra("todate");
-
-        fromday = Integer.parseInt(getIntent().getStringExtra("fromday"));
-        frommonth = Integer.parseInt(getIntent().getStringExtra("frommonth"));
-        fromyear = Integer.parseInt(getIntent().getStringExtra("fromyear"));
-        today = Integer.parseInt(getIntent().getStringExtra("today"));
-        tomonth = Integer.parseInt(getIntent().getStringExtra("tomonth"));
-        toyear = Integer.parseInt(getIntent().getStringExtra("toyear"));
 
         job_ref = getIntent().getStringExtra("job_ref");
         shipcode = getIntent().getStringExtra("shipcode");
@@ -157,26 +148,15 @@ public class Datewise_Bundle_Scanned_Detail_Activity extends AppCompatActivity i
         part_id = getIntent().getStringExtra("part_id");
 
         txt_jobref.setText(job_ref);
-        text_shipcode.setText(sectionname +" | "+ shipcode +" | "+ partname +" | "+sizename);
+        text_shipcode.setText(sectionname + " | " + shipcode + " | " + partname + " | " + sizename);
 
         getvalue();
         fetch_datewise_bundle_piece_scan_details();
     }
 
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.imgd:
-                HashMap<String, String> user = session.getUserDetails();
-                String username = user.get(SessionManagement.KEY_USER);
-                String userid = user.get(SessionManagement.KEY_USER_ID);
-
-                Intent intent = new Intent(Datewise_Bundle_Scanned_Detail_Activity.this, HomeActivity.class);
-                intent.putExtra("openDrawer", true);
-                intent.putExtra("username", username);
-                intent.putExtra("userid", userid);
-                intent.putExtra("processorid", processorid);
-                startActivity(intent);
-                break;
+        if (v.getId() == R.id.imgd) {
+            toggleDrawer();
         }
     }
     private ArrayList<Datewise_Bundle_Piece_Data_Object> getDataSet() {

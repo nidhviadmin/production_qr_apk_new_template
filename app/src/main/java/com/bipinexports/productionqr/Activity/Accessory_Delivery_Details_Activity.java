@@ -41,7 +41,7 @@ import java.util.List;
 
 import retrofit2.Call;
 
-public class Accessory_Delivery_Details_Activity extends AppCompatActivity implements View.OnClickListener, GetResult.MyListener {
+public class Accessory_Delivery_Details_Activity extends BaseActivity implements View.OnClickListener, GetResult.MyListener {
 
     String Id, User;
 
@@ -63,18 +63,21 @@ public class Accessory_Delivery_Details_Activity extends AppCompatActivity imple
 
     public static CustPrograssbar_new custPrograssbar_new;
 
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_accessory_delivery_details);
+        setContentView(R.layout.activity_base);
+        setupDrawer();
 
-        imageView = (ImageView) findViewById(R.id.imgd);
-        gridView = (GridView) this.findViewById(R.id.grid);
-        progress = (ProgressBar) findViewById(R.id.progress);
+        View content = getLayoutInflater().inflate(R.layout.activity_accessory_delivery_details,
+                findViewById(R.id.content_frame), true);
+
+        imageView = content.findViewById(R.id.imgd);
+        gridView = content.findViewById(R.id.grid);
+        progress = content.findViewById(R.id.progress);
         custPrograssbar_new = new CustPrograssbar_new();
+        txtUser = content.findViewById(R.id.txtUser);
 
-        txtUser = (TextView) findViewById(R.id.txtUser);
-
-        session = new SessionManagement(getApplicationContext());
         HashMap<String, String> user = session.getUserDetails();
         String name = user.get(SessionManagement.KEY_USER);
         this.Id = user.get(SessionManagement.KEY_PROCESSOR_ID);
@@ -105,15 +108,15 @@ public class Accessory_Delivery_Details_Activity extends AppCompatActivity imple
 
         imageView.setOnClickListener(this);
 
-        text_PO_No = findViewById(R.id.text_PO_No);
-        text_PO_Date = findViewById(R.id.text_PO_Date);
-        text_Vendor_Name = findViewById(R.id.text_Vendor_Name);
-        text_DC_No = findViewById(R.id.text_DC_No);
-        text_DC_Date = findViewById(R.id.text_DC_Date);
-        text_Job_Ref = findViewById(R.id.text_Job_Ref);
-        text_Job_Order_No = findViewById(R.id.text_Job_Order_No);
-        text_Style_Name = findViewById(R.id.text_Style_Name);
-        text_Accessory_Name = findViewById(R.id.text_Accessory_Name);
+        text_PO_No = content.findViewById(R.id.text_PO_No);
+        text_PO_Date = content.findViewById(R.id.text_PO_Date);
+        text_Vendor_Name = content.findViewById(R.id.text_Vendor_Name);
+        text_DC_No = content.findViewById(R.id.text_DC_No);
+        text_DC_Date = content.findViewById(R.id.text_DC_Date);
+        text_Job_Ref = content.findViewById(R.id.text_Job_Ref);
+        text_Job_Order_No = content.findViewById(R.id.text_Job_Order_No);
+        text_Style_Name = content.findViewById(R.id.text_Style_Name);
+        text_Accessory_Name = content.findViewById(R.id.text_Accessory_Name);
 
         text_PO_No.setText(pono);
         text_PO_Date.setText(podate);
@@ -126,9 +129,10 @@ public class Accessory_Delivery_Details_Activity extends AppCompatActivity imple
 
         getvalue();
         get_deliverydetails();
-        AddProg = findViewById(R.id.AddProg);
+
+        AddProg = content.findViewById(R.id.AddProg);
+        AddReject = content.findViewById(R.id.AddReject);
         AddProg.setOnClickListener(this);
-        AddReject = findViewById(R.id.AddReject);
         AddReject.setOnClickListener(this);
         AddProg.setVisibility(View.INVISIBLE);
         AddReject.setVisibility(View.INVISIBLE);
@@ -138,12 +142,7 @@ public class Accessory_Delivery_Details_Activity extends AppCompatActivity imple
         if (isOnline()) {
             switch (v.getId()) {
                 case R.id.imgd:
-                    Intent intent = new Intent(Accessory_Delivery_Details_Activity.this, HomeActivity.class);
-                    intent.putExtra("openDrawer", true); //
-                    intent.putExtra("username", User);
-                    intent.putExtra("userid", userid);
-                    intent.putExtra("processorid", processorid);
-                    startActivity(intent);
+                    toggleDrawer();
                     break;
                 case R.id.AddProg:
                     Accessory_Delivery_Details_Activity.custPrograssbar_new.prograssCreate(this);

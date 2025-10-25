@@ -73,10 +73,11 @@ import retrofit2.Call;
 
 import static java.lang.Integer.parseInt;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, GetResult.MyListener {
+public class MainActivity extends BaseActivity implements View.OnClickListener, GetResult.MyListener {
+
 
     String Id, User;
-    SessionManagement session;
+//    SessionManagement session;
 
     GridView gridView;
     ProgressBar progress;
@@ -126,60 +127,65 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main2);
+        setContentView(R.layout.activity_base);
+        setupDrawer();
 
-        imageView = (ImageView) findViewById(R.id.imgd);
-        homebtn = (ImageView) findViewById(R.id.home);
-        gridView = (GridView) this.findViewById(R.id.grid);
-        progress = (ProgressBar) findViewById(R.id.progress);
+        View content = getLayoutInflater().inflate(R.layout.activity_main2,
+                findViewById(R.id.content_frame), true);
+
+
+        imageView = (ImageView) content.findViewById(R.id.imgd);
+        homebtn = (ImageView) content.findViewById(R.id.home);
+        gridView = (GridView) content.findViewById(R.id.grid);
+        progress = (ProgressBar) content.findViewById(R.id.progress);
         custPrograssbar_new = new CustPrograssbar_new();
         MainActivity.custPrograssbar_new.prograssCreate(this);
 
-        layout_qrscan = (LinearLayout) findViewById(R.id.layout_qrscan);
-        layout_mac_scan = (LinearLayout) findViewById(R.id.layout_mac_scan);
-        layout_emp_operation_mapp = (LinearLayout) findViewById(R.id.layout_emp_operation_mapp);
-        layout_emp_operation_mapped = (LinearLayout) findViewById(R.id.layout_emp_operation_mapped);
-        layout_employee_bundle_mapping = (LinearLayout) findViewById(R.id.layout_employee_bundle_mapping);
-        layout_piecewise_qrscan = (LinearLayout) findViewById(R.id.layout_piecewise_qrscan);
-        layout_piecewise_qrscan_using_barcode_reader = (LinearLayout) findViewById(R.id.layout_piecewise_qrscan_using_barcode_reader);
-        layout_piecewise_qrscan_using_usb_barcode_reader = (LinearLayout) findViewById(R.id.layout_piecewise_qrscan_using_usb_barcode_reader);
-        layout_usb_qrscan = findViewById(R.id.layout_usb_qrscan);
+        layout_qrscan = (LinearLayout) content.findViewById(R.id.layout_qrscan);
+        layout_mac_scan = (LinearLayout) content.findViewById(R.id.layout_mac_scan);
+        layout_emp_operation_mapp = (LinearLayout) content.findViewById(R.id.layout_emp_operation_mapp);
+        layout_emp_operation_mapped = (LinearLayout) content.findViewById(R.id.layout_emp_operation_mapped);
+        layout_employee_bundle_mapping = (LinearLayout) content.findViewById(R.id.layout_employee_bundle_mapping);
+        layout_piecewise_qrscan = (LinearLayout) content.findViewById(R.id.layout_piecewise_qrscan);
+        layout_piecewise_qrscan_using_barcode_reader = (LinearLayout) content.findViewById(R.id.layout_piecewise_qrscan_using_barcode_reader);
+        layout_piecewise_qrscan_using_usb_barcode_reader = (LinearLayout) content.findViewById(R.id.layout_piecewise_qrscan_using_usb_barcode_reader);
+        layout_usb_qrscan = content.findViewById(R.id.layout_usb_qrscan);
 
-        layout_bundle_scan = (LinearLayout) findViewById(R.id.layout_bundle_scan);
-        layout_multi_bundle_qrscan_using_usb_barcode_reader = (LinearLayout) findViewById(R.id.layout_multi_bundle_qrscan_using_usb_barcode_reader);
+        layout_bundle_scan = (LinearLayout) content.findViewById(R.id.layout_bundle_scan);
+        layout_multi_bundle_qrscan_using_usb_barcode_reader = (LinearLayout) content.findViewById(R.id.layout_multi_bundle_qrscan_using_usb_barcode_reader);
 
-        layout_laywise_qrscan = findViewById(R.id.layout_laywise_qrscan);
-        layout_laywise_qrscanner = findViewById(R.id.layout_laywise_qrscanner);
-        layout_rollwise_qrscan = findViewById(R.id.layout_rollwise_qrscan);
-        layout_rollwise_qrscanner = findViewById(R.id.layout_rollwise_qrscanner);
-        layout_rollwise_qrscan_using_barcode_reader = findViewById(R.id.layout_rollwise_qrscan_using_barcode_reader);
+        layout_laywise_qrscan = content.findViewById(R.id.layout_laywise_qrscan);
+        layout_laywise_qrscanner = content.findViewById(R.id.layout_laywise_qrscanner);
+        layout_rollwise_qrscan = content.findViewById(R.id.layout_rollwise_qrscan);
+        layout_rollwise_qrscanner = content.findViewById(R.id.layout_rollwise_qrscanner);
+        layout_rollwise_qrscan_using_barcode_reader = content.findViewById(R.id.layout_rollwise_qrscan_using_barcode_reader);
 
-        layout_scan_inward_rolls = findViewById(R.id.layout_scan_inward_rolls);
-        layout_scan_relaxed_rolls = findViewById(R.id.layout_scan_relaxed_rolls);
+        layout_scan_inward_rolls = content.findViewById(R.id.layout_scan_inward_rolls);
+        layout_scan_relaxed_rolls = content.findViewById(R.id.layout_scan_relaxed_rolls);
 
-        ll_category   = (LinearLayout) findViewById(R.id.ll_category);
+        ll_category   = (LinearLayout) content.findViewById(R.id.ll_category);
         ll_category.setVisibility(View.GONE);
 
-        ll_category1   = (LinearLayout) findViewById(R.id.ll_category1);
-        ll_category2   = (LinearLayout) findViewById(R.id.ll_category2);
-        ll_category3   = (LinearLayout) findViewById(R.id.ll_category3);
-        ll_category4   = (LinearLayout) findViewById(R.id.ll_category4);
-        ll_category5   = (LinearLayout) findViewById(R.id.ll_category5);
-        ll_category6 = findViewById(R.id.ll_category6);
-        ll_category7 = findViewById(R.id.ll_category7);
-        ll_category8 = findViewById(R.id.ll_category8);
-        ll_category9 = findViewById(R.id.ll_category9);
-        ll_category10 = findViewById(R.id.ll_category10);
+        ll_category1   = (LinearLayout) content.findViewById(R.id.ll_category1);
+        ll_category2   = (LinearLayout) content.findViewById(R.id.ll_category2);
+        ll_category3   = (LinearLayout) content.findViewById(R.id.ll_category3);
+        ll_category4   = (LinearLayout) content.findViewById(R.id.ll_category4);
+        ll_category5   = (LinearLayout) content.findViewById(R.id.ll_category5);
+        ll_category6 = content.findViewById(R.id.ll_category6);
+        ll_category7 = content.findViewById(R.id.ll_category7);
+        ll_category8 = content.findViewById(R.id.ll_category8);
+        ll_category9 = content.findViewById(R.id.ll_category9);
+        ll_category10 = content.findViewById(R.id.ll_category10);
 
-        txtScan = (TextView) findViewById(R.id.txtScan);
-        txtUser = (TextView) findViewById(R.id.txtUser);
+        txtScan = (TextView) content.findViewById(R.id.txtScan);
+        txtUser = (TextView) content.findViewById(R.id.txtUser);
 
-        txt_piecewise_scan = (TextView) findViewById(R.id.txt_piecewise_scan);
-        txt_piecewise = findViewById(R.id.txt_piecewise);
-        txt_rollwise = findViewById(R.id.txt_rollwise);
+        txt_piecewise_scan = (TextView) content.findViewById(R.id.txt_piecewise_scan);
+        txt_piecewise = content.findViewById(R.id.txt_piecewise);
+        txt_rollwise = content.findViewById(R.id.txt_rollwise);
         txt_piecewise.setVisibility(View.GONE);
 
-        session = new SessionManagement(getApplicationContext());
+//        session = new SessionManagement(getApplicationContext());
         HashMap<String, String> user = session.getUserDetails();
         String name = user.get(SessionManagement.KEY_USER);
         this.Id = user.get(SessionManagement.KEY_PROCESSOR_ID);
@@ -188,12 +194,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         this.User = user.get(SessionManagement.KEY_USER);
         unitid = user.get(SessionManagement.KEY_UNITID);
 
-        txt_bundleqr = findViewById(R.id.txt_bundleqr);
-        txt_multiple_bundle_qr = findViewById(R.id.txt_multiple_bundle_qr);
-        txt_laywise = findViewById(R.id.txt_laywise);
-        txt_reports = findViewById(R.id.txt_reports);
-        txt_machine_details = findViewById(R.id.txt_machine_details);
-        txt_bundle_mapping = findViewById(R.id.txt_bundle_mapping);
+        txt_bundleqr = content.findViewById(R.id.txt_bundleqr);
+        txt_multiple_bundle_qr = content.findViewById(R.id.txt_multiple_bundle_qr);
+        txt_laywise = content.findViewById(R.id.txt_laywise);
+        txt_reports = content.findViewById(R.id.txt_reports);
+        txt_machine_details = content.findViewById(R.id.txt_machine_details);
+        txt_bundle_mapping = content.findViewById(R.id.txt_bundle_mapping);
 
         int underlineThickness = 8; // Thickness in pixels
 
@@ -275,20 +281,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         imageView.setOnClickListener(this);
         homebtn.setOnClickListener(this);
 
-        layout_jobsummary = (LinearLayout) findViewById(R.id.layout_jobsummary);
-        layout_output =   (LinearLayout) findViewById(R.id.layout_output);
-        layout_datewiseoutput =   (LinearLayout) findViewById(R.id.layout_datewiseoutput);
-        layout_accessory_receipt =   (LinearLayout) findViewById(R.id.layout_accessory_receipt);
-        layout_mac_service_verification =   (LinearLayout) findViewById(R.id.layout_mac_service_verification);
-        layout_datewise_pc = (LinearLayout) findViewById(R.id.layout_datewise_pc);
+        layout_jobsummary = (LinearLayout) content.findViewById(R.id.layout_jobsummary);
+        layout_output =   (LinearLayout) content.findViewById(R.id.layout_output);
+        layout_datewiseoutput =   (LinearLayout) content.findViewById(R.id.layout_datewiseoutput);
+        layout_accessory_receipt =   (LinearLayout) content.findViewById(R.id.layout_accessory_receipt);
+        layout_mac_service_verification =   (LinearLayout) content.findViewById(R.id.layout_mac_service_verification);
+        layout_datewise_pc = (LinearLayout) content.findViewById(R.id.layout_datewise_pc);
 
-        layout_accessory_receipt_new =   (LinearLayout) findViewById(R.id.layout_accessory_receipt_new);
-        txt_accessory_count = (TextView) findViewById(R.id.txt_accessory_count);
+        layout_accessory_receipt_new =   (LinearLayout) content.findViewById(R.id.layout_accessory_receipt_new);
+        txt_accessory_count = (TextView) content.findViewById(R.id.txt_accessory_count);
 
-        layout_fabric_receipt_new = findViewById(R.id.layout_fabric_receipt_new);
-        txt_fabric_count = (TextView) findViewById(R.id.txt_fabric_count);
-        layout_machine_scan = findViewById(R.id.layout_machine_scan);
-        layout_sharptool_scan= findViewById(R.id.layout_sharptool_scan);
+        layout_fabric_receipt_new = content.findViewById(R.id.layout_fabric_receipt_new);
+        txt_fabric_count = (TextView) content.findViewById(R.id.txt_fabric_count);
+        layout_machine_scan = content.findViewById(R.id.layout_machine_scan);
+        layout_sharptool_scan= content.findViewById(R.id.layout_sharptool_scan);
 
         layout_qrscan.setOnClickListener(this);
         layout_mac_scan.setOnClickListener(this);
@@ -321,8 +327,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         layout_multi_bundle_qrscan_using_usb_barcode_reader.setOnClickListener(this);
 //        layout_multi_bundle_qrscan_using_usb_barcode_reader.setVisibility(View.GONE);
 
-        textpendingcount = (TextView) findViewById(R.id.txt_count);
-        mac_service_verification = (TextView) findViewById(R.id.txt_mac_service_verification_count);
+        textpendingcount = (TextView) content.findViewById(R.id.txt_count);
+        mac_service_verification = (TextView) content.findViewById(R.id.txt_mac_service_verification_count);
         fetch_image_cat_Details();
 
         getpendingdeliverycounts();
@@ -367,7 +373,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             //txt_rollwise.setVisibility(View.VISIBLE);
         }
 
-//        swipeRefreshLayout = findViewById(R.id.swiperefresh);
+//        swipeRefreshLayout = content.findViewById(R.id.swiperefresh);
 //        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
 //            @Override
 //            public void onRefresh() {
@@ -377,6 +383,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //        });
 //        swipeRefreshLayout.setColorSchemeColors(Color.BLACK);
     }
+
 
     private void versioncode() {
         if(isOnline()) {
@@ -491,12 +498,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Intent intent;
             switch (v.getId()) {
                 case R.id.imgd:
-                    intent = new Intent(MainActivity.this, HomeActivity.class);
-                    intent.putExtra("openDrawer", true);
-                    intent.putExtra("username", username);
-                    intent.putExtra("userid", userid);
-                    intent.putExtra("processorid", processorid);
-                    startActivity(intent);
+                    toggleDrawer();
                     break;
 
                 case R.id.home:

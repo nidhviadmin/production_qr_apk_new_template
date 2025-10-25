@@ -36,7 +36,7 @@ import java.util.Iterator;
 import retrofit2.Call;
 
 
-public class Out_Employee_Operation_Mapping_Activity extends AppCompatActivity implements View.OnClickListener, GetResult.MyListener {
+public class Out_Employee_Operation_Mapping_Activity extends BaseActivity implements View.OnClickListener, GetResult.MyListener {
 
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
@@ -61,14 +61,22 @@ public class Out_Employee_Operation_Mapping_Activity extends AppCompatActivity i
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_out_employee_operation_mapping);
+//        setContentView(R.layout.activity_out_employee_operation_mapping);
+        setContentView(R.layout.activity_base);
+        setupDrawer();
 
-        txtUser = findViewById(R.id.txtUser);
-        imageView = findViewById(R.id.imgd);
-        progress = (ProgressBar) findViewById(R.id.progress);
+        View content = getLayoutInflater().inflate(
+                R.layout.activity_out_employee_operation_mapping,
+                findViewById(R.id.content_frame),
+                true
+        );
+
+        txtUser = content.findViewById(R.id.txtUser);
+        imageView = content.findViewById(R.id.imgd);
+        progress = (ProgressBar)  content.findViewById(R.id.progress);
         custPrograssbar_new = new CustPrograssbar_new();
 
-        txtUser = (TextView) findViewById(R.id.txtUser);
+        txtUser = (TextView)  content.findViewById(R.id.txtUser);
 
         session = new SessionManagement(getApplicationContext());
         HashMap<String, String> user = session.getUserDetails();
@@ -87,7 +95,7 @@ public class Out_Employee_Operation_Mapping_Activity extends AppCompatActivity i
 
         getvalue();
         fetch_employee_Details();
-        swipeRefreshLayout = findViewById(R.id.swiperefresh);
+        swipeRefreshLayout =  content.findViewById(R.id.swiperefresh);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -192,16 +200,7 @@ public class Out_Employee_Operation_Mapping_Activity extends AppCompatActivity i
         switch (v.getId()) {
             case R.id.imgd:
                 PopupMenu popup = new PopupMenu(Out_Employee_Operation_Mapping_Activity.this, imageView);
-                HashMap<String, String> user = session.getUserDetails();
-                String username = user.get(SessionManagement.KEY_USER);
-                String userid = user.get(SessionManagement.KEY_USER_ID);
-
-                Intent intent = new Intent(Out_Employee_Operation_Mapping_Activity.this, HomeActivity.class);
-                intent.putExtra("openDrawer", true);
-                intent.putExtra("username", username);
-                intent.putExtra("userid", userid);
-                intent.putExtra("processorid", processorid);
-                startActivity(intent);
+                toggleDrawer();
                 popup.show();
                 break;
         }

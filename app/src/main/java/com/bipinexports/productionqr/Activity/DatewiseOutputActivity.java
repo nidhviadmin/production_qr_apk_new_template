@@ -42,8 +42,9 @@ import java.util.Iterator;
 import retrofit2.Call;
 
 
-public class DatewiseOutputActivity extends AppCompatActivity implements View.OnClickListener, GetResult.MyListener {
+public class DatewiseOutputActivity extends BaseActivity implements View.OnClickListener, GetResult.MyListener {
 
+    private View content;
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -80,31 +81,34 @@ public class DatewiseOutputActivity extends AppCompatActivity implements View.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_datewiseoutput);
+        setContentView(R.layout.activity_base);  // Base layout with Drawer
+        setupDrawer();  // Initialize the drawer
+
+        // Inflate actual content into drawer's content_frame
+        content = getLayoutInflater().inflate(
+                R.layout.activity_datewiseoutput,
+                findViewById(R.id.content_frame),
+                true
+        );
 
         type = getIntent().getStringExtra("type");
 
-        txtUser = findViewById(R.id.txtUser);
-        imageView = findViewById(R.id.imgd);
-        progress = (ProgressBar) findViewById(R.id.progress);
-        progress.setVisibility(View.VISIBLE);
-
-        txtUser = (TextView) findViewById(R.id.txtUser);
+        txtUser = content.findViewById(R.id.txtUser);
+        imageView = content.findViewById(R.id.imgd);
+        progress = content.findViewById(R.id.progress);
 
         session = new SessionManagement(getApplicationContext());
         HashMap<String, String> user = session.getUserDetails();
-        String name = user.get(SessionManagement.KEY_USER);
         this.Id = user.get(SessionManagement.KEY_PROCESSOR_ID);
         processorid = user.get(SessionManagement.KEY_PROCESSOR_ID);
         userid = user.get(SessionManagement.KEY_USER_ID);
         this.User = user.get(SessionManagement.KEY_USER);
 
-        processorid = getIntent().getStringExtra("processorid");
-        imageView.setOnClickListener(this);
+        imageView.setOnClickListener(this);  // Toggle drawer
 
-        txtFromDate = findViewById(R.id.txtFromDate);
-        txttoDate = findViewById(R.id.txttoDate);
-        FetchData  = findViewById(R.id.FetchData);
+        txtFromDate = content.findViewById(R.id.txtFromDate);
+        txttoDate = content.findViewById(R.id.txttoDate);
+        FetchData = content.findViewById(R.id.FetchData);
 
         txtFromDate.setOnClickListener(this);
         txttoDate.setOnClickListener(this);
@@ -112,8 +116,7 @@ public class DatewiseOutputActivity extends AppCompatActivity implements View.On
 
         getvalue();
 
-        if (type.equals("Data")) {
-
+        if ("Data".equals(type)) {
             startdate = getIntent().getStringExtra("startdate");
             enddate = getIntent().getStringExtra("enddate");
 
@@ -127,13 +130,13 @@ public class DatewiseOutputActivity extends AppCompatActivity implements View.On
             txtFromDate.setText(startdate);
             txttoDate.setText(enddate);
 
-
-            selectedfromdate =  startdate;
-            selectedtodate =  enddate;
+            selectedfromdate = startdate;
+            selectedtodate = enddate;
 
             fetchDatewiseoutputDetails();
         }
     }
+
 
     private ArrayList<DatewiseDataObject> getDataSet() {
         ArrayList results = new ArrayList<DatewiseDataObject>();
@@ -167,16 +170,7 @@ public class DatewiseOutputActivity extends AppCompatActivity implements View.On
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.imgd:
-                HashMap<String, String> user = session.getUserDetails();
-                String username = user.get(SessionManagement.KEY_USER);
-                String userid = user.get(SessionManagement.KEY_USER_ID);
-
-                Intent intent = new Intent(DatewiseOutputActivity.this, HomeActivity.class);
-                intent.putExtra("openDrawer", true);
-                intent.putExtra("username", username);
-                intent.putExtra("userid", userid);
-                intent.putExtra("processorid", processorid);
-                startActivity(intent);
+                toggleDrawer();
                 break;
             case R.id.txtFromDate:
                 if(fromday == 0 || frommonth == 0 || fromyear == 0)

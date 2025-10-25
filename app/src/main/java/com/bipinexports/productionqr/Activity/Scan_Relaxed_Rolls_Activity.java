@@ -62,7 +62,7 @@ import retrofit2.Call;
 
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
-public class Scan_Relaxed_Rolls_Activity extends AppCompatActivity implements View.OnClickListener, GetResult.MyListener {
+public class Scan_Relaxed_Rolls_Activity extends BaseActivity implements View.OnClickListener, GetResult.MyListener {
 
     String Id, User;
     SessionManagement session;
@@ -96,7 +96,12 @@ public class Scan_Relaxed_Rolls_Activity extends AppCompatActivity implements Vi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_scan_relaxed_rollwise);
+        setContentView(R.layout.activity_base);  // Changed to base layout
+        setupDrawer();  // Setup drawer before using it
+
+        // Inflate your actual content into the content_frame
+        View content = getLayoutInflater().inflate(R.layout.activity_scan_relaxed_rollwise,
+                findViewById(R.id.content_frame), true);
 
         if ( Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission( getApplicationContext(), Manifest.permission.CAMERA ) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.CAMERA}, 212);
@@ -112,43 +117,44 @@ public class Scan_Relaxed_Rolls_Activity extends AppCompatActivity implements Vi
 
         custPrograssbar = new CustPrograssbar();
 
-        imageView = (ImageView) findViewById(R.id.imgd);
-        txtUser = (TextView) findViewById(R.id.txtUser);
+        imageView = content.findViewById(R.id.imgd);
+        txtUser = content.findViewById(R.id.txtUser);
 
-        txtJobNo = findViewById(R.id.txtJobNo);
-        txtShipCode = findViewById(R.id.txtShipCode);
-        text_Color = findViewById(R.id.text_Color);
-        txtStyle = findViewById(R.id.txtStyle);
-        txtTitle = findViewById(R.id.txtTitle);
+        txtJobNo = content.findViewById(R.id.txtJobNo);
+        txtShipCode = content.findViewById(R.id.txtShipCode);
+        text_Color = content.findViewById(R.id.text_Color);
+        txtStyle = content.findViewById(R.id.txtStyle);
+        txtTitle = content.findViewById(R.id.txtTitle);
         txtTitle.setVisibility(View.GONE);
 
-        text_partname = findViewById(R.id.text_partname);
-        text_rackname = findViewById(R.id.text_rackname);
-        text_rollno = findViewById(R.id.text_rollno);
-        text_rollcode = findViewById(R.id.text_rollcode);
-        text_weight = findViewById(R.id.text_weight);
-        text_4point = findViewById(R.id.text_4point);
-        text_relaxed_by = findViewById(R.id.text_relaxed_by);
-        text_relaxed_on = findViewById(R.id.text_relaxed_on);
+        text_partname = content.findViewById(R.id.text_partname);
+        text_rackname = content.findViewById(R.id.text_rackname);
+        text_rollno = content.findViewById(R.id.text_rollno);
+        text_rollcode = content.findViewById(R.id.text_rollcode);
+        text_weight = content.findViewById(R.id.text_weight);
+        text_4point = content.findViewById(R.id.text_4point);
+        text_relaxed_by = content.findViewById(R.id.text_relaxed_by);
+        text_relaxed_on = content.findViewById(R.id.text_relaxed_on);
 
-        liner_bundle_details = findViewById(R.id.liner_bundle_details);
+        liner_bundle_details = content.findViewById(R.id.liner_bundle_details);
         liner_bundle_details.setVisibility(View.GONE);
 
-        layout_text_4point = findViewById(R.id.layout_text_4point);
+        layout_text_4point = content.findViewById(R.id.layout_text_4point);
         layout_text_4point.setVisibility(View.GONE);
 
-        layout_text_relaxed_by= findViewById(R.id.layout_text_relaxed_by);
+        layout_text_relaxed_by = content.findViewById(R.id.layout_text_relaxed_by);
         layout_text_relaxed_by.setVisibility(View.GONE);
 
-        layout_text_relaxed_on= findViewById(R.id.layout_text_relaxed_on);
+        layout_text_relaxed_on = content.findViewById(R.id.layout_text_relaxed_on);
         layout_text_relaxed_on.setVisibility(View.GONE);
 
-        linear_layout_btn = findViewById(R.id.linear_layout_btn);
+        linear_layout_btn = content.findViewById(R.id.linear_layout_btn);
         linear_layout_btn.setVisibility(View.GONE);
 
-        btnOk = findViewById(R.id.btnOk);
-        btn_scan_again = findViewById(R.id.btn_scan_again);
-        btnCancel = findViewById(R.id.btnCancel);
+        btnOk = content.findViewById(R.id.btnOk);
+        btn_scan_again = content.findViewById(R.id.btn_scan_again);
+        btnCancel = content.findViewById(R.id.btnCancel);
+
         session = new SessionManagement(getApplicationContext());
         HashMap<String, String> user = session.getUserDetails();
         String name = user.get(SessionManagement.KEY_USER);
@@ -173,7 +179,6 @@ public class Scan_Relaxed_Rolls_Activity extends AppCompatActivity implements Vi
         btnCancel.setOnClickListener(this);
         btn_scan_again.setOnClickListener(this);
     }
-
     private void versioncode() {
         if(isOnline()) {
             Context context = this;
@@ -330,16 +335,7 @@ public class Scan_Relaxed_Rolls_Activity extends AppCompatActivity implements Vi
             switch (v.getId()) {
                 case R.id.imgd:
                     PopupMenu popup = new PopupMenu(Scan_Relaxed_Rolls_Activity.this, imageView);
-                    HashMap<String, String> user = session.getUserDetails();
-                    String username = user.get(SessionManagement.KEY_USER);
-                    String userid = user.get(SessionManagement.KEY_USER_ID);
-
-                    Intent intent = new Intent(Scan_Relaxed_Rolls_Activity.this, HomeActivity.class);
-                    intent.putExtra("openDrawer", true);
-                    intent.putExtra("username", username);
-                    intent.putExtra("userid", userid);
-                    intent.putExtra("processorid", processorid);
-                    startActivity(intent);
+                    toggleDrawer();
                     popup.show();
                     break;
                 case R.id.btn_scan_again:

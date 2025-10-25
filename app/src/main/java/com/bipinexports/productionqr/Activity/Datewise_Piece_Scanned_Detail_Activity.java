@@ -41,8 +41,9 @@ import java.util.Locale;
 import retrofit2.Call;
 
 
-public class Datewise_Piece_Scanned_Detail_Activity extends AppCompatActivity implements View.OnClickListener, GetResult.MyListener {
+public class Datewise_Piece_Scanned_Detail_Activity extends BaseActivity implements View.OnClickListener, GetResult.MyListener {
 
+    private View content;
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -87,15 +88,21 @@ public class Datewise_Piece_Scanned_Detail_Activity extends AppCompatActivity im
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_datewise_piece_scan_list);
 
-        txtUser = findViewById(R.id.txtUser);
-        imageView = findViewById(R.id.imgd);
-        progress = (ProgressBar) findViewById(R.id.progress);
+        setContentView(R.layout.activity_base);
+        setupDrawer();
+
+        content = getLayoutInflater().inflate(
+                R.layout.activity_datewise_piece_scan_list,
+                findViewById(R.id.content_frame),
+                true
+        );
+
+        txtUser = content.findViewById(R.id.txtUser);
+        imageView = content.findViewById(R.id.imgd);
+        progress = content.findViewById(R.id.progress);
 
         custPrograssbar = new CustPrograssbar();
-
-        txtUser = (TextView) findViewById(R.id.txtUser);
 
         session = new SessionManagement(getApplicationContext());
         HashMap<String, String> user = session.getUserDetails();
@@ -107,15 +114,13 @@ public class Datewise_Piece_Scanned_Detail_Activity extends AppCompatActivity im
         userid = getIntent().getStringExtra("userid");
         username = getIntent().getStringExtra("name");
 
-        txt_empty = findViewById(R.id.txt_empty);
-
-        txt_jobref = findViewById(R.id.txt_jobref);
-        txt_shipcode = findViewById(R.id.txt_shipcode);
+        txt_empty = content.findViewById(R.id.txt_empty);
+        txt_jobref = content.findViewById(R.id.txt_jobref);
+        txt_shipcode = content.findViewById(R.id.txt_shipcode);
 
         imageView.setOnClickListener(this);
 
         Date c = Calendar.getInstance().getTime();
-        System.out.println("Current time => " + c);
         SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
         String formattedDate = df.format(c);
 
@@ -137,29 +142,18 @@ public class Datewise_Piece_Scanned_Detail_Activity extends AppCompatActivity im
         sectionid = getIntent().getStringExtra("sectionid");
 
         txt_jobref.setText(job_ref);
-        txt_shipcode.setText(shipcode +" | "+ sectionname);
+        txt_shipcode.setText(shipcode + " | " + sectionname);
 
         fetch_datewise_piece_details();
         getvalue();
-
     }
 
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.imgd:
-                HashMap<String, String> user = session.getUserDetails();
-                String username = user.get(SessionManagement.KEY_USER);
-                String userid = user.get(SessionManagement.KEY_USER_ID);
-
-                Intent intent = new Intent(Datewise_Piece_Scanned_Detail_Activity.this, HomeActivity.class);
-                intent.putExtra("openDrawer", true);
-                intent.putExtra("username", username);
-                intent.putExtra("userid", userid);
-                intent.putExtra("processorid", processorid);
-                startActivity(intent);
-                break;
+        if (v.getId() == R.id.imgd) {
+            toggleDrawer();
         }
     }
+
     private ArrayList<Datewise_Piece_Scan_List_Data_Object> getDataSet() {
 //        ArrayList results = new ArrayList<Accessory_Receipt_Data_Object>();
         try {
@@ -219,7 +213,6 @@ public class Datewise_Piece_Scanned_Detail_Activity extends AppCompatActivity im
             }
         }
     }
-
 
     private void fetch_datewise_piece_details() {
         Datewise_Piece_Scanned_Detail_Activity.custPrograssbar.prograssCreate(this);

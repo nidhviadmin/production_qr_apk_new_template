@@ -5,61 +5,175 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Your child page will be inflated here -->
     <FrameLayout
         android:id="@+id/content_frame"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <!-- Side drawer -->
     <LinearLayout
         android:layout_width="280dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:orientation="vertical"
-        android:background="@color/white"
-        android:padding="16dp">
-
-        <ImageView
-            android:id="@+id/img_close"
-            android:src="@drawable/close"
-            android:layout_width="24dp"
-            android:layout_height="24dp" />
-
-        <TextView
-            android:id="@+id/txt_name"
-            android:text="Hello User"
-            android:textSize="16sp"
-            android:paddingTop="8dp"
-            android:paddingBottom="16dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+        android:background="@color/white">
 
         <LinearLayout
-            android:id="@+id/lvl_home"
-            android:orientation="horizontal"
-            android:padding="10dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <TextView
-                android:text="Home"
-                android:textSize="14sp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/colorPrimary"
+            android:padding="16dp">
+
+            <ImageView
+                android:id="@+id/img_close"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="end"
+                android:src="@drawable/close" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp">
+
+                <TextView
+                    android:id="@+id/txtfirstl"
+                    android:layout_width="65dp"
+                    android:layout_height="65dp"
+                    android:gravity="center"
+                    android:textSize="25sp"
+                    android:textColor="@color/colorWhite"
+                    android:textAllCaps="true"
+                    android:background="@drawable/circale_card" />
+
+                <TextView
+                    android:id="@+id/txt_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/coresans_cr_medium"
+                    android:text="Username"
+                    android:textSize="18sp"
+                    android:textColor="@color/colorBalck"
+                    android:textStyle="bold"
+                    android:paddingTop="8dp"/>
+            </LinearLayout>
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/logout"
-            android:orientation="horizontal"
-            android:padding="10dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <TextView
-                android:text="Logout"
-                android:textSize="14sp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:background="@color/white"
+            android:padding="16dp">
+
+            <LinearLayout
+                android:id="@+id/lvl_home"
+                android:orientation="horizontal"
+                android:padding="12dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:background="?attr/selectableItemBackground">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_home1"
+                    android:contentDescription="Home icon"
+                    android:layout_marginEnd="16dp" />
+
+                <TextView
+                    android:text="Home"
+                    android:textSize="16sp"
+                    android:textColor="@color/colorBalck"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/lvl_change_password"
+                android:orientation="horizontal"
+                android:padding="12dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:background="?attr/selectableItemBackground"
+                android:layout_marginTop="8dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_forgot_pass"
+                    android:contentDescription="Change Password icon"
+                    android:layout_marginEnd="16dp" />
+
+                <TextView
+                    android:text="Change Password"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/coresans_cr_medium"
+                    android:textColor="@color/colorBalck"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/logout"
+                android:orientation="horizontal"
+                android:padding="12dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:background="?attr/selectableItemBackground"
+                android:layout_marginTop="8dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_logout"
+                    android:contentDescription="Logout icon"
+                    android:layout_marginEnd="16dp" />
+
+                <TextView
+                    android:text="Logout"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/coresans_cr_medium"
+                    android:textColor="@color/colorBalck"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/lvl_version"
+                android:orientation="horizontal"
+                android:padding="12dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:background="?attr/selectableItemBackground"
+                android:layout_marginTop="8dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_update"
+                    android:contentDescription="Version icon"
+                    android:layout_marginEnd="16dp"/>
+
+                <TextView
+                    android:id="@+id/txt_version"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/coresans_cr_medium"
+                    android:textColor="@color/colorBalck"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
+
         </LinearLayout>
 
     </LinearLayout>
+
 </androidx.drawerlayout.widget.DrawerLayout>

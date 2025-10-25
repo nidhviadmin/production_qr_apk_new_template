@@ -32,7 +32,7 @@ import java.util.HashMap;
 
 import retrofit2.Call;
 
-public class SelectJobSummaryActivity extends AppCompatActivity implements View.OnClickListener, GetResult.MyListener {
+public class SelectJobSummaryActivity extends BaseActivity implements View.OnClickListener, GetResult.MyListener {
 
     String Id, User;
 
@@ -53,19 +53,26 @@ public class SelectJobSummaryActivity extends AppCompatActivity implements View.
     public static CustPrograssbar_new custPrograssbar_new;
 
 
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_select_jobsummary);
-        progress = (ProgressBar) findViewById(R.id.progress);
+        setContentView(R.layout.activity_base);  // Changed to base layout
+        setupDrawer();  // Setup drawer before using it
+
+        // Inflate your actual content into the content_frame
+        View content = getLayoutInflater().inflate(R.layout.activity_select_jobsummary,
+                findViewById(R.id.content_frame), true);
+
+        // Find views from the inflated content
+        progress = content.findViewById(R.id.progress);
 
         custPrograssbar_new = new CustPrograssbar_new();
         SelectJobSummaryActivity.custPrograssbar_new.prograssCreate(this);
 
+        imageView = content.findViewById(R.id.imgd);
+        gridView = content.findViewById(R.id.grid);
 
-        imageView = (ImageView) findViewById(R.id.imgd);
-        gridView = (GridView) this.findViewById(R.id.grid);
-
-        txtUser = (TextView) findViewById(R.id.txtUser);
+        txtUser = content.findViewById(R.id.txtUser);
 
         session = new SessionManagement(getApplicationContext());
         HashMap<String, String> user = session.getUserDetails();
@@ -78,31 +85,30 @@ public class SelectJobSummaryActivity extends AppCompatActivity implements View.
         processorid = getIntent().getStringExtra("processorid");
         imageView.setOnClickListener(this);
 
-        btn_AssignedJobs =  findViewById(R.id.btn_AssignedJobs);
-        btn_PendingJobs =  findViewById(R.id.btn_PendingJobs);
-        btn_InprocessJobs =  findViewById(R.id.btn_InprocessJobs);
-        btn_CompletedJobs =  findViewById(R.id.btn_CompletedJobs);
+        btn_AssignedJobs = content.findViewById(R.id.btn_AssignedJobs);
+        btn_PendingJobs = content.findViewById(R.id.btn_PendingJobs);
+        btn_InprocessJobs = content.findViewById(R.id.btn_InprocessJobs);
+        btn_CompletedJobs = content.findViewById(R.id.btn_CompletedJobs);
 
-        txtAssignedBundleCount = findViewById(R.id.txtAssignedBundleCount);
-        txtassignedbundleqty = findViewById(R.id.txtassignedbundleqty);
-        txtAssignedPrice = findViewById(R.id.txtAssignedPrice);
+        txtAssignedBundleCount = content.findViewById(R.id.txtAssignedBundleCount);
+        txtassignedbundleqty = content.findViewById(R.id.txtassignedbundleqty);
+        txtAssignedPrice = content.findViewById(R.id.txtAssignedPrice);
 
-        txtPendingBundleCount = findViewById(R.id.txtPendingBundleCount);
-        txtapendingbundleqty = findViewById(R.id.txtapendingbundleqty);
-        txtPedndingPrice = findViewById(R.id.txtPedndingPrice);
+        txtPendingBundleCount = content.findViewById(R.id.txtPendingBundleCount);
+        txtapendingbundleqty = content.findViewById(R.id.txtapendingbundleqty);
+        txtPedndingPrice = content.findViewById(R.id.txtPedndingPrice);
 
-        txtInprocesscnt = findViewById(R.id.txtInprocesscnt);
-        txtinprocessbundleqty = findViewById(R.id.txtinprocessbundleqty);
-        txtInprocessPrice = findViewById(R.id.txtInprocessPrice);
+        txtInprocesscnt = content.findViewById(R.id.txtInprocesscnt);
+        txtinprocessbundleqty = content.findViewById(R.id.txtinprocessbundleqty);
+        txtInprocessPrice = content.findViewById(R.id.txtInprocessPrice);
 
-        txtCompletedBundleCount = findViewById(R.id.txtCompletedBundleCount);
-        txtcompletedbundleqty = findViewById(R.id.txtcompletedbundleqty);
-        txtCompletedPrice = findViewById(R.id.txtCompletedPrice);
+        txtCompletedBundleCount = content.findViewById(R.id.txtCompletedBundleCount);
+        txtcompletedbundleqty = content.findViewById(R.id.txtcompletedbundleqty);
+        txtCompletedPrice = content.findViewById(R.id.txtCompletedPrice);
 
-
-        txtGrandtotalBundleCount = findViewById(R.id.txtGrandtotalBundleCount);
-        txtGrandtotalbundleqty = findViewById(R.id.txtGrandtotalbundleqty);
-        txtGrandtotalPrice = findViewById(R.id.txtGrandtotalPrice);
+        txtGrandtotalBundleCount = content.findViewById(R.id.txtGrandtotalBundleCount);
+        txtGrandtotalbundleqty = content.findViewById(R.id.txtGrandtotalbundleqty);
+        txtGrandtotalPrice = content.findViewById(R.id.txtGrandtotalPrice);
 
         getvalue();
         getJobDetails();
@@ -111,8 +117,6 @@ public class SelectJobSummaryActivity extends AppCompatActivity implements View.
         btn_PendingJobs.setOnClickListener(this);
         btn_InprocessJobs.setOnClickListener(this);
         btn_CompletedJobs.setOnClickListener(this);
-
-
     }
 
     public void onClick(View v) {
@@ -120,16 +124,7 @@ public class SelectJobSummaryActivity extends AppCompatActivity implements View.
             switch (v.getId()) {
                 case R.id.imgd:
                     PopupMenu popup = new PopupMenu(SelectJobSummaryActivity.this, imageView);
-                    HashMap<String, String> user = session.getUserDetails();
-                    String username = user.get(SessionManagement.KEY_USER);
-                    String userid = user.get(SessionManagement.KEY_USER_ID);
-
-                    Intent intent = new Intent(SelectJobSummaryActivity.this, HomeActivity.class);
-                    intent.putExtra("openDrawer", true);
-                    intent.putExtra("username", username);
-                    intent.putExtra("userid", userid);
-                    intent.putExtra("processorid", processorid);
-                    startActivity(intent);
+                    toggleDrawer();
                     popup.show();
                     break;
                 case R.id.btn_AssignedJobs:

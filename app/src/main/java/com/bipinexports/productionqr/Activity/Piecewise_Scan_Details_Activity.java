@@ -36,7 +36,7 @@ import java.util.Iterator;
 
 import retrofit2.Call;
 
-public class Piecewise_Scan_Details_Activity extends AppCompatActivity implements View.OnClickListener, GetResult.MyListener {
+public class Piecewise_Scan_Details_Activity extends BaseActivity implements View.OnClickListener, GetResult.MyListener {
 
     String Id, User;
 
@@ -64,14 +64,21 @@ public class Piecewise_Scan_Details_Activity extends AppCompatActivity implement
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_piecewise_scan_details);
+        setContentView(R.layout.activity_base);
+        setupDrawer();
 
-        imageView = (ImageView) findViewById(R.id.imgd);
+        View content = getLayoutInflater().inflate(
+                R.layout.activity_piecewise_scan_details,
+                findViewById(R.id.content_frame),
+                true
+        );
+
+        imageView = (ImageView)content.findViewById(R.id.imgd);
         gridView = (GridView) this.findViewById(R.id.grid);
-        progress = (ProgressBar) findViewById(R.id.progress);
+        progress = (ProgressBar) content.findViewById(R.id.progress);
         progress.setVisibility(View.VISIBLE);
 
-        txtUser = (TextView) findViewById(R.id.txtUser);
+        txtUser = (TextView) content.findViewById(R.id.txtUser);
 
         session = new SessionManagement(getApplicationContext());
         HashMap<String, String> user = session.getUserDetails();
@@ -111,12 +118,12 @@ public class Piecewise_Scan_Details_Activity extends AppCompatActivity implement
 
         imageView.setOnClickListener(this);
 
-        text_Job_Refer = findViewById(R.id.text_Job_Refer);
-        text_Shipcode = findViewById(R.id.text_Shipcode);
-        text_Part_Name = findViewById(R.id.text_Part_Name);
-        text_Size_Name = findViewById(R.id.text_Size_Name);
-        text_Bundle_No = findViewById(R.id.text_Bundle_No);
-        text_Bundle_Qty = findViewById(R.id.text_Bundle_Qty);
+        text_Job_Refer = content.findViewById(R.id.text_Job_Refer);
+        text_Shipcode = content.findViewById(R.id.text_Shipcode);
+        text_Part_Name = content.findViewById(R.id.text_Part_Name);
+        text_Size_Name = content.findViewById(R.id.text_Size_Name);
+        text_Bundle_No = content.findViewById(R.id.text_Bundle_No);
+        text_Bundle_Qty = content.findViewById(R.id.text_Bundle_Qty);
 
         text_Job_Refer.setText(job_ref);
         text_Shipcode.setText(shipcode);
@@ -128,7 +135,7 @@ public class Piecewise_Scan_Details_Activity extends AppCompatActivity implement
         getvalue();
         get_piecewise_scan_details();
 
-        AddReject = findViewById(R.id.AddReject);
+        AddReject = content.findViewById(R.id.AddReject);
         AddReject.setOnClickListener(this);
         AddReject.setVisibility(View.INVISIBLE);
     }
@@ -138,16 +145,7 @@ public class Piecewise_Scan_Details_Activity extends AppCompatActivity implement
             switch (v.getId()) {
                 case R.id.imgd:
                     PopupMenu popup = new PopupMenu(Piecewise_Scan_Details_Activity.this, imageView);
-                    HashMap<String, String> user = session.getUserDetails();
-                    String username = user.get(SessionManagement.KEY_USER);
-                    String userid = user.get(SessionManagement.KEY_USER_ID);
-
-                    Intent intent = new Intent(Piecewise_Scan_Details_Activity.this, HomeActivity.class);
-                    intent.putExtra("openDrawer", true);
-                    intent.putExtra("username", username);
-                    intent.putExtra("userid", userid);
-                    intent.putExtra("processorid", processorid);
-                    startActivity(intent);
+                    toggleDrawer();
                     popup.show();
                     break;
                 case R.id.AddReject:
