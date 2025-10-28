@@ -154,9 +154,13 @@
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:background="?attr/selectableItemBackground"
-                android:layout_marginTop="8dp">
+                android:layout_marginTop="8dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:enabled="false">
 
-                <ImageView
+
+            <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@drawable/ic_update"
