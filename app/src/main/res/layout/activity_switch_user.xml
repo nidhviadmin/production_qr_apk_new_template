@@ -6,7 +6,7 @@
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:layout_gravity="center_horizontal"
-        tools:context="com.bipinexports.productionqr.Activity.Switch_User_Activity">
+        tools:context="com.bipinexports.productionqrnew.Activity.Switch_User_Activity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
@@ -62,7 +62,7 @@
                 android:gravity="center"
                 android:orientation="vertical"
                 android:padding="10dp"
-                tools:context="com.bipinexports.productionqr.Activity.Switch_User_Activity">
+                tools:context="com.bipinexports.productionqrnew.Activity.Switch_User_Activity">
 
                 <LinearLayout
                     android:layout_width="match_parent"

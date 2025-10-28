@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.bipinexports.productionqr.Activity.AssignedJobActivity">
+    tools:context="com.bipinexports.productionqrnew.Activity.AssignedJobActivity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"

@@ -1,18 +1,17 @@
-// Top-level build file
 buildscript {
     repositories {
         google()
-        mavenCentral() // Replace jcenter() with mavenCentral()
+        mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.2.2' // Update to a newer version
+        classpath 'com.android.tools.build:gradle:8.2.2'
     }
 }
 
 allprojects {
     repositories {
         google()
-        mavenCentral() // Replace jcenter() with mavenCentral()
+        mavenCentral()
     }
 }
 

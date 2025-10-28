@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    tools:context="com.bipinexports.productionqr.Activity.Select_Employee_Detail_Activity">
+    tools:context="com.bipinexports.productionqrnew.Activity.Select_Employee_Detail_Activity">
 
     <ProgressBar
         android:id="@+id/progress"

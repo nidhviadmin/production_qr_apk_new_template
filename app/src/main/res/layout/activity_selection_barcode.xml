@@ -7,7 +7,7 @@
     android:gravity="center_horizontal"
     android:layout_gravity="center_horizontal"
     android:orientation="vertical"
-    tools:context="com.bipinexports.productionqr.Activity.ScannerSelectionBarcodeActivity">
+    tools:context="com.bipinexports.productionqrnew.Activity.ScannerSelectionBarcodeActivity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
