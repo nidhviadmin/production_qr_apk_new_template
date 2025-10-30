@@ -7,7 +7,7 @@
     android:gravity="center_horizontal"
     android:layout_gravity="center_horizontal"
     android:orientation="vertical"
-    tools:context="com.bipinexports.productionqrnew.Activity.Roll_Delivery_USB_Reader_Activity">
+    tools:context="com.bipinexports.productionqr.Activity.Roll_Delivery_USB_Reader_Activity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"

@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    tools:context="com.bipinexports.productionqrnew.Activity.Select_Employee_Detail_Activity">
+    tools:context="com.bipinexports.productionqr.Activity.Select_Employee_Detail_Activity">
 
     <ProgressBar
         android:id="@+id/progress"
@@ -74,11 +74,14 @@
                 <androidx.cardview.widget.CardView
 
                     android:id="@+id/in_details"
-                    android:layout_gravity="center"
                     android:layout_width="match_parent"
-                    android:layout_marginTop="15dp"
-                    android:layout_height="70dp"
-                    card_view:cardCornerRadius="10dp">
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    card_view:cardCornerRadius="10dp"
+                    card_view:cardElevation="6dp"
+                    card_view:cardUseCompatPadding="true"
+                    card_view:cardPreventCornerOverlap="false"
+                    android:foreground="?attr/selectableItemBackground">
 
 
                     <RelativeLayout
@@ -110,16 +113,16 @@
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:orientation="horizontal"
                                 android:padding="2dp"
-                                android:layout_marginBottom="7dp">
+                                android:gravity="center_vertical">
 
                                 <TextView
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
-                                    android:layout_weight="1"
+                                    android:layout_weight="0.8"
+                                    android:text="Employee IN Count"
                                     android:textColor="@android:color/black"
-                                    android:text="Employee IN Count "
-                                    android:layout_marginLeft="0dp"
                                     android:textStyle="bold"
                                     android:textSize="16sp" />
 
@@ -127,27 +130,32 @@
                                     android:id="@+id/txt_Employee_In_Count"
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
-                                    android:layout_weight="1"
+                                    android:layout_weight="0.2"
+                                    android:gravity=""
+                                    android:text="0"
                                     android:textColor="@color/green"
                                     android:textStyle="bold"
                                     android:textSize="18sp" />
-
                             </LinearLayout>
+
 
                         </LinearLayout>
 
 
                     </RelativeLayout>
+
                 </androidx.cardview.widget.CardView>
                 <androidx.cardview.widget.CardView
 
                     android:id="@+id/out_details"
-                    android:layout_gravity="center"
                     android:layout_width="match_parent"
-                    android:layout_marginTop="15dp"
-                    android:layout_height="70dp"
-                    card_view:cardCornerRadius="10dp">
-
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    card_view:cardCornerRadius="10dp"
+                    card_view:cardElevation="6dp"
+                    card_view:cardUseCompatPadding="true"
+                    card_view:cardPreventCornerOverlap="false"
+                    android:foreground="?attr/selectableItemBackground">
 
                     <RelativeLayout
                         android:layout_width="fill_parent"
@@ -179,15 +187,14 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:padding="2dp"
-                                android:layout_marginBottom="7dp">
+                                android:gravity="center_vertical">
 
                                 <TextView
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
-                                    android:layout_weight="1"
+                                    android:layout_weight="0.8"
+                                    android:text="Employee OUT Count"
                                     android:textColor="@android:color/black"
-                                    android:text="Employee OUT Count "
-                                    android:layout_marginLeft="0dp"
                                     android:textStyle="bold"
                                     android:textSize="16sp" />
 
@@ -195,12 +202,14 @@
                                     android:id="@+id/txt_Employee_Out_Count"
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
-                                    android:layout_weight="1"
+                                    android:layout_weight="0.2"
+                                    android:gravity=""
+                                    android:text="0"
                                     android:textColor="@color/tab_indicator"
                                     android:textStyle="bold"
                                     android:textSize="18sp" />
-
                             </LinearLayout>
+
 
                         </LinearLayout>
 
@@ -210,11 +219,15 @@
                 <androidx.cardview.widget.CardView
 
                     android:id="@+id/absent_details"
-                    android:layout_gravity="center"
                     android:layout_width="match_parent"
-                    android:layout_marginTop="15dp"
-                    android:layout_height="70dp"
-                    card_view:cardCornerRadius="10dp">
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginBottom="24dp"
+                    card_view:cardCornerRadius="10dp"
+                    card_view:cardElevation="6dp"
+                    card_view:cardUseCompatPadding="true"
+                    card_view:cardPreventCornerOverlap="false"
+                    android:foreground="?attr/selectableItemBackground">
 
 
                     <RelativeLayout
@@ -247,15 +260,14 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:padding="2dp"
-                                android:layout_marginBottom="7dp">
+                                android:gravity="center_vertical">
 
                                 <TextView
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
-                                    android:layout_weight="1"
-                                    android:textColor="@android:color/black"
+                                    android:layout_weight="0.8"
                                     android:text="Employee Absent Count"
-                                    android:layout_marginLeft="0dp"
+                                    android:textColor="@android:color/black"
                                     android:textStyle="bold"
                                     android:textSize="16sp" />
 
@@ -263,12 +275,14 @@
                                     android:id="@+id/txt_Employee_Absent_Count"
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
-                                    android:layout_weight="1"
+                                    android:layout_weight="0.2"
+                                    android:gravity=""
+                                    android:text="0"
                                     android:textColor="@color/red"
                                     android:textStyle="bold"
                                     android:textSize="18sp" />
-
                             </LinearLayout>
+
 
                         </LinearLayout>
 

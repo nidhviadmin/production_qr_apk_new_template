@@ -7,7 +7,7 @@
     android:gravity="center_horizontal"
     android:layout_gravity="center_horizontal"
     android:orientation="vertical"
-    tools:context="com.bipinexports.productionqrnew.Activity.Bundle_QR_Scanner_USB_Reader_Activity">
+    tools:context="com.bipinexports.productionqr.Activity.Bundle_QR_Scanner_USB_Reader_Activity">
 
     <!-- Toolbar -->
     <androidx.appcompat.widget.Toolbar

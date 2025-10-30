@@ -7,11 +7,11 @@ android {
     buildToolsVersion "34.0.0"
 
     defaultConfig {
-        applicationId "com.bipinexports.productionqrnew"
+        applicationId "com.bipinexports.productionqr"
         minSdkVersion 24
         targetSdkVersion 34
-        versionCode 7
-        versionName "7.4"
+        versionCode 8
+        versionName "7.5"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -43,7 +43,7 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
-    namespace 'com.bipinexports.productionqrnew'
+    namespace 'com.bipinexports.productionqr' // Add this line
 }
 
 dependencies {
