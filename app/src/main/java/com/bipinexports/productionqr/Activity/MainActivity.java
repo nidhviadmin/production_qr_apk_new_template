@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -20,7 +21,13 @@ import android.os.Build;
 import android.os.Bundle;
 import androidx.annotation.RequiresApi;
 
+import com.bipinexports.productionqr.service.NotificationHelper;
+import com.google.firebase.messaging.FirebaseMessaging;
+import android.util.Log;
+
+
 import com.bipinexports.productionqr.MainImage_Data_Object;
+import com.bipinexports.productionqr.SlideImage_Data_object;
 import com.google.android.material.snackbar.Snackbar;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
@@ -28,7 +35,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.viewpager2.widget.ViewPager2;
 
+
+import android.os.Handler;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
@@ -50,6 +60,8 @@ import com.bipinexports.productionqr.GetResult;
 import com.bipinexports.productionqr.ModelClass;
 import com.bipinexports.productionqr.R;
 import com.bipinexports.productionqr.SessionManagement;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -69,6 +81,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 
 import static java.lang.Integer.parseInt;
@@ -76,9 +89,12 @@ import static java.lang.Integer.parseInt;
 public class MainActivity extends BaseActivity implements View.OnClickListener, GetResult.MyListener {
 
 
-    String Id, User;
-//    SessionManagement session;
+   SlideImageAdapter slideImageAdapter;
+    ViewPager2 viewPagerSlider;
+    List<SlideImage_Data_object> slideImageList = new ArrayList<>();
 
+    View notificationDot;
+    String Id, User;
     GridView gridView;
     ProgressBar progress;
     ArrayList<ModelClass> mylist = new ArrayList<>();
@@ -133,8 +149,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         View content = getLayoutInflater().inflate(R.layout.activity_main2,
                 findViewById(R.id.content_frame), true);
 
-
         imageView = (ImageView) content.findViewById(R.id.imgd);
+        viewPagerSlider = content.findViewById(R.id.viewPagerSlider);
+
+        viewPagerSlider.setAdapter(slideImageAdapter);
         homebtn = (ImageView) content.findViewById(R.id.home);
         gridView = (GridView) content.findViewById(R.id.grid);
         progress = (ProgressBar) content.findViewById(R.id.progress);
@@ -330,6 +348,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         textpendingcount = (TextView) content.findViewById(R.id.txt_count);
         mac_service_verification = (TextView) content.findViewById(R.id.txt_mac_service_verification_count);
         fetch_image_cat_Details();
+        fetch_slide_image_Details();
 
         getpendingdeliverycounts();
         get_mac_service_verification_counts();
@@ -382,9 +401,167 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 //            }
 //        });
 //        swipeRefreshLayout.setColorSchemeColors(Color.BLACK);
+//        Handler handler = new Handler();
+//        Runnable runnable = new Runnable() {
+//            @Override
+//            public void run() {
+//                if (slideImageList.size() > 0) {
+//                    int currentItem = viewPagerSlider.getCurrentItem();
+//                    int nextItem = (currentItem + 1) % slideImageList.size();
+//                    viewPagerSlider.setCurrentItem(nextItem, true);
+//                    handler.postDelayed(this, 3000);
+//                }
+//            }
+//        };
+//        handler.postDelayed(runnable, 3000);
+//        ImageView notifyIcon = findViewById(R.id.notify);
+//        notifyIcon.setOnClickListener(v -> {
+//            Intent intent = new Intent(MainActivity.this, com.bipinexports.productionqr.Activity.NotificationViewActivity.class);
+//            startActivity(intent);
+//        });
+
+
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) {
+                        Log.w("FCM", " Fetching FCM registration token failed", task.getException());
+                        return;
+                    }
+
+                    String token = task.getResult();
+                    Log.d("FCM", " Firebase Token: " + token);
+
+                    // Save locally if you need later
+                    SharedPreferences prefs = getSharedPreferences("USER_PREFS", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.putString("device_token", token);
+                    editor.apply();
+
+                    // Send to backend API (UpdateDeviceToken)
+                    try {
+                        com.google.gson.JsonObject json = new com.google.gson.JsonObject();
+                        json.addProperty("user_id", userid);
+                        json.addProperty("unique_id", android.provider.Settings.Secure.getString(
+                                getContentResolver(), android.provider.Settings.Secure.ANDROID_ID));
+                        json.addProperty("device_token", token);
+
+                        com.bipinexports.productionqr.UserService api = com.bipinexports.productionqr.APIClient.getInterface();
+                        retrofit2.Call<ResponseBody> call = api.updateDeviceToken(json);
+
+                        call.enqueue(new retrofit2.Callback<ResponseBody>() {
+                            @Override
+                            public void onResponse(retrofit2.Call<ResponseBody> call, retrofit2.Response<ResponseBody> response) {
+                                try {
+                                    if (response.isSuccessful() && response.body() != null) {
+                                        String res = response.body().string();
+                                        Log.d("FCM", " Server response: " + res);
+                                    } else {
+                                        Log.e("FCM", " Token update failed. HTTP Code: " + response.code());
+                                    }
+                                } catch (Exception e) {
+                                    Log.e("FCM", " Error reading response: " + e.getMessage());
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(retrofit2.Call<ResponseBody> call, Throwable t) {
+                                Log.e("FCM", " Network error sending token: " + t.getMessage());
+                            }
+                        });
+
+                    } catch (Exception e) {
+                        Log.e("FCM", " Exception sending token: " + e.getMessage());
+                    }
+                });
+
+        notificationDot = findViewById(R.id.notificationDot);
+
+        ImageView notifyIcon = findViewById(R.id.notify);
+        notifyIcon.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, NotificationViewActivity.class);
+            startActivity(intent);
+        });
+        updateNotificationDot();
+
+        handleFCMNotificationData(getIntent());
     }
 
+    private void handleFCMNotificationData(Intent intent) {
+        if (intent == null) return;
 
+        Bundle extras = intent.getExtras();
+        if (extras != null && extras.getBoolean("fromNotification", false)) {
+            // Fetch the custom keys you set in MyFirebaseMessagingService
+            String title = extras.getString("title");
+            String body = extras.getString("message");
+            String imageUrl = extras.getString("imageUrl");
+
+            Log.d("MainActivity", "Opened from notification → Title: " + title + ", Body: " + body + ", Image: " + imageUrl);
+
+            if (title != null && body != null) {
+                saveNotificationFromIntent(title, body, imageUrl != null ? imageUrl : "");
+
+                new Handler().postDelayed(() -> {
+                    Intent notifIntent = new Intent(MainActivity.this, NotificationViewActivity.class);
+                    notifIntent.putExtra("title", title);
+                    notifIntent.putExtra("message", body);
+                    notifIntent.putExtra("imageUrl", imageUrl);
+                    startActivity(notifIntent);
+                }, 800);
+            }
+        }
+    }
+
+    private void saveNotificationFromIntent(String title, String message, String imageUrl) {
+        try {
+            SharedPreferences prefs = getSharedPreferences("NOTIFICATIONS", MODE_PRIVATE);
+            String existing = prefs.getString("list", "[]");
+
+            org.json.JSONArray array = new org.json.JSONArray(existing);
+
+            boolean exists = false;
+            for (int i = 0; i < array.length(); i++) {
+                org.json.JSONObject obj = array.getJSONObject(i);
+                if (obj.optString("title").equals(title) &&
+                        obj.optString("message").equals(message)) {
+                    exists = true;
+                    break;
+                }
+            }
+
+            if (!exists) {
+                org.json.JSONObject obj = new org.json.JSONObject();
+                obj.put("title", title);
+                obj.put("message", message);
+                obj.put("imageUrl", imageUrl);
+                obj.put("time", System.currentTimeMillis());
+                obj.put("isRead", false);
+
+                array.put(obj);
+                prefs.edit().putString("list", array.toString()).apply();
+
+                NotificationHelper.incrementUnreadCount(this);
+
+                Log.d("MainActivity", "Notification saved from intent: " + title);
+            }
+        } catch (Exception e) {
+            Log.e("MainActivity", "Failed to save notification from intent: " + e.getMessage());
+        }
+    }
+
+    private void updateNotificationDot() {
+        int unreadCount = NotificationHelper.getUnreadCount(this);
+        if (notificationDot != null) {
+            notificationDot.setVisibility(unreadCount > 0 ? View.VISIBLE : View.GONE);
+            Log.d("MainActivity", "Notification dot visibility updated. Unread count: " + unreadCount);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateNotificationDot();
+    }
     private void versioncode() {
         if(isOnline()) {
             Context context = this;
@@ -979,7 +1156,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
             snackbar.show();
         }
     }
-
 
     private void fetch_accessory_receipt_Details() {
         if(isOnline()) {
@@ -2947,8 +3123,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                     if(Integer.parseInt(image_count) > 0)
                     {
                         recyclerView = findViewById(R.id.recyclerView);
-                        itemList.add(new MainImage_Data_Object(MainImage_Data_Object.TYPE_LOGO, "", "", "", ""));
-
+//                        itemList.add(new MainImage_Data_Object(MainImage_Data_Object.TYPE_LOGO, "", "", "", ""));
+//                        if logo has to appear uncomment this line
                         JSONObject userDetailsObject = jsonObject.getJSONObject("data").getJSONObject("user_details");
 
                         Map<String, List<JSONObject>> groupedData = new LinkedHashMap<>();
@@ -3355,6 +3531,47 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 }
                 MainActivity.custPrograssbar_new.closePrograssBar();
             }
+
+            else if (callNo.equalsIgnoreCase("SlideImageList")) {
+                try {
+                    if (result.get("status").getAsString().equalsIgnoreCase("success")) {
+
+                        JsonElement dataElement = result.get("data");
+                        JsonArray jsonArray;
+
+                        if (dataElement.isJsonArray()) {
+                            jsonArray = dataElement.getAsJsonArray();
+                        } else {
+                            JsonObject dataObject = dataElement.getAsJsonObject();
+                            jsonArray = dataObject.getAsJsonArray("user_details");
+                        }
+
+                        slideImageList.clear();
+                        Log.e("Bipin", "Received " + jsonArray.size() + " slide images");
+
+                        for (JsonElement element : jsonArray) {
+                            JsonObject imgObj = element.getAsJsonObject();
+                            String imgPath = imgObj.get("imgpath").getAsString();
+
+                            Log.e("Bipin", "Adding slide image: " + imgPath);
+
+                            slideImageList.add(new SlideImage_Data_object(
+                                    SlideImage_Data_object.TYPE_IMAGE,
+                                    imgPath,
+                                    ""
+                            ));
+                        }
+
+                        Log.e("Bipin", "Total slideImageList size: " + slideImageList.size());
+                        slideImageAdapter.notifyDataSetChanged();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Log.e("Bipin", "Error parsing SlideImageList: " + e.getMessage());
+                }
+            }
+
+
         }
         catch (Exception e) {
         }
@@ -3387,4 +3604,35 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
             e.printStackTrace();
         }
     }
+
+    private void fetch_slide_image_Details() {
+
+        MainActivity.custPrograssbar_new.prograssCreate(this);
+        session = new SessionManagement(getApplicationContext());
+        HashMap<String, String> user = session.getUserDetails();
+        processorid = user.get(SessionManagement.KEY_PROCESSOR_ID);
+        userid = user.get(SessionManagement.KEY_USER_ID);
+        username = user.get(SessionManagement.KEY_USER);
+
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("userid", userid);
+            jsonObject.put("processorid", processorid);
+            jsonObject.put("username", username);
+            jsonObject.put("sessionid", session);
+            jsonObject.put("version_name", myversionName);
+
+            JsonParser jsonParser = new JsonParser();
+            Call<JsonObject> call;
+            call = APIClient.getInterface().fetch_slideimage_details((JsonObject) jsonParser.parse(jsonObject.toString()));
+            GetResult getResult = new GetResult();
+            getResult.setMyListener(this);
+            getResult.callForLogin(call, "SlideImageList");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
 }

@@ -38,14 +38,6 @@
                 android:layout_centerVertical="true"
                 android:layout_marginStart="36dp"/>
 
-            <!-- Notification icon on RIGHT -->
-            <ImageView
-                android:id="@+id/img_noti"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:src="@drawable/ic_notification"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"/>
         </RelativeLayout>
     </androidx.appcompat.widget.Toolbar>
 

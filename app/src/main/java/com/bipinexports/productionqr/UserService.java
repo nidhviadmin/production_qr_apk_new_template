@@ -2,6 +2,7 @@ package com.bipinexports.productionqr;
 
 import com.google.gson.JsonObject;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.POST;
@@ -228,11 +229,12 @@ public interface UserService {
     @POST(APIClient.QR_URL + "fetch_mainimage_details")
     Call<JsonObject> fetch_mainimage_details(@Body JsonObject object);
 
+    @POST(APIClient.QR_URL + "fetch_slideimage_details")
+    Call<JsonObject> fetch_slideimage_details(@Body JsonObject object);
 
     // Get User Details //
     @POST(APIClient.QR_URL + "get_user_data")
     Call<JsonObject> get_user_data(@Body JsonObject object);
-
 
     // save Device Details //
     @POST(APIClient.QR_URL + "update_device_details")
@@ -241,5 +243,11 @@ public interface UserService {
     // save Device Details //
     @POST(APIClient.QR_URL + "update_user_lastin")
     Call<JsonObject> update_user_lastin(@Body JsonObject object);
+
+    @POST(APIClient.API_URL + "UpdateDeviceToken")
+    Call<ResponseBody> updateDeviceToken(@Body JsonObject object);
+
+
+
 }
 

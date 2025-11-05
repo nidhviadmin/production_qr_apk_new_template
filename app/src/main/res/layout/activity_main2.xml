@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:layout_gravity="center_horizontal"
-        tools:context="com.bipinexports.productionqr.Activity.MainActivity">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:layout_gravity="center_horizontal"
+    tools:context="com.bipinexports.productionqr.Activity.MainActivity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
@@ -25,7 +25,7 @@
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_menu_icon"
                 android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"/>
+                android:layout_centerVertical="true" />
 
             <TextView
                 android:id="@+id/txtUser"
@@ -37,16 +37,46 @@
                 android:textSize="20sp"
                 android:layout_toEndOf="@id/imgd"
                 android:layout_centerVertical="true"
-                android:layout_marginStart="16dp"/>
+                android:layout_marginStart="16dp" />
 
             <ImageView
                 android:id="@+id/home"
                 android:layout_width="30dp"
                 android:layout_height="39dp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="56dp"
+                android:src="@drawable/ic_base_home"
+                android:contentDescription="Home" />
+
+            <!-- Notification Icon with Dot -->
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
-                android:layout_marginEnd="16dp"
-                android:src="@drawable/ic_base_home" />
+                android:layout_marginEnd="16dp">
+
+                <!-- Bell icon -->
+                <ImageView
+                    android:id="@+id/notify"
+                    android:layout_width="25dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/ic_notify"
+                    android:contentDescription="Notifications" />
+
+                <!-- Red dot indicator -->
+                <View
+                    android:id="@+id/notificationDot"
+                    android:layout_width="9dp"
+                    android:layout_height="9dp"
+                    android:layout_gravity="top|end"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginEnd="2dp"
+                    android:background="@drawable/red_dot"
+                    android:visibility="gone" />
+            </FrameLayout>
+
 
         </RelativeLayout>
     </androidx.appcompat.widget.Toolbar>
@@ -82,7 +112,8 @@
                 android:gravity="center"
                 android:numColumns="1"
                 android:stretchMode="columnWidth"
-                android:visibility="gone"></GridView>
+                android:visibility="gone">
+            </GridView>
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -92,22 +123,24 @@
                 android:layout_marginBottom="40dp"
                 android:visibility="gone">
 
-                <RelativeLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true"
-                    android:layout_centerVertical="true"
-                    android:visibility="gone">
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:src="@drawable/ic_logo" />
-
-                </RelativeLayout>
-
             </RelativeLayout>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/card_slider"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginTop="8dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="6dp"
+                android:layout_gravity="center">
+
+                <androidx.viewpager2.widget.ViewPager2
+                    android:id="@+id/viewPagerSlider"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="visible" />
+
+            </androidx.cardview.widget.CardView>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerView"
@@ -121,7 +154,6 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
                 android:orientation="vertical"
-
                 android:weightSum="2">
 
                 <ProgressBar

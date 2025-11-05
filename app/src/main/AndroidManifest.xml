@@ -26,6 +26,15 @@
         android:roundIcon="@mipmap/ic_appicon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme2">
+
+        <service
+            android:name=".service.MyFirebaseMessagingService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
         <activity android:name="com.bipinexports.productionqr.Activity.SplashScreen"
             android:exported="true"
             tools:ignore="Instantiatable">
@@ -108,6 +117,17 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/provider_paths" />
         </provider>
+
+        <activity
+            android:name="com.bipinexports.productionqr.Activity.NotificationViewActivity"
+            android:exported="true"
+            android:theme="@style/AppTheme2"
+            android:label="Notifications"
+            android:launchMode="singleTop" />
+
+        <activity android:name="com.bipinexports.productionqr.Activity.NotificationDetailActivity" />
+
+
     </application>
 
 </manifest>

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "875019583627",
+    "project_id": "productionqr-8e331",
+    "storage_bucket": "productionqr-8e331.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:875019583627:android:4be72950ed391ed8f1d48e",
+        "android_client_info": {
+          "package_name": "com.bipinexports.productionqr"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDQV-JIaFivDEwjRrQbWGyIs9ecnvocRCY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

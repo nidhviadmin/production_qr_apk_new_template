@@ -82,6 +82,7 @@ public class MainImage_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         }
         else if (holder instanceof ImageViewHolder)
         {
+//            Log.e("Bipin"," getimgpath " +item.getimgpath());
             ((ImageViewHolder) holder).txtTitle.setText(item.getimage_name());
             Picasso.get()
                     .load(item.getimgpath())
