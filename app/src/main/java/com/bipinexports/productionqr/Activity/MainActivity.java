@@ -474,44 +474,82 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                     }
                 });
 
-        notificationDot = findViewById(R.id.notificationDot);
+        TextView notificationCount = findViewById(R.id.notificationCount);
 
         ImageView notifyIcon = findViewById(R.id.notify);
         notifyIcon.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, NotificationViewActivity.class);
             startActivity(intent);
         });
-        updateNotificationDot();
+        updateNotificationBadge(notificationCount);
 
-        handleFCMNotificationData(getIntent());
+        handleNotificationIntent(getIntent());
     }
 
-    private void handleFCMNotificationData(Intent intent) {
-        if (intent == null) return;
+    private void updateNotificationBadge(TextView notificationCount) {
 
-        Bundle extras = intent.getExtras();
-        if (extras != null && extras.getBoolean("fromNotification", false)) {
-            // Fetch the custom keys you set in MyFirebaseMessagingService
-            String title = extras.getString("title");
-            String body = extras.getString("message");
-            String imageUrl = extras.getString("imageUrl");
+        int unreadCount = NotificationHelper.getUnreadCount(this);
 
-            Log.d("MainActivity", "Opened from notification → Title: " + title + ", Body: " + body + ", Image: " + imageUrl);
+        if (unreadCount > 0) {
 
-            if (title != null && body != null) {
-                saveNotificationFromIntent(title, body, imageUrl != null ? imageUrl : "");
+            if (unreadCount > 99) {
+                notificationCount.setText("99+");
+            } else {
+                notificationCount.setText(String.valueOf(unreadCount));
+            }
 
+            notificationCount.setVisibility(View.VISIBLE);
+            Log.d("MainActivity", "Showing badge count: " + unreadCount);
+
+        } else {
+            notificationCount.setVisibility(View.GONE);
+            Log.d("MainActivity", "No unread. Badge hidden");
+        }
+    }
+
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        handleNotificationIntent(intent);
+    }
+
+    private void handleNotificationIntent(Intent intent) {
+        if (intent != null && intent.getBooleanExtra("from_notification", false)) {
+            String title = intent.getStringExtra("notification_title");
+            String message = intent.getStringExtra("notification_message");
+            String imageUrl = intent.getStringExtra("notification_imageUrl");
+
+            Log.d("MainActivity", "Received notification - Title: " + title + ", Message: " + message);
+
+            if (title != null && message != null) {
+                // Save notification locally
+                saveNotificationFromIntent(title, message, imageUrl != null ? imageUrl : "");
+
+                // Navigate to NotificationViewActivity after a short delay
                 new Handler().postDelayed(() -> {
-                    Intent notifIntent = new Intent(MainActivity.this, NotificationViewActivity.class);
-                    notifIntent.putExtra("title", title);
-                    notifIntent.putExtra("message", body);
-                    notifIntent.putExtra("imageUrl", imageUrl);
-                    startActivity(notifIntent);
-                }, 800);
+                    if (isUserLoggedIn()) {
+                        // User is logged in, go directly to notification view
+                        Intent notificationIntent = new Intent(MainActivity.this, NotificationViewActivity.class);
+                        notificationIntent.putExtra("title", title);
+                        notificationIntent.putExtra("message", message);
+                        notificationIntent.putExtra("imageUrl", imageUrl);
+                        startActivity(notificationIntent);
+                    } else {
+                        // User not logged in, show message
+                        Toast.makeText(MainActivity.this, "Please login first", Toast.LENGTH_SHORT).show();
+                        // Optionally redirect to login
+                        // startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                    }
+                }, 1000);
             }
         }
     }
 
+    private boolean isUserLoggedIn() {
+        session = new SessionManagement(getApplicationContext());
+        return session.isLoggedIn();
+    }
     private void saveNotificationFromIntent(String title, String message, String imageUrl) {
         try {
             SharedPreferences prefs = getSharedPreferences("NOTIFICATIONS", MODE_PRIVATE);

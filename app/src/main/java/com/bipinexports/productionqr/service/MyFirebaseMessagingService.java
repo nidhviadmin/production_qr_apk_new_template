@@ -126,18 +126,19 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     }
 
     private void showNotification(String title, String message, String imageUrl) {
-        Intent intent = new Intent(this, NotificationViewActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        // Always start from MainActivity and let it handle the navigation
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 
-        // pass notification info
-        intent.putExtra("fromNotification", true);
-        intent.putExtra("title", title);
-        intent.putExtra("message", message);
-        intent.putExtra("imageUrl", imageUrl);
+        // Pass notification data to MainActivity
+        intent.putExtra("from_notification", true);
+        intent.putExtra("notification_title", title);
+        intent.putExtra("notification_message", message);
+        intent.putExtra("notification_imageUrl", imageUrl);
 
         PendingIntent pendingIntent = PendingIntent.getActivity(
                 this,
-                0,
+                (int) System.currentTimeMillis(), // Use unique request code
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
@@ -146,7 +147,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channelId)
-                .setSmallIcon(R.mipmap.ic_appicon)
+                .setSmallIcon(R.drawable.ic_logo)
                 .setContentTitle(title != null ? title : "Production QR")
                 .setContentText(message)
                 .setAutoCancel(true)
@@ -167,5 +168,4 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         manager.notify((int) System.currentTimeMillis(), builder.build());
     }
-
 }
