@@ -39,14 +39,14 @@
                 android:layout_centerVertical="true"
                 android:layout_marginStart="16dp" />
 
-            <ImageView
-                android:id="@+id/imgClearAll"
-                android:layout_width="25dp"
-                android:layout_height="30dp"
-                android:src="@drawable/ic_trash"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:contentDescription="Clear All" />
+<!--            <ImageView-->
+<!--                android:id="@+id/imgClearAll"-->
+<!--                android:layout_width="25dp"-->
+<!--                android:layout_height="30dp"-->
+<!--                android:src="@drawable/ic_trash"-->
+<!--                android:layout_alignParentEnd="true"-->
+<!--                android:layout_centerVertical="true"-->
+<!--                android:contentDescription="Clear All" />-->
 
         </RelativeLayout>
     </androidx.appcompat.widget.Toolbar>

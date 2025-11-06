@@ -35,7 +35,7 @@ public class NotificationViewActivity extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.recyclerNotifications);
         backBtn = findViewById(R.id.imgd);
-        clearAllBtn = findViewById(R.id.imgClearAll);
+//        clearAllBtn = findViewById(R.id.imgClearAll);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 

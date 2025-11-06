@@ -13,18 +13,104 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.bipinexports.productionqr.R;
 import com.bipinexports.productionqr.SessionManagement;
+import com.bipinexports.productionqr.utils.NotificationManager;
 
 import java.util.HashMap;
 
 public abstract class BaseActivity extends AppCompatActivity {
 
     protected DrawerLayout drawerLayout;
-    protected SessionManagement session;
+//    protected SessionManagement session;
     protected String username, userid, processorid;
+    protected NotificationManager notificationManager;
+    protected SessionManagement session;
+
+    /**
+     * Setup notifications with FCM token registration
+     * Call this in child activity's onCreate()
+     */
+    protected void setupNotificationsWithFCM() {
+        session = new SessionManagement(getApplicationContext());
+        HashMap<String, String> user = session.getUserDetails();
+        String userid = user.get(SessionManagement.KEY_USER_ID);
+
+        notificationManager = new NotificationManager(this);
+
+        ImageView notifyIcon = findViewById(R.id.notify);
+        TextView notificationCount = findViewById(R.id.notificationCount);
+
+        if (notifyIcon != null && notificationCount != null) {
+            notificationManager.setupComplete(notifyIcon, notificationCount, userid);
+        }
+    }
+
+    protected void setupNotifications() {
+        notificationManager = new NotificationManager(this);
+
+        ImageView notifyIcon = findViewById(R.id.notify);
+        TextView notificationCount = findViewById(R.id.notificationCount);
+
+        if (notifyIcon != null && notificationCount != null) {
+            notificationManager.setupNotifications(notifyIcon, notificationCount);
+        }
+    }
+
+    /**
+     * Setup notifications with dot indicator
+     */
+    protected void setupNotificationsWithDot(View notificationDot) {
+        session = new SessionManagement(getApplicationContext());
+        HashMap<String, String> user = session.getUserDetails();
+        String userid = user.get(SessionManagement.KEY_USER_ID);
+
+        notificationManager = new NotificationManager(this);
+
+        ImageView notifyIcon = findViewById(R.id.notify);
+        TextView notificationCount = findViewById(R.id.notificationCount);
+
+        if (notifyIcon != null && notificationCount != null) {
+            notificationManager.setupWithDot(notifyIcon, notificationCount, notificationDot, userid);
+        }
+    }
+
+    /**
+     * Handle notification intent
+     * Call this in onCreate() and onNewIntent()
+     */
+    protected void handleNotificationIntent(Intent intent) {
+        if (notificationManager != null) {
+            notificationManager.handleNotificationIntent(intent, isUserLoggedIn());
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (notificationManager != null) {
+            notificationManager.refresh();
+        }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        handleNotificationIntent(intent);
+    }
+
+    protected boolean isUserLoggedIn() {
+        session = new SessionManagement(getApplicationContext());
+        return session.isLoggedIn();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            getWindow().getDecorView().setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+            );
+        }
+
         session = new SessionManagement(getApplicationContext());
 
         HashMap<String, String> user = session.getUserDetails();

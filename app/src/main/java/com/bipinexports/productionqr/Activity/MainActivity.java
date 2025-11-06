@@ -21,9 +21,10 @@ import android.os.Build;
 import android.os.Bundle;
 import androidx.annotation.RequiresApi;
 
-import com.bipinexports.productionqr.service.NotificationHelper;
-import com.google.firebase.messaging.FirebaseMessaging;
+//import com.bipinexports.productionqr.service.NotificationHelper;
+//import com.google.firebase.messaging.FirebaseMessaging;
 import android.util.Log;
+import com.bipinexports.productionqr.utils.NotificationManager;
 
 
 import com.bipinexports.productionqr.MainImage_Data_Object;
@@ -87,7 +88,6 @@ import retrofit2.Call;
 import static java.lang.Integer.parseInt;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener, GetResult.MyListener {
-
 
    SlideImageAdapter slideImageAdapter;
     ViewPager2 viewPagerSlider;
@@ -432,187 +432,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 //            Intent intent = new Intent(MainActivity.this, com.bipinexports.productionqr.Activity.NotificationViewActivity.class);
 //            startActivity(intent);
 //        });
-
-
-        FirebaseMessaging.getInstance().getToken()
-                .addOnCompleteListener(task -> {
-                    if (!task.isSuccessful()) {
-                        Log.w("FCM", " Fetching FCM registration token failed", task.getException());
-                        return;
-                    }
-
-                    String token = task.getResult();
-                    Log.d("FCM", " Firebase Token: " + token);
-
-                    // Save locally if you need later
-                    SharedPreferences prefs = getSharedPreferences("USER_PREFS", MODE_PRIVATE);
-                    SharedPreferences.Editor editor = prefs.edit();
-                    editor.putString("device_token", token);
-                    editor.apply();
-
-                    // Send to backend API (UpdateDeviceToken)
-                    try {
-                        com.google.gson.JsonObject json = new com.google.gson.JsonObject();
-                        json.addProperty("user_id", userid);
-                        json.addProperty("unique_id", android.provider.Settings.Secure.getString(
-                                getContentResolver(), android.provider.Settings.Secure.ANDROID_ID));
-                        json.addProperty("device_token", token);
-
-                        com.bipinexports.productionqr.UserService api = com.bipinexports.productionqr.APIClient.getInterface();
-                        retrofit2.Call<ResponseBody> call = api.updateDeviceToken(json);
-
-                        call.enqueue(new retrofit2.Callback<ResponseBody>() {
-                            @Override
-                            public void onResponse(retrofit2.Call<ResponseBody> call, retrofit2.Response<ResponseBody> response) {
-                                try {
-                                    if (response.isSuccessful() && response.body() != null) {
-                                        String res = response.body().string();
-                                        Log.d("FCM", " Server response: " + res);
-                                    } else {
-                                        Log.e("FCM", " Token update failed. HTTP Code: " + response.code());
-                                    }
-                                } catch (Exception e) {
-                                    Log.e("FCM", " Error reading response: " + e.getMessage());
-                                }
-                            }
-
-                            @Override
-                            public void onFailure(retrofit2.Call<ResponseBody> call, Throwable t) {
-                                Log.e("FCM", " Network error sending token: " + t.getMessage());
-                            }
-                        });
-
-                    } catch (Exception e) {
-                        Log.e("FCM", " Exception sending token: " + e.getMessage());
-                    }
-                });
-
-        TextView notificationCount = findViewById(R.id.notificationCount);
-
-        ImageView notifyIcon = findViewById(R.id.notify);
-        notifyIcon.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, NotificationViewActivity.class);
-            startActivity(intent);
-        });
-        updateNotificationBadge(notificationCount);
-
+        setupNotificationsWithFCM();
         handleNotificationIntent(getIntent());
+
     }
 
-    private void updateNotificationBadge(TextView notificationCount) {
-
-        int unreadCount = NotificationHelper.getUnreadCount(this);
-
-        if (unreadCount > 0) {
-
-            if (unreadCount > 99) {
-                notificationCount.setText("99+");
-            } else {
-                notificationCount.setText(String.valueOf(unreadCount));
-            }
-
-            notificationCount.setVisibility(View.VISIBLE);
-            Log.d("MainActivity", "Showing badge count: " + unreadCount);
-
-        } else {
-            notificationCount.setVisibility(View.GONE);
-            Log.d("MainActivity", "No unread. Badge hidden");
-        }
-    }
-
-
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        handleNotificationIntent(intent);
-    }
-
-    private void handleNotificationIntent(Intent intent) {
-        if (intent != null && intent.getBooleanExtra("from_notification", false)) {
-            String title = intent.getStringExtra("notification_title");
-            String message = intent.getStringExtra("notification_message");
-            String imageUrl = intent.getStringExtra("notification_imageUrl");
-
-            Log.d("MainActivity", "Received notification - Title: " + title + ", Message: " + message);
-
-            if (title != null && message != null) {
-                // Save notification locally
-                saveNotificationFromIntent(title, message, imageUrl != null ? imageUrl : "");
-
-                // Navigate to NotificationViewActivity after a short delay
-                new Handler().postDelayed(() -> {
-                    if (isUserLoggedIn()) {
-                        // User is logged in, go directly to notification view
-                        Intent notificationIntent = new Intent(MainActivity.this, NotificationViewActivity.class);
-                        notificationIntent.putExtra("title", title);
-                        notificationIntent.putExtra("message", message);
-                        notificationIntent.putExtra("imageUrl", imageUrl);
-                        startActivity(notificationIntent);
-                    } else {
-                        // User not logged in, show message
-                        Toast.makeText(MainActivity.this, "Please login first", Toast.LENGTH_SHORT).show();
-                        // Optionally redirect to login
-                        // startActivity(new Intent(MainActivity.this, LoginActivity.class));
-                    }
-                }, 1000);
-            }
-        }
-    }
-
-    private boolean isUserLoggedIn() {
-        session = new SessionManagement(getApplicationContext());
-        return session.isLoggedIn();
-    }
-    private void saveNotificationFromIntent(String title, String message, String imageUrl) {
-        try {
-            SharedPreferences prefs = getSharedPreferences("NOTIFICATIONS", MODE_PRIVATE);
-            String existing = prefs.getString("list", "[]");
-
-            org.json.JSONArray array = new org.json.JSONArray(existing);
-
-            boolean exists = false;
-            for (int i = 0; i < array.length(); i++) {
-                org.json.JSONObject obj = array.getJSONObject(i);
-                if (obj.optString("title").equals(title) &&
-                        obj.optString("message").equals(message)) {
-                    exists = true;
-                    break;
-                }
-            }
-
-            if (!exists) {
-                org.json.JSONObject obj = new org.json.JSONObject();
-                obj.put("title", title);
-                obj.put("message", message);
-                obj.put("imageUrl", imageUrl);
-                obj.put("time", System.currentTimeMillis());
-                obj.put("isRead", false);
-
-                array.put(obj);
-                prefs.edit().putString("list", array.toString()).apply();
-
-                NotificationHelper.incrementUnreadCount(this);
-
-                Log.d("MainActivity", "Notification saved from intent: " + title);
-            }
-        } catch (Exception e) {
-            Log.e("MainActivity", "Failed to save notification from intent: " + e.getMessage());
-        }
-    }
-
-    private void updateNotificationDot() {
-        int unreadCount = NotificationHelper.getUnreadCount(this);
-        if (notificationDot != null) {
-            notificationDot.setVisibility(unreadCount > 0 ? View.VISIBLE : View.GONE);
-            Log.d("MainActivity", "Notification dot visibility updated. Unread count: " + unreadCount);
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        updateNotificationDot();
-    }
     private void versioncode() {
         if(isOnline()) {
             Context context = this;
