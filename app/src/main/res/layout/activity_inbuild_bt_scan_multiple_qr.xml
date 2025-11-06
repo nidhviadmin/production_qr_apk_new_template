@@ -7,8 +7,7 @@
     android:gravity="center_horizontal"
     android:layout_gravity="center_horizontal"
     android:orientation="vertical"
-    tools:context="com.bipinexports.productionqr.Activity.Scanner_Multiple_Bundle_QR_Activity">
-<!--    tools:context="com.bipinexports.productionqr.Activity.Multiple_Bundle_QR_Scan_Activity">-->
+    tools:context="com.bipinexports.productionqr.Activity.Inbuilt_Scanner_Multiple_Barcode_Activity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
@@ -50,15 +49,14 @@
         </RelativeLayout>
     </androidx.appcompat.widget.Toolbar>
 
-
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="40dp"
         android:gravity="center"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="40dp"
         android:text="@string/multiple_txtBarcode"
-        android:textColor="#FF0000"
+        android:textColor="#009688"
         android:textSize="20dp" />
 
     <TextView
@@ -71,24 +69,12 @@
         android:textSize="16dp" >
     </TextView>
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/layout_scan_data"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <EditText
-            android:id="@+id/txtScanData"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="none"/>
-
-    </com.google.android.material.textfield.TextInputLayout>
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/toolbar"
-        android:layout_marginTop="0dp"
+        android:layout_marginTop="50dp"
         android:fillViewport="false"
         android:gravity="center"
         android:orientation="vertical"
@@ -293,7 +279,8 @@
                     android:id="@+id/r"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="#b8b7bb"></TableRow>
+                    android:background="#b8b7bb">
+                </TableRow>
 
 
                 <TableLayout

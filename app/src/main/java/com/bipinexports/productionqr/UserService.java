@@ -187,7 +187,7 @@ public interface UserService {
 
     // Rollwise  Details
 
-    @POST(APIClient.Rollwise_URL + "getjobdetails")
+//    @POST(APIClient.Rollwise_URL + "getjobdetails")
     Call<JsonObject> getjobdetails(@Body JsonObject object);
 
     @POST(APIClient.Rollwise_URL + "updateproductionrolls")

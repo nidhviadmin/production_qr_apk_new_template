@@ -1,14 +1,17 @@
 package com.bipinexports.productionqr.Activity;
 
-import android.Manifest;
+import static android.app.ProgressDialog.show;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DownloadManager;
+import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -19,34 +22,48 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import androidx.annotation.RequiresApi;
-import com.google.android.material.snackbar.Snackbar;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
-import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
+import android.view.View.OnClickListener;
+import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
+
 import com.bipinexports.productionqr.APIClient;
 import com.bipinexports.productionqr.GetResult;
-import com.bipinexports.productionqr.ModelClass;
 import com.bipinexports.productionqr.R;
 import com.bipinexports.productionqr.SessionManagement;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.zxing.integration.android.IntentIntegrator;
-import com.google.zxing.integration.android.IntentResult;
+import com.honeywell.aidc.AidcManager;
+import com.honeywell.aidc.AidcManager.BarcodeDeviceListener;
+import com.honeywell.aidc.AidcManager.CreatedCallback;
+import com.honeywell.aidc.BarcodeDeviceConnectionEvent;
+import com.honeywell.aidc.BarcodeFailureEvent;
+import com.honeywell.aidc.BarcodeReadEvent;
+import com.honeywell.aidc.BarcodeReader;
+import com.honeywell.aidc.BarcodeReaderInfo;
+import com.honeywell.aidc.InvalidScannerNameException;
+import com.honeywell.aidc.ScannerUnavailableException;
+import com.honeywell.aidc.TriggerStateChangeEvent;
+import com.honeywell.aidc.UnsupportedPropertyException;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -61,35 +78,40 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import retrofit2.Call;
 
-import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
+public class Inbuilt_Scanner_Multiple_Barcode_Activity extends AppCompatActivity implements
+        BarcodeReader.BarcodeListener, BarcodeReader.TriggerListener, OnClickListener, GetResult.MyListener {
 
-public class Multiple_Bundle_QR_Scan_Activity extends BaseActivity implements View.OnClickListener, GetResult.MyListener {
+    private com.honeywell.aidc.AidcManager mAidcManager;
+    private com.honeywell.aidc.BarcodeReader mBarcodeReader;
+    private final Context mContext = this;
+    private String mConnectedScanner = null;
+    private boolean mResume = false;
 
-    String Id, User;
     SessionManagement session;
-
-    ArrayList<ModelClass> mylist = new ArrayList<>();
-    String processorid;
-    String userid;
-    String username;
-    String qrid;
-    String unitid;
+    String User, unitid;
     ImageView imageView;
-    TextView  txtUser;
+    TextView txtUser;
 
-    Button btnOk;
-    Button btnCancel;
-    Dialog dialog;
+    String myversionName;
+    String apkurl;
 
-    public static CustPrograssbar custPrograssbar;
+    String apkFileName;
+    BroadcastReceiver receiver;
+    String app_version_name;
+
+    String processorid;
+    String userid, isqc, qrid;
+    String username;
+
+    public static CustPrograssbar_new custPrograssbar_new;
+
 
     String curr_qr_id, scanneddate, joborderno, shipcode, colors, size, bundleno, styleno, stylename, partname, total_insert_count;
-
-    ImageView FetchData;
 
     List qr_id_arr = new ArrayList<String>();
 
@@ -98,18 +120,9 @@ public class Multiple_Bundle_QR_Scan_Activity extends BaseActivity implements Vi
     JSONArray QR_ID_Array = new JSONArray();
     List pending_scan_qr_id_arr = new ArrayList<String>();
 
-    String qrprefix;
-    int index = 1;
-
-    String myversionName;
-    String apkurl;
-    String apkFileName;
-
-    BroadcastReceiver receiver;
-    String app_version_name;
     TableLayout outprogramtbl;
 
-    TextView txtJobNo, txtShipCode, text_Part_Name, text_Size_Name, txtStyle, txtStyleRef;
+    TextView txtJobNo, txtShipCode, text_Part_Name, text_Size_Name, txtStyle, txtStyleRef, title_name;
     LinearLayout liner_bundle_details, linear_programdata, linear_layout_btn, linear_badge;
 
     JSONObject scan_qr_data_details;
@@ -124,6 +137,7 @@ public class Multiple_Bundle_QR_Scan_Activity extends BaseActivity implements Vi
     HashMap<Integer, String> pending_qr_st_arr = new HashMap<Integer, String>();
     HashMap<Integer, String> assign_header_qr_st_arr = new HashMap<Integer, String>();
     HashMap<Integer, String> bundle_no_arr = new HashMap<Integer, String>();
+
     TextView txt_bundlenos;
     int current_pageNo = 1;
 
@@ -137,260 +151,154 @@ public class Multiple_Bundle_QR_Scan_Activity extends BaseActivity implements Vi
 
     String statrt_qrid;
 
+    Button btnOk;
+    Button btnCancel;
+
+    public Inbuilt_Scanner_Multiple_Barcode_Activity() {
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_multiple_bundle_qr_scan);
-        setContentView(R.layout.activity_base);
-        setupDrawer();
+        setContentView(R.layout.activity_bt_scanner_multiple_qr);
 
-        View content = getLayoutInflater().inflate(
-                R.layout.activity_multiple_bundle_qr_scan,
-                findViewById(R.id.content_frame),
-                true
-        );
+        versioncode();
 
-        if ( Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission( getApplicationContext(), Manifest.permission.CAMERA ) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.CAMERA}, 212);
+        if(Build.MODEL.startsWith("VM1A")) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         }
-
-        if ( Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission( getApplicationContext(), WRITE_EXTERNAL_STORAGE ) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{WRITE_EXTERNAL_STORAGE}, 212);
+        else{
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
-
-        if ( Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission( getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE ) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 212);
-        }
-
-        custPrograssbar = new CustPrograssbar();
-
-        imageView = (ImageView) content.findViewById(R.id.imgd);
-        txtUser = (TextView) content.findViewById(R.id.txtUser);
-
-        txtJobNo = content.findViewById(R.id.txtJobNo);
-        txtShipCode = content.findViewById(R.id.txtShipCode);
-        text_Part_Name = content.findViewById(R.id.text_Part_Name);
-        text_Size_Name = content.findViewById(R.id.text_Size_Name);
-        txtStyle = content.findViewById(R.id.txtStyle);
-        txtStyleRef = content.findViewById(R.id.text_Color);
-
-        liner_bundle_details = content.findViewById(R.id.liner_bundle_details);
-        liner_bundle_details.setVisibility(View.GONE);
-
-        linear_programdata = content.findViewById(R.id.linear_programdata);
-        linear_programdata.setVisibility(View.GONE);
-
-        linear_badge = content.findViewById(R.id.linear_badge);
-        linear_badge.setVisibility(View.GONE);
-
-        linear_layout_btn = content.findViewById(R.id.linear_layout_btn);
-        linear_layout_btn.setVisibility(View.GONE);
-        outprogramtbl = content.findViewById(R.id.AddProgramData);
-
-        txt_bundlenos = content.findViewById(R.id.txt_bundlenos);
-        btnOk = content.findViewById(R.id.btnOk);
-        btnCancel = content.findViewById(R.id.btnCancel);
-        session = new SessionManagement(getApplicationContext());
-        HashMap<String, String> user = session.getUserDetails();
-        String name = user.get(SessionManagement.KEY_USER);
-        this.Id = user.get(SessionManagement.KEY_PROCESSOR_ID);
-        this.User = user.get(SessionManagement.KEY_USER);
-        unitid = user.get(SessionManagement.KEY_UNITID);
 
         processorid = getIntent().getStringExtra("processorid");
         userid = getIntent().getStringExtra("userid");
         username = getIntent().getStringExtra("name");
+        isqc = getIntent().getStringExtra("isqc");
 
-        versioncode();
-        getvalue();
-        hideKeyboard();
+        custPrograssbar_new = new CustPrograssbar_new();
+
+        imageView = findViewById(R.id.imgd);
         imageView.setOnClickListener(this);
-        Scanning();
+        txtUser = findViewById(R.id.txtUser);
 
-        FetchData = content.findViewById(R.id.FetchData);
+        session = new SessionManagement(getApplicationContext());
+        HashMap<String, String> user = session.getUserDetails();
+        this.User = user.get(SessionManagement.KEY_USER);
+        unitid = user.get(SessionManagement.KEY_UNITID);
+        txtUser.setText("Hello " + this.User);
+
+        txtJobNo = findViewById(R.id.txtJobNo);
+        txtShipCode = findViewById(R.id.txtShipCode);
+        text_Part_Name =findViewById(R.id.text_Part_Name);
+        text_Size_Name = findViewById(R.id.text_Size_Name);
+        txtStyle = findViewById(R.id.txtStyle);
+        txtStyleRef = findViewById(R.id.text_Color);
+
+        title_name  = findViewById(R.id.title_name);
+        title_name.setVisibility(View.GONE);
+
+        liner_bundle_details = findViewById(R.id.liner_bundle_details);
+        liner_bundle_details.setVisibility(View.GONE);
+
+        linear_programdata = findViewById(R.id.linear_programdata);
+        linear_programdata.setVisibility(View.GONE);
+
+        linear_layout_btn = findViewById(R.id.linear_layout_btn);
+        linear_layout_btn.setVisibility(View.GONE);
+
+        linear_badge = findViewById(R.id.linear_badge);
+        linear_badge.setVisibility(View.GONE);
+
+        outprogramtbl = findViewById(R.id.AddProgramData);
+
+        txt_bundlenos = findViewById(R.id.txt_bundlenos);
+        btnOk = findViewById(R.id.btnOk);
+        btnCancel = findViewById(R.id.btnCancel);
 
         btnOk.setOnClickListener(this);
         btnCancel.setOnClickListener(this);
         btnOk.setVisibility(View.GONE);
-        FetchData.setOnClickListener(this);
+
+
+        /*
+         * Get new AidcManager
+         */
+        AidcManager.create(this, new CreatedCallback() {
+
+            @Override
+            public void onCreated(AidcManager aidcManager) {
+                mAidcManager = aidcManager;
+                mAidcManager.addBarcodeDeviceListener(new BarcodeDeviceListener() {
+
+                    @Override
+                    public void onBarcodeDeviceConnectionEvent(BarcodeDeviceConnectionEvent event) {
+                        // Could use this to call scannerSelection like when
+                        // press switch scanner button.
+                        // Here we just use it to notify the user when a scanner
+                        // is attached or detached and
+                        // give a toast.
+                        String connected;
+                        if (event.getConnectionStatus() == AidcManager.BARCODE_DEVICE_DISCONNECTED) {
+                            connected = "Disconnected";
+                        } else {
+                            connected = "Connected";
+                        }
+
+                        // Only act on the event if the app is in the resume state. The app could
+                        // store the connection event and BarcodeReaderInfo object if the app is
+                        // not in the resume state so the proper imager claim can be made in onResume
+                        if (mResume) {
+                            final String message = "Scanner: "
+                                    + event.getBarcodeReaderInfo().getFriendlyName() + " is "
+                                    + connected;
+                            ((AppCompatActivity) mContext).runOnUiThread(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show();
+                                }
+
+                            });
+                        }
+                    }
+                });
+                initialize();
+            }
+        });
     }
 
     private void versioncode() {
-        if(isOnline()) {
-            Context context = this;
-            PackageManager manager = context.getPackageManager();
-            try {
-                PackageInfo info = manager.getPackageInfo(context.getPackageName(), 0);
-                myversionName = info.versionName;
-                Log.e("Bipin","myversionName :" + myversionName);
-            }
-            catch (PackageManager.NameNotFoundException e) {
-                e.printStackTrace();
-                myversionName = "Unknown-01";
-            }
-        }
-        else {
-            AlertDialog alertDialog = new AlertDialog.Builder(Multiple_Bundle_QR_Scan_Activity.this)
-                    .setMessage("Please Check Your Internet Connection")
-                    .setCancelable(false)
-                    .setNegativeButton("Exit", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface arg1, int arg0) {
-                            arg1.dismiss();
-                            onDestroy();
-                            finish();
-                        }
-                    }).show();
-            alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.RED);
-        }
-    }
-
-    public void hideKeyboard() {
-        // Check if no view has focus:
-        View view = this.getCurrentFocus();
-        if (view != null)
-        {
-            InputMethodManager inputManager = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
-            inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-        }
-    }
-
-    public void Scanning() {
-        IntentIntegrator qrScan = new IntentIntegrator(this);
-        qrScan.setPrompt(" Scan Bundle QR Code");
-        qrScan.setOrientationLocked(false);
-        qrScan.initiateScan();
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-        if (isOnline()) {
-
-            if (requestCode == 12345) { // Use the same request code as in the previous step
-                if (resultCode == RESULT_OK) {
-                    // User granted permission, you can proceed with the installation
-                } else {
-                    // User denied permission, handle accordingly
-                }
-            } else if (result != null) {
-                if (result.getContents() == null) {
-                    Toast t = Toast.makeText(Multiple_Bundle_QR_Scan_Activity.this, "\"Result Not Found", Toast.LENGTH_LONG);
-                    t.show();
-                } else {
-                    qrid = result.getContents();
-                    String[] arrayString = qrid.split("-");
-                    if (arrayString.length > 1) {
-                        qrprefix = arrayString[0];
-                        qrid = arrayString[1];
-                    }
-                    if (arrayString.length > 1 && (qrprefix.equals("NE"))) {
-                        if (isOnline()) {
-
-                            if (click_count == 0)
-                            {
-                                Multiple_Bundle_QR_Scan_Activity.custPrograssbar.prograssCreate(this);
-
-                                JSONObject jsonObject = new JSONObject();
-                                try {
-                                    jsonObject.put("qrid", qrid);
-                                    jsonObject.put("userid", userid);
-                                    jsonObject.put("processorid", processorid);
-                                    jsonObject.put("version_name", myversionName);
-                                    Log.e("Bipin :" ,"qrid current: " +qrid);
-
-                                    statrt_qrid = qrid;
-
-                                    JsonParser jsonParser = new JsonParser();
-                                    Call<JsonObject> call = APIClient.getInterface().get_new_qr_data((JsonObject) jsonParser.parse(jsonObject.toString()));
-                                    GetResult getResult = new GetResult();
-                                    getResult.setMyListener(this);
-                                    getResult.callForLogin(call, "get_new_qr_data");
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            else {
-                                curr_qr_id = qrid;
-                                data_added();
-                            }
-                        } else {
-                            AlertDialog alertDialog = new AlertDialog.Builder(Multiple_Bundle_QR_Scan_Activity.this)
-                                    .setMessage("Please Check Your Internet Connection")
-                                    .setCancelable(false)
-                                    .setNegativeButton("OK", new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface arg1, int arg0) {
-                                            arg1.dismiss();
-
-                                        }
-                                    }).show();
-                            alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.RED);
-                        }
-                    } else {
-                        Handler h = new Handler(Looper.getMainLooper());
-                        h.post(new Runnable() {
-                            public void run() {
-                                new AlertDialog.Builder(Multiple_Bundle_QR_Scan_Activity.this)
-                                        .setTitle("Error")
-                                        .setMessage("Only Bundle Scanning is supported as of now.\nContact Admin!")
-                                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                dialog.dismiss();
-                                            }
-                                        }).show();
-                            }
-                        });
-                    }
-                }
-            }
-        } else {
-            new AlertDialog.Builder(Multiple_Bundle_QR_Scan_Activity.this)
-                    .setMessage("No internet connection!")
-                    .setCancelable(false)
-                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface d, int arg0) {
-                            d.dismiss();
-                        }
-                    }).show();
-        }
-    }
-
-    public void get_new_qr_data_new()
-    {
-        JSONObject jsonObject = new JSONObject();
+        Context context = this;
+        PackageManager manager = context.getPackageManager();
         try {
-            jsonObject.put("qrid", qrid);
-            jsonObject.put("userid", userid);
-            jsonObject.put("processorid", processorid);
-            jsonObject.put("version_name", myversionName);
-            jsonObject.put("batch_no", 1);
-
-            JsonParser jsonParser = new JsonParser();
-            Call<JsonObject> call = APIClient.getInterface().get_new_qr_data((JsonObject) jsonParser.parse(jsonObject.toString()));
-            GetResult getResult = new GetResult();
-            getResult.setMyListener(this);
-            getResult.callForLogin(call, "get_new_qr_data");
-        } catch (JSONException e) {
+            PackageInfo info = manager.getPackageInfo(context.getPackageName(), 0);
+            myversionName = info.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
+            myversionName = "Unknown-01";
         }
     }
-
 
     @Override
     public void onClick(View v) {
-
-        if (isOnline()) {
-            dialog = new Dialog(Multiple_Bundle_QR_Scan_Activity.this);
+        if (isOnline())
+        {
             switch (v.getId()) {
                 case R.id.imgd:
-                    toggleDrawer();
+                    PopupMenu popup = new PopupMenu(Inbuilt_Scanner_Multiple_Barcode_Activity.this, imageView);
+                    popup.getMenuInflater().inflate(R.menu.menu_chgpswd, popup.getMenu());
+                    popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                        public boolean onMenuItemClick(MenuItem item) {
+                            if (item.getItemId() == R.id.logout) {
+                                session.logoutUser();
+                                finish();
+                            }
+                            return true;
+                        }
+                    });
+                    popup.show();
                     break;
-
-                case R.id.FetchData:
-                    Scanning();
-                    break;
-
                 case R.id.btnOk:
                     UpdatescanData();
                     break;
@@ -398,118 +306,338 @@ public class Multiple_Bundle_QR_Scan_Activity extends BaseActivity implements Vi
                 case R.id.btnCancel:
                     onBackPressed();
                     break;
+                default:
+                    break;
             }
-        } else {
-            Snackbar snackbar = Snackbar.make(v, "No internet connection!", Snackbar.LENGTH_LONG);
+        }
+        else {
+            Snackbar snackbar = Snackbar
+                    .make(v, "No internet connection!", Snackbar.LENGTH_LONG);
             snackbar.show();
         }
     }
 
-    private void UpdatescanData() {
-        // Upload Audio and update qc scan status
-        // Create new table to update qc data
-        if (isOnline()){
-            Multiple_Bundle_QR_Scan_Activity.custPrograssbar.prograssCreate(this);
+    public void initialize() {
+//        scannerSelection(mAidcManager.listConnectedBarcodeDevices());
+        String scanner = "dcs.scanner.imager";
+        createBarcodeReaderConnection(scanner);
+    }
 
-            JSONObject jsonObject = new JSONObject();
+    @Override
+    public void onBarcodeEvent(final BarcodeReadEvent event) {
+//        qrid = event.getBarcodeData();
+//        String[] arrayString = qrid.split("-");
+        // Scanner thread
+        runOnUiThread(() -> {
             try {
+                qrid = event.getBarcodeData();
+                String[] arrayString = qrid.split("-");
+//        String qrprefix = null;
+                String qrprefix = null;
 
-                if (qr_id_arr != null && qr_id_arr.size() > 0)
-                {
-                    for (int i = 0; i < totalinsert_count; i++) {
-                        QR_ID_Array.put(qr_id_arr.get(i));
-                    }
+//        if(arrayString.length > 1) {
+//            qrprefix = arrayString[0];
+//            qrid = arrayString[1];
+//        }
+//        if(arrayString.length > 1 && qrprefix.equals("NE"))
+//        {
+//            if(isOnline()) {
+//
+//                session = new SessionManagement(getApplicationContext());
+//                HashMap<String, String> user = session.getUserDetails();
+//                processorid = user.get(SessionManagement.KEY_PROCESSOR_ID);
+//                userid = user.get(SessionManagement.KEY_USER_ID);
+//                isqc = user.get(SessionManagement.KEY_ISQC);
+//
+//                if (isqc.equals("N")) {
+//                    Inbuilt_Scanner_Multiple_Barcode_Activity.custPrograssbar_new.prograssCreate(this);
+//                    if(click_count == 0) {
+//                        JSONObject jsonObject = new JSONObject();
+//                        try {
+//                            jsonObject.put("qrid", qrid);
+//                            jsonObject.put("userid", userid);
+//                            jsonObject.put("processorid", processorid);
+//                            jsonObject.put("version_name", myversionName);
+//
+//                            statrt_qrid = qrid;
+//
+//                            JsonParser jsonParser = new JsonParser();
+//                            Call<JsonObject> call = APIClient.getInterface().get_new_qr_data((JsonObject) jsonParser.parse(jsonObject.toString()));
+//                            GetResult getResult = new GetResult();
+//                            getResult.setMyListener(this);
+//                            getResult.callForLogin(call, "get_new_qr_data");
+//                        } catch (JSONException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                    else {
+//                        curr_qr_id =  qrid;
+//                        data_added();
+//                    }
+                if (arrayString.length > 1) {
+                    qrprefix = arrayString[0];
+                    qrid = arrayString[1];
                 }
-                jsonObject.put("userid", userid);
-                jsonObject.put("processorid", processorid);
-                jsonObject.put("bundle_qr_id_array", QR_ID_Array);
-                JsonParser jsonParser = new JsonParser();
-                Call<JsonObject> call = APIClient.getInterface().update_qr_scan_queue_bundwisewise((JsonObject) jsonParser.parse(jsonObject.toString()));
-                GetResult getResult = new GetResult();
-                getResult.setMyListener(this);
-                getResult.callForLogin(call, "update_qr_scan_queue_bundwisewise");
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-        else {
-            new AlertDialog.Builder(Multiple_Bundle_QR_Scan_Activity.this)
-                    .setMessage("No internet connection!")
-                    .setCancelable(false)
-                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface d, int arg0) {
-                            d.dismiss();
+
+//            }
+//            else {
+//
+//                AlertDialog alertDialog = new AlertDialog.Builder(Inbuilt_Scanner_Multiple_Barcode_Activity.this)
+//                        .setMessage("Please Check Your Internet Connection")
+//                        .setCancelable(false)
+//                        .setNegativeButton("Exit", new DialogInterface.OnClickListener() {
+//                            public void onClick(DialogInterface arg1, int arg0) {
+//                                arg1.dismiss();
+
+                if (arrayString.length > 1 && "NE".equals(qrprefix)) {
+                    if (isOnline()) {
+                        session = new SessionManagement(getApplicationContext());
+                        HashMap<String, String> user = session.getUserDetails();
+                        processorid = user.get(SessionManagement.KEY_PROCESSOR_ID);
+                        userid = user.get(SessionManagement.KEY_USER_ID);
+                        isqc = user.get(SessionManagement.KEY_ISQC);
+
+                        if ("N".equals(isqc)) {
+                            Inbuilt_Scanner_Multiple_Barcode_Activity.custPrograssbar_new.prograssCreate(this);
+
+                            if (click_count == 0) {
+                                JSONObject jsonObject = new JSONObject();
+                                jsonObject.put("qrid", qrid);
+                                jsonObject.put("userid", userid);
+                                jsonObject.put("processorid", processorid);
+                                jsonObject.put("version_name", myversionName);
+
+                                statrt_qrid = qrid;
+
+                                JsonParser jsonParser = new JsonParser();
+                                Call<JsonObject> call = APIClient.getInterface()
+                                        .get_new_qr_data((JsonObject) jsonParser.parse(jsonObject.toString()));
+                                GetResult getResult = new GetResult();
+                                getResult.setMyListener(this);
+                                getResult.callForLogin(call, "get_new_qr_data");
+                            } else {
+                                curr_qr_id = qrid;
+                                data_added();
+                            }
+//                        }).show();
+//                alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.RED);
+//            }
+//        }
+//        else
+//        {
+//            Handler h = new Handler(Looper.getMainLooper());
+//            h.post(new Runnable() {
+//                public void run() {
+//                    new AlertDialog.Builder(mContext)
                         }
-                    }).show();
-        }
-    }
+                    } else {
+                        AlertDialog alertDialog = new AlertDialog.Builder(Inbuilt_Scanner_Multiple_Barcode_Activity.this)
+                                .setMessage("Please Check Your Internet Connection")
+                                .setCancelable(false)
+                                .setNegativeButton("Exit", (arg1, arg0) -> arg1.dismiss())
+                                .show();
 
-    public void getvalue() {
-        txtUser.setText("Hello " + this.User);
-        ModelClass modelClass = new ModelClass();
-        modelClass.setmID(userid);
-        mylist.add(modelClass);
-    }
-
-
-    public boolean isOnline() {
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
-    }
-
-    private void downloadFile(String sUrl) {
-
-        apkFileName = "production_qr_v"+app_version_name+".apk";
-        File externalFilesDir = getExternalFilesDir(null);
-        String previousApkFilePath = externalFilesDir.getAbsolutePath()+"/"+ apkFileName;
-        File previousApkFile = new File(previousApkFilePath);
-        if (previousApkFile.exists()) {
-            if (previousApkFile.delete()) {
-                // The previous APK file has been successfully deleted
-            } else {
-                // There was an issue deleting the previous APK file
-            }
-        }
-        else {
-            // The previous APK file does not exist or has already been deleted
-        }
-
-        String apkUrl = sUrl;
-        Multiple_Bundle_QR_Scan_Activity.custPrograssbar.prograssCreate(this);
-        DownloadManager downloadManager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
-
-        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(apkUrl));
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
-        request.setDestinationInExternalFilesDir(this, null, apkFileName);
-        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-        request.setTitle("Downloading APK");
-        request.setDescription("Download Production QR APK File..");
-        final long downloadId = downloadManager.enqueue(request);
-
-        receiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                long id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
-                if (downloadId == id) {
-                    // The download has completed, open and install the APK
-                    Multiple_Bundle_QR_Scan_Activity.custPrograssbar.closePrograssBar();
-
-                    Uri apkUri = FileProvider.getUriForFile(context, "com.nidhvitec.productionqr.fileprovider", new File(context.getExternalFilesDir(null), apkFileName));
-                    Intent installIntent = new Intent(Intent.ACTION_VIEW);
-                    installIntent.setData(apkUri);
-                    installIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    context.startActivity(installIntent);
-                    unregisterReceiver(receiver);
+                        alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.RED);
+                    }
+                } else {
+                    new AlertDialog.Builder(Inbuilt_Scanner_Multiple_Barcode_Activity.this)
+                            .setTitle("Error")
+                            .setMessage("Only Piecewise Scanning is supported as of now.\nContact Admin!")
+//                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//                                @Override
+//                                public void onClick(DialogInterface dialog, int which) {
+//                                    dialog.dismiss();
+//                                }
+//                            }).show();
+                            .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
+                            .show();
                 }
+            } catch (Exception e) {
+                Log.e("BarcodeEvent", "Error in barcode event", e);
             }
-        };
-        registerReceiver(receiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+        });
+    }
+
+    // When using Automatic Trigger control do not need to implement the
+    // onTriggerEvent function
+    @Override
+    public void onTriggerEvent(TriggerStateChangeEvent event) {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public void onFailureEvent(BarcodeFailureEvent arg0) {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mResume = true;
+        if (mBarcodeReader != null) {
+            try {
+                mBarcodeReader.claim();
+            } catch (ScannerUnavailableException e) {
+                e.printStackTrace();
+                Toast.makeText(this, "Scanner unavailable", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mResume = false;
+        if (mBarcodeReader != null) {
+            // release the scanner claim so we don't get any scanner
+            // notifications while paused.
+            mBarcodeReader.release();
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (mBarcodeReader != null) {
+            // unregister barcode event listener
+            mBarcodeReader.removeBarcodeListener(this);
+            // unregister trigger state change listener
+            mBarcodeReader.removeTriggerListener(this);
+            mBarcodeReader.close();
+        }
+        if (mAidcManager != null) {
+            mAidcManager.close();
+        }
+    }
+
+    public void claimBarcodeReader() {
+        if (mBarcodeReader != null) {
+            try {
+                mBarcodeReader.claim();
+            } catch (ScannerUnavailableException e) {
+                e.printStackTrace();
+                Toast.makeText(this, "Scanner unavailable", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private void scannerSelection(final List<BarcodeReaderInfo> scanners) {
+        Handler h = new Handler(Looper.getMainLooper());
+        h.post(new Runnable() {
+            @Override
+            public void run() {
+                final Dialog scannerSelectDialog = new Dialog(mContext);
+                scannerSelectDialog.setContentView(R.layout.scanner_select_dialog);
+                Button dialogButton = (Button) scannerSelectDialog
+                        .findViewById(R.id.dialogButtonOK);
+
+                // If there are scanners, just show the list, must select one
+                if (scanners.size() > 0) {
+                    scannerSelectDialog.setTitle("Select Scanner");
+                    dialogButton.setVisibility(Button.INVISIBLE);
+                    final Map<String, String> scannerNames = new HashMap<String, String>();
+                    for (BarcodeReaderInfo i : scanners) {
+                        scannerNames.put(i.getFriendlyName(), i.getName());
+                    }
+
+                    final ListView list = (ListView) scannerSelectDialog
+                            .findViewById(R.id.listScanners);
+                    ArrayAdapter<String> scannerNameAdapter = new ArrayAdapter<String>(mContext,
+                            android.R.layout.simple_list_item_1, android.R.id.text1,
+                            new ArrayList<String>(scannerNames.keySet()));
+                    list.setAdapter(scannerNameAdapter);
+
+                    list.setOnItemClickListener(new OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> myAdapter, View myView, int pos,
+                                                long mylng) {
+                            String selectedScanner = (String) list.getItemAtPosition(pos);
+                            createBarcodeReaderConnection(scannerNames.get(selectedScanner));
+                            scannerSelectDialog.dismiss();
+                        }
+
+                    });
+
+                } else { // Show an ok button to close dialog
+                    scannerSelectDialog.setTitle("No Scanners Connected");
+                    dialogButton.setOnClickListener(new OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            scannerSelectDialog.dismiss();
+                        }
+                    });
+                }
+
+                scannerSelectDialog.setCancelable(false);
+                scannerSelectDialog.show();
+            }
+        });
+    }
+
+    private void createBarcodeReaderConnection(String scanner) {
+//        Log.e("Bipin", "Scanner " + scanner);
+        if (scanner != null && !scanner.equals(mConnectedScanner)) {
+
+            if (mBarcodeReader != null) {
+                mBarcodeReader.release();
+                mBarcodeReader.close();
+            }
+
+            try {
+                mBarcodeReader = mAidcManager.createBarcodeReader(scanner);
+                mBarcodeReader.setProperty(BarcodeReader.PROPERTY_TRIGGER_CONTROL_MODE,
+                        BarcodeReader.TRIGGER_CONTROL_MODE_AUTO_CONTROL);
+
+            } catch (UnsupportedPropertyException e) {
+                e.printStackTrace();
+                Toast.makeText(this, "Control mode not set", Toast.LENGTH_SHORT).show();
+            }
+            catch (InvalidScannerNameException e) {
+                e.printStackTrace();
+                Toast.makeText(this, "Invalid Scanner Name Exception: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+            catch (Exception e){
+                e.printStackTrace();
+                Toast.makeText(this, "Exception: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+
+            mBarcodeReader.addBarcodeListener((BarcodeReader.BarcodeListener) mContext);
+            mBarcodeReader.addTriggerListener((BarcodeReader.TriggerListener) mContext);
+//			mBarcodeReader.addMenuCommandListener((BarcodeReader.MenuCommandListener) mContext);
+
+            Map<String, Object> properties = new HashMap<String, Object>();
+            // Set Symbologies On/Off
+            properties.put(BarcodeReader.PROPERTY_CODE_128_ENABLED, true);
+            properties.put(BarcodeReader.PROPERTY_GS1_128_ENABLED, true);
+            properties.put(BarcodeReader.PROPERTY_QR_CODE_ENABLED, true);
+            properties.put(BarcodeReader.PROPERTY_CODE_39_ENABLED, true);
+            properties.put(BarcodeReader.PROPERTY_DATAMATRIX_ENABLED, true);
+            properties.put(BarcodeReader.PROPERTY_UPC_A_ENABLE, true);
+            properties.put(BarcodeReader.PROPERTY_EAN_13_ENABLED, false);
+            properties.put(BarcodeReader.PROPERTY_AZTEC_ENABLED, false);
+            properties.put(BarcodeReader.PROPERTY_CODABAR_ENABLED, false);
+            properties.put(BarcodeReader.PROPERTY_INTERLEAVED_25_ENABLED, false);
+            properties.put(BarcodeReader.PROPERTY_PDF_417_ENABLED, false);
+            // Set Max Code 39 barcode length
+            properties.put(BarcodeReader.PROPERTY_CODE_39_MAXIMUM_LENGTH, 10);
+            // Turn on center decoding
+            properties.put(BarcodeReader.PROPERTY_CENTER_DECODE, true);
+            // Enable bad read response
+            properties.put(BarcodeReader.PROPERTY_NOTIFICATION_BAD_READ_ENABLED, true);
+            // Sets time period for decoder timeout in any mode
+            properties.put(BarcodeReader.PROPERTY_DECODER_TIMEOUT,  400);
+            // Apply the settings
+            mBarcodeReader.setProperties(properties);
+
+            claimBarcodeReader();
+            mConnectedScanner = scanner;
+        }
     }
 
     @Override
     public void callback(JsonObject result, String callNo) {
-        try {
-
+        try
+        {
             btnOk.setOnClickListener(this);
             btnCancel.setOnClickListener(this);
 
@@ -525,9 +653,9 @@ public class Multiple_Bundle_QR_Scan_Activity extends BaseActivity implements Vi
                     JSONObject jsonObj = jsonObject.getJSONObject("data");
                     apkurl = jsonObj.optString("apk_url");
                     app_version_name = jsonObj.optString("version_name");
-                    Multiple_Bundle_QR_Scan_Activity.custPrograssbar.closePrograssBar();
+                    Inbuilt_Scanner_Multiple_Barcode_Activity.custPrograssbar_new.closePrograssBar();
 
-                    AlertDialog alertDialog = new AlertDialog.Builder(Multiple_Bundle_QR_Scan_Activity.this)
+                    AlertDialog alertDialog = new AlertDialog.Builder(Inbuilt_Scanner_Multiple_Barcode_Activity.this)
                             .setMessage(message)
                             .setCancelable(false)
                             .setPositiveButton("OK", new DialogInterface.OnClickListener()
@@ -569,7 +697,6 @@ public class Multiple_Bundle_QR_Scan_Activity extends BaseActivity implements Vi
                                 try {
                                     JSONObject dataObj = jsonObject.getJSONObject("batches_data");
                                     JSONArray batchesArray = dataObj.getJSONArray("batches");
-
                                     int current_batch_no = dataObj.getInt("current_batch_no");
 
                                     for (int i = 0; i < batchesArray.length(); i++) {
@@ -580,7 +707,7 @@ public class Multiple_Bundle_QR_Scan_Activity extends BaseActivity implements Vi
                                         int to_bundle_no = batchObj.getInt("to_bundle_no");
 
 
-
+                                        // Create a vertical layout for each page
                                         LinearLayout badgeLayout = new LinearLayout(this);
                                         badgeLayout.setOrientation(LinearLayout.VERTICAL);
                                         badgeLayout.setGravity(Gravity.CENTER);
@@ -652,19 +779,14 @@ public class Multiple_Bundle_QR_Scan_Activity extends BaseActivity implements Vi
                                         linear_badge.addView(badgeLayout);
                                     }
 
-                                    // Trigger first page click automatically
-//                                    if (linear_badge.getChildCount() > 0) {
-//                                        linear_badge.getChildAt(0).performClick();
-//                                    }
-
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
                             }
                             else
                             {
-                                Multiple_Bundle_QR_Scan_Activity.custPrograssbar.closePrograssBar();
-                                new AlertDialog.Builder(Multiple_Bundle_QR_Scan_Activity.this)
+                                Inbuilt_Scanner_Multiple_Barcode_Activity.custPrograssbar_new.closePrograssBar();
+                                new AlertDialog.Builder(Inbuilt_Scanner_Multiple_Barcode_Activity.this)
                                         .setMessage(message)
                                         .setCancelable(false)
                                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -674,8 +796,6 @@ public class Multiple_Bundle_QR_Scan_Activity extends BaseActivity implements Vi
                                             }
                                         }).show();
                             }
-
-
 
                             JSONObject jsonObj = jsonObject.getJSONObject("data");
 
@@ -705,6 +825,7 @@ public class Multiple_Bundle_QR_Scan_Activity extends BaseActivity implements Vi
                             txtStyle.setText(styleno);
                             txtStyleRef.setText(stylename);
 
+                            title_name.setVisibility(View.VISIBLE);
                             liner_bundle_details.setVisibility(View.VISIBLE);
                             linear_programdata.setVisibility(View.VISIBLE);
                             linear_layout_btn.setVisibility(View.VISIBLE);
@@ -712,7 +833,6 @@ public class Multiple_Bundle_QR_Scan_Activity extends BaseActivity implements Vi
                             add_scan_data();
 
                             Boolean arraycontains = false;
-
                             outprogramtbl.removeAllViews();
                             TableRow row;
 
@@ -810,7 +930,7 @@ public class Multiple_Bundle_QR_Scan_Activity extends BaseActivity implements Vi
                                                 textViewPcQr[currindex].setOnClickListener(v -> {
                                                     String clickedText = ((TextView) v).getText().toString();
                                                     int clicked_id = ((TextView) v).getId();
-                                                    new AlertDialog.Builder(Multiple_Bundle_QR_Scan_Activity.this)
+                                                    new AlertDialog.Builder(Inbuilt_Scanner_Multiple_Barcode_Activity.this)
                                                             .setTitle("Already Scanned")
                                                             .setMessage("Bundle No :" + Integer.parseInt(clickedText)
                                                                     + "\nScanned On : " + scan_date_time_hashmap.get(clicked_id)
@@ -822,13 +942,14 @@ public class Multiple_Bundle_QR_Scan_Activity extends BaseActivity implements Vi
 
                                             int currentIndexId = textViewPcQr[currindex].getId();
 
-                                            if (scanned_qr_id_arr != null && scanned_qr_id_arr.contains(currentIndexId)) {
+                                            if (scanned_qr_id_arr != null && scanned_qr_id_arr.contains(currentIndexId))
+                                            {
                                                 textViewPcQr[currindex].setBackgroundResource(R.drawable.border_green);
                                                 textViewPcQr[currindex].setOnClickListener(v -> {
                                                     int current_click_text_id = v.getId();
                                                     if (scanned_qr_st_arr_hashmap.containsKey(current_click_text_id)) {
                                                         String clickedText = ((TextView) v).getText().toString();
-                                                        new AlertDialog.Builder(Multiple_Bundle_QR_Scan_Activity.this)
+                                                        new AlertDialog.Builder(Inbuilt_Scanner_Multiple_Barcode_Activity.this)
                                                                 .setTitle("Already Scanned")
                                                                 .setMessage("Bundle No :" + Integer.parseInt(clickedText)
                                                                         + "\n" + String.valueOf(scanned_qr_st_arr_hashmap.get(current_click_text_id)))
@@ -844,7 +965,7 @@ public class Multiple_Bundle_QR_Scan_Activity extends BaseActivity implements Vi
                                                     int current_click_text_id = v.getId();
                                                     if (pending_qr_st_arr.containsKey(current_click_text_id)) {
                                                         String clickedText = ((TextView) v).getText().toString();
-                                                        new AlertDialog.Builder(Multiple_Bundle_QR_Scan_Activity.this)
+                                                        new AlertDialog.Builder(Inbuilt_Scanner_Multiple_Barcode_Activity.this)
                                                                 .setTitle(String.valueOf(assign_header_qr_st_arr.get(current_click_text_id)))
                                                                 .setMessage("Bundle No :" + Integer.parseInt(clickedText)
                                                                         + "\n" + String.valueOf(pending_qr_st_arr.get(current_click_text_id)))
@@ -879,46 +1000,43 @@ public class Multiple_Bundle_QR_Scan_Activity extends BaseActivity implements Vi
                                 outprogramtbl.addView(row, new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
 
                             }
+                            if(scanned_qr_id_arr.size() > 0 ) {
+                                if (scanned_qr_id_arr.contains(Integer.parseInt(String.valueOf(curr_qr_id).trim()))) {
+                                    arraycontains = true;
+                                    String reason = scanned_qr_st_arr_hashmap.get(Integer.parseInt(String.valueOf(curr_qr_id).trim()));
+                                    bundleno = bundle_no_arr.get(Integer.parseInt(String.valueOf(curr_qr_id).trim()));
+                                    new AlertDialog.Builder(Inbuilt_Scanner_Multiple_Barcode_Activity.this)
+                                            .setTitle("Already Scanned")
+                                            .setMessage("Bundle No : "+ bundleno +"\n" +reason )
+                                            .setCancelable(false)
+                                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface arg1, int arg0) {
+                                                    arg1.dismiss();
 
-//                            if(scanned_qr_id_arr.size() > 0 ) {
-//                                if (scanned_qr_id_arr.contains(Integer.parseInt(String.valueOf(curr_qr_id).trim()))) {
-//                                    arraycontains = true;
-//                                    String reason = scanned_qr_st_arr_hashmap.get(Integer.parseInt(String.valueOf(curr_qr_id).trim()));
-//                                    bundleno = bundle_no_arr.get(Integer.parseInt(String.valueOf(curr_qr_id).trim()));
-//
-//                                    new AlertDialog.Builder(Multiple_Bundle_QR_Scan_Activity.this)
-//                                        .setTitle("Already Scanned")
-//                                        .setMessage("Bundle No :"+ bundleno +"\n" +reason )
-//                                        .setCancelable(false)
-//                                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//                                        public void onClick(DialogInterface arg1, int arg0) {
-//                                            arg1.dismiss();
-//
-//                                        }
-//                                    }).show();
-//                                }
-//                            }
-////                            else
-//                            if(pending_scan_qr_id_arr.size() > 0 ) {
-//                                if (pending_scan_qr_id_arr.contains(Integer.parseInt(String.valueOf(curr_qr_id).trim()))) {
-//                                    arraycontains = true;
-//                                    new AlertDialog.Builder(Multiple_Bundle_QR_Scan_Activity.this)
-//                                            .setMessage("This Bundle No" + bundleno + assign_header_qr_st_arr.get(curr_qr_id) +"!")
-//                                            .setCancelable(false)
-//                                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//                                                public void onClick(DialogInterface arg1, int arg0) {
-//                                                    arg1.dismiss();
-//
-//                                                }
-//                                            }).show();
-//                                }
-//                            }
-                            Multiple_Bundle_QR_Scan_Activity.custPrograssbar.closePrograssBar();
+                                                }
+                                            }).show();
+                                }
+                            }
+                            else if(pending_scan_qr_id_arr.size() > 0 ) {
+                                if (pending_scan_qr_id_arr.contains(Integer.parseInt(String.valueOf(curr_qr_id).trim()))) {
+                                    arraycontains = true;
+                                    new AlertDialog.Builder(Inbuilt_Scanner_Multiple_Barcode_Activity.this)
+                                            .setMessage("This Bundle No" + bundleno + assign_header_qr_st_arr.get(curr_qr_id) +"!")
+                                            .setCancelable(false)
+                                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface arg1, int arg0) {
+                                                    arg1.dismiss();
+
+                                                }
+                                            }).show();
+                                }
+                            }
+                            Inbuilt_Scanner_Multiple_Barcode_Activity.custPrograssbar_new.closePrograssBar();
                         }
                         else
                         {
-                            Multiple_Bundle_QR_Scan_Activity.custPrograssbar.closePrograssBar();
-                            new AlertDialog.Builder(Multiple_Bundle_QR_Scan_Activity.this)
+                            Inbuilt_Scanner_Multiple_Barcode_Activity.custPrograssbar_new.closePrograssBar();
+                            new AlertDialog.Builder(Inbuilt_Scanner_Multiple_Barcode_Activity.this)
                                     .setMessage(message)
                                     .setCancelable(false)
                                     .setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -928,11 +1046,10 @@ public class Multiple_Bundle_QR_Scan_Activity extends BaseActivity implements Vi
                                     }).show();
                         }
                     }
-
                     else if (mStatus.equalsIgnoreCase("error"))
                     {
-                        Multiple_Bundle_QR_Scan_Activity.custPrograssbar.closePrograssBar();
-                        new AlertDialog.Builder(Multiple_Bundle_QR_Scan_Activity.this)
+                        Inbuilt_Scanner_Multiple_Barcode_Activity.custPrograssbar_new.closePrograssBar();
+                        new AlertDialog.Builder(Inbuilt_Scanner_Multiple_Barcode_Activity.this)
                                 .setMessage(message)
                                 .setCancelable(false)
                                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -944,14 +1061,14 @@ public class Multiple_Bundle_QR_Scan_Activity extends BaseActivity implements Vi
                     }
                 }
             }
-            else  if(callNo.equalsIgnoreCase("update_qr_scan_queue_bundwisewise"))
+            else if(callNo.equalsIgnoreCase("update_qr_scan_queue_bundwisewise"))
             {
                 JSONObject jsonObject = new JSONObject(result.toString());
                 String mStatus = jsonObject.optString("status");
                 String message = jsonObject.optString("message");
-                Multiple_Bundle_QR_Scan_Activity.custPrograssbar.closePrograssBar();
+                Inbuilt_Scanner_Multiple_Barcode_Activity.custPrograssbar_new.closePrograssBar();
                 if (mStatus.equals("success")) {
-                    new AlertDialog.Builder(Multiple_Bundle_QR_Scan_Activity.this)
+                    new AlertDialog.Builder(Inbuilt_Scanner_Multiple_Barcode_Activity.this)
                             .setMessage(message)
                             .setCancelable(false)
                             .setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -962,8 +1079,8 @@ public class Multiple_Bundle_QR_Scan_Activity extends BaseActivity implements Vi
                             }).show();
                 }
                 else {
-                    Multiple_Bundle_QR_Scan_Activity.custPrograssbar.closePrograssBar();
-                    new AlertDialog.Builder(Multiple_Bundle_QR_Scan_Activity.this)
+                    Inbuilt_Scanner_Multiple_Barcode_Activity.custPrograssbar_new.closePrograssBar();
+                    new AlertDialog.Builder(Inbuilt_Scanner_Multiple_Barcode_Activity.this)
                             .setMessage(message)
                             .setCancelable(false)
                             .setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -979,6 +1096,73 @@ public class Multiple_Bundle_QR_Scan_Activity extends BaseActivity implements Vi
         }
     }
 
+    private void downloadFile(String sUrl) {
+
+        apkFileName = "production_qr_v"+app_version_name+".apk";
+        File externalFilesDir = getExternalFilesDir(null);
+        String previousApkFilePath = externalFilesDir.getAbsolutePath()+"/"+ apkFileName;
+        File previousApkFile = new File(previousApkFilePath);
+        if (previousApkFile.exists()) {
+            if (previousApkFile.delete()) {
+                // The previous APK file has been successfully deleted
+            } else {
+                // There was an issue deleting the previous APK file
+            }
+        }
+        else {
+            // The previous APK file does not exist or has already been deleted
+        }
+
+        String apkUrl = sUrl;
+
+        DownloadManager downloadManager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+
+        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(apkUrl));
+
+        request.setDestinationInExternalFilesDir(this, null, apkFileName);
+        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+        request.setTitle("Downloading APK");
+        request.setDescription("Download Production QR APK File..");
+        final long downloadId = downloadManager.enqueue(request);
+
+        receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                long id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
+                if (downloadId == id) {
+                    // The download has completed, open and install the APK
+
+//                    checkForUpdates();
+                    unregisterReceiver(receiver);
+                    installApkFromStorage(context, apkFileName);
+                }
+            }
+        };
+        registerReceiver(receiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+    }
+
+
+    public void installApkFromStorage(Context context, String apkFileName) {
+        // Define the authority for your File Provider
+        Uri apkUri = FileProvider.getUriForFile(context, "com.bipinexports.productionqr.fileprovider", new File(context.getExternalFilesDir(null), apkFileName));
+        Intent installIntent = new Intent(Intent.ACTION_INSTALL_PACKAGE);
+        installIntent.setData(apkUri);
+        installIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        // Start the installation process
+
+        try
+        {
+            context.startActivity(installIntent);
+        }
+        catch (ActivityNotFoundException e)
+        {
+            Toast.makeText(context, "APK NOT Open", Toast.LENGTH_LONG).show();
+        }
+    }
+
+
     private void callGetNewQRData(int from_bundle_no, int pageNo, int to_bundle_no) {
         try {
 
@@ -990,13 +1174,11 @@ public class Multiple_Bundle_QR_Scan_Activity extends BaseActivity implements Vi
             jsonObject.put("from_bundle_no", from_bundle_no);
             jsonObject.put("batch_no", pageNo);
 
-            Log.e("Bipin :" ,"qrid  badge : " +statrt_qrid);
-
             current_pageNo = pageNo;
             from_bundleno = from_bundle_no;
             tobundle_no = to_bundle_no;
 
-            Multiple_Bundle_QR_Scan_Activity.custPrograssbar.prograssCreate(this);
+            Inbuilt_Scanner_Multiple_Barcode_Activity.custPrograssbar_new.prograssCreate(this);
 
             JsonParser jsonParser = new JsonParser();
             Call<JsonObject> call = APIClient.getInterface().get_new_qr_data(
@@ -1010,25 +1192,64 @@ public class Multiple_Bundle_QR_Scan_Activity extends BaseActivity implements Vi
             e.printStackTrace();
         }
     }
+    private void UpdatescanData() {
+        // Upload Audio and update qc scan status
+        // Create new table to update qc data
+        if (isOnline()){
+            Inbuilt_Scanner_Multiple_Barcode_Activity.custPrograssbar_new.prograssCreate(this);
+
+            JSONObject jsonObject = new JSONObject();
+            try {
+
+                if (qr_id_arr != null && qr_id_arr.size() > 0)
+                {
+                    for (int i = 0; i < totalinsert_count; i++) {
+                        QR_ID_Array.put(qr_id_arr.get(i));
+                    }
+                }
+                jsonObject.put("userid", userid);
+                jsonObject.put("processorid", processorid);
+                jsonObject.put("bundle_qr_id_array", QR_ID_Array);
+                JsonParser jsonParser = new JsonParser();
+                Call<JsonObject> call = APIClient.getInterface().update_qr_scan_queue_bundwisewise((JsonObject) jsonParser.parse(jsonObject.toString()));
+                GetResult getResult = new GetResult();
+                getResult.setMyListener(this);
+                getResult.callForLogin(call, "update_qr_scan_queue_bundwisewise");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        else {
+            new AlertDialog.Builder(Inbuilt_Scanner_Multiple_Barcode_Activity.this)
+                    .setMessage("No internet connection!")
+                    .setCancelable(false)
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface d, int arg0) {
+                            d.dismiss();
+                        }
+                    }).show();
+        }
+    }
+
 
     public void add_scan_data() {
+
+        totalinsert_count = 0;
+        qr_id_arr.clear();
+        scan_qr_id_arr.clear();
+        bundle_no_arr.clear();
+        pending_scan_qr_id_arr.clear();
+        pending_qr_st_arr.clear();
+        assign_header_qr_st_arr.clear();
+        scanned_qr_st_arr_hashmap.clear();
+
+        text_view_hashmap.clear();
+//        qr_id_arr.clear();
+
+        if (bundleNosIdxArray != null && bundleNosIdxArray.length > 0) {
+            bundleNosIdxArray = null;
+        }
         try {
-
-            totalinsert_count = 0;
-            qr_id_arr.clear();
-            scan_qr_id_arr.clear();
-            bundle_no_arr.clear();
-            pending_scan_qr_id_arr.clear();
-            pending_qr_st_arr.clear();
-            assign_header_qr_st_arr.clear();
-            scanned_qr_st_arr_hashmap.clear();
-            text_view_hashmap.clear();
-//            qr_id_arr.clear();
-
-
-            if (bundleNosIdxArray != null && bundleNosIdxArray.length > 0) {
-                bundleNosIdxArray = null;
-            }
             if (scan_qr_data_details.length() > 0) {
                 Iterator<String> sc_data = scan_qr_data_details.keys();
                 while (sc_data.hasNext()) {
@@ -1040,7 +1261,6 @@ public class Multiple_Bundle_QR_Scan_Activity extends BaseActivity implements Vi
                         String scan_ts = ((JSONObject) scan_qr_data_details.get(key)).getString("scan_ts");
                         String assigned_header = ((JSONObject) scan_qr_data_details.get(key)).getString("assigned_header");
                         String assigned_msg = ((JSONObject) scan_qr_data_details.get(key)).getString("assigned_msg");
-
                         if(scan_status.equals("N"))
                         {
                             scan_qr_id_arr.add(qrid);
@@ -1082,7 +1302,6 @@ public class Multiple_Bundle_QR_Scan_Activity extends BaseActivity implements Vi
                 bundleNosIdxArray[rowIdx][colIdx] = curIdx;
             }
         }
-
     }
 
 
@@ -1095,11 +1314,15 @@ public class Multiple_Bundle_QR_Scan_Activity extends BaseActivity implements Vi
         String header = "";
         String bundleno = "";
 
+        Log.e("Bipin","qr_id_arr : " +qr_id_arr);
+        Log.e("Bipin","curr_qr_id : " +curr_qr_id);
+
+//        if (qr_id_arr.contains(curr_qr_id))
         if (qr_id_arr.contains(Integer.parseInt(String.valueOf(curr_qr_id).trim())))
         {
+            startcontain_data = true;
             reason = scan_date_time_hashmap.get(Integer.parseInt(String.valueOf(curr_qr_id).trim()));
             bundleno = bundle_no_arr.get(Integer.parseInt(String.valueOf(curr_qr_id).trim()));
-            startcontain_data = true;
         }
         if (pending_scan_qr_id_arr.contains(Integer.parseInt(String.valueOf(curr_qr_id).trim())))
         {
@@ -1115,25 +1338,27 @@ public class Multiple_Bundle_QR_Scan_Activity extends BaseActivity implements Vi
             reason = scanned_qr_st_arr_hashmap.get(Integer.parseInt(String.valueOf(curr_qr_id).trim()));
             bundleno = bundle_no_arr.get(Integer.parseInt(String.valueOf(curr_qr_id).trim()));
         }
-
-        if(not_allow_contain_data)
+        if(startcontain_data)
         {
-            new AlertDialog.Builder(Multiple_Bundle_QR_Scan_Activity.this)
-                    .setTitle(header)
-                    .setMessage("Bundle No :"+ bundleno +"\n"+ reason)
+            Log.e("Bipin","startcontain_data : " +startcontain_data);
+            Inbuilt_Scanner_Multiple_Barcode_Activity.custPrograssbar_new.closePrograssBar();
+            new AlertDialog.Builder(Inbuilt_Scanner_Multiple_Barcode_Activity.this)
+                    .setTitle("Already Scanned")
+                    .setMessage("Bundle No : "+ bundleno +"\n"+"Scanned On : "+ reason +"\nScanned By : "+username)
                     .setCancelable(false)
                     .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface arg1, int arg0) {
                             arg1.dismiss();
-
                         }
                     }).show();
         }
-        else if(startcontain_data)
+        else if(not_allow_contain_data)
         {
-            new AlertDialog.Builder(Multiple_Bundle_QR_Scan_Activity.this)
-                    .setTitle("Already Scanned")
-                    .setMessage("Bundle No :"+ bundleno +"\n"+"Scanned On : "+ reason +"\nScanned By : "+username)
+            Log.e("Bipin","arraycontain_data : " +arraycontain_data);
+            Inbuilt_Scanner_Multiple_Barcode_Activity.custPrograssbar_new.closePrograssBar();
+            new AlertDialog.Builder(Inbuilt_Scanner_Multiple_Barcode_Activity.this)
+                    .setTitle(header)
+                    .setMessage("Bundle No : "+ bundleno +"\n"+ reason)
                     .setCancelable(false)
                     .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface arg1, int arg0) {
@@ -1143,9 +1368,10 @@ public class Multiple_Bundle_QR_Scan_Activity extends BaseActivity implements Vi
         }
         else if(arraycontain_data)
         {
-            new AlertDialog.Builder(Multiple_Bundle_QR_Scan_Activity.this)
+            Inbuilt_Scanner_Multiple_Barcode_Activity.custPrograssbar_new.closePrograssBar();
+            new AlertDialog.Builder(Inbuilt_Scanner_Multiple_Barcode_Activity.this)
                     .setTitle("Already Scanned")
-                    .setMessage("Bundle No :"+ bundleno +"\n" +reason )
+                    .setMessage("Bundle No : "+ bundleno +"\n" +reason )
                     .setCancelable(false)
                     .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface arg1, int arg0) {
@@ -1154,14 +1380,15 @@ public class Multiple_Bundle_QR_Scan_Activity extends BaseActivity implements Vi
                     }).show();
         }
         else {
-            if(text_view_hashmap.containsKey(Integer.parseInt(curr_qr_id)))
+
+
+            if(text_view_hashmap.containsKey(Integer.parseInt(String.valueOf(curr_qr_id).trim())))
             {
-                int current_index = text_view_hashmap.get(Integer.parseInt(curr_qr_id));
+                int current_index = text_view_hashmap.get(Integer.parseInt(String.valueOf(curr_qr_id).trim()));
                 Date c = Calendar.getInstance().getTime();
                 SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss");
                 String formattedDate = df.format(c);
-                scan_date_time_hashmap.put(Integer.parseInt(curr_qr_id), formattedDate);
-
+                scan_date_time_hashmap.put(Integer.parseInt(String.valueOf(curr_qr_id).trim()), formattedDate);
                 textViewPcQr[current_index].setBackgroundResource(R.drawable.border);
                 textViewPcQr[current_index].setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -1169,10 +1396,9 @@ public class Multiple_Bundle_QR_Scan_Activity extends BaseActivity implements Vi
                         // Show an alert (dialog) when the TextView is clicked
                         String clickedText = ((TextView) v).getText().toString();
                         int clicked_id = ((TextView) v).getId();
-
-                        AlertDialog.Builder builder = new AlertDialog.Builder(Multiple_Bundle_QR_Scan_Activity.this);
-                        builder.setTitle("Already Scanned")
-                                .setMessage("Bundle No :"+Integer.parseInt(clickedText) +"\nScanned On : "+scan_date_time_hashmap.get(clicked_id) +"\nScanned By : "+username)
+                        AlertDialog.Builder builder = new AlertDialog.Builder(Inbuilt_Scanner_Multiple_Barcode_Activity.this);
+                        builder.setTitle("Bundle Scanned On")
+                                .setMessage("Bundle No : "+Integer.parseInt(clickedText) +"\nScanned On : " + scan_date_time_hashmap.get(clicked_id) +"\nScanned By : " +username)
                                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int which) {
                                         // Do something when OK button is clicked
@@ -1185,11 +1411,14 @@ public class Multiple_Bundle_QR_Scan_Activity extends BaseActivity implements Vi
                 qr_id_arr.add(curr_qr_id);
                 totalinsert_count++;
                 btnOk.setVisibility(View.VISIBLE);
+                Inbuilt_Scanner_Multiple_Barcode_Activity.custPrograssbar_new.closePrograssBar();
             }
             else
             {
-                AlertDialog alertDialog = new AlertDialog.Builder(Multiple_Bundle_QR_Scan_Activity.this)
-                        .setMessage("This Bundle No " + bundleno +"Not Avilable in This Size / Please Scan Valid QR!")
+//                Log.e("Bipin","text_view_hashmap : " +text_view_hashmap);
+                Inbuilt_Scanner_Multiple_Barcode_Activity.custPrograssbar_new.closePrograssBar();
+                AlertDialog alertDialog = new AlertDialog.Builder(Inbuilt_Scanner_Multiple_Barcode_Activity.this)
+                        .setMessage("This Bundle # Not Avilable in This Size / Please Scan Valid QR!")
                         .setCancelable(false)
                         .setNegativeButton("Exit", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface arg1, int arg0) {
@@ -1201,13 +1430,20 @@ public class Multiple_Bundle_QR_Scan_Activity extends BaseActivity implements Vi
         }
     }
 
+
     @Override
     public void onBackPressed() {
-        Intent intent = new Intent(Multiple_Bundle_QR_Scan_Activity.this, MainActivity.class);
+        Intent intent = new Intent(Inbuilt_Scanner_Multiple_Barcode_Activity.this, MainActivity.class);
         intent.putExtra("username", username);
         intent.putExtra("processorid", processorid);
         intent.putExtra("userid", userid);
         startActivity(intent);
         finish();
     }
+
+    public boolean isOnline() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
+    }
+
 }

@@ -48,7 +48,6 @@
                 android:layout_centerVertical="true"
                 android:contentDescription="Clear All" />
 
-
         </RelativeLayout>
     </androidx.appcompat.widget.Toolbar>
 

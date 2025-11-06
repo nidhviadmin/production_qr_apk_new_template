@@ -41,4 +41,6 @@
     <string name="relax_roll_usb_code">Relax Roll-wise QR Scan using USB Reader</string>
     <string name="delivery_roll_usb_code">Delivery Roll-wise QR Scan using USB Reader</string>
 
+    <string name="multiple_txtBarcode">Bundle-wise QR Scan using Inbuilt Scanner</string>
+
 </resources>

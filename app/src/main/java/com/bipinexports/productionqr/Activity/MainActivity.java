@@ -146,6 +146,36 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         setContentView(R.layout.activity_base);
         setupDrawer();
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+            List<String> permissionsToRequest = new ArrayList<>();
+
+            if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
+                permissionsToRequest.add(Manifest.permission.CAMERA);
+
+            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+                permissionsToRequest.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+            if (checkSelfPermission(Manifest.permission.ACCESS_NETWORK_STATE) != PackageManager.PERMISSION_GRANTED)
+                permissionsToRequest.add(Manifest.permission.ACCESS_NETWORK_STATE);
+
+            if (checkSelfPermission(Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED)
+                permissionsToRequest.add(Manifest.permission.READ_PHONE_STATE);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                    checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED)
+            {
+                permissionsToRequest.add(Manifest.permission.POST_NOTIFICATIONS);
+            }
+
+            if (!permissionsToRequest.isEmpty()) {
+                requestPermissions(
+                        permissionsToRequest.toArray(new String[0]),
+                        MY_REQUEST_CODE
+                );
+            }
+        }
+
         View content = getLayoutInflater().inflate(R.layout.activity_main2,
                 findViewById(R.id.content_frame), true);
 
@@ -271,23 +301,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         accessory_pendingcount = "0";
         fabric_pendingcount = "0";
         mac_service_verification_count = "0";
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED &&
-                    checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED &&
-                    checkSelfPermission(Manifest.permission.ACCESS_NETWORK_STATE) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{Manifest.permission.CAMERA,
-                                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                                Manifest.permission.ACCESS_NETWORK_STATE},
-                        MY_REQUEST_CODE);
-            }
-
-            int permissionCheckREAD_PHONE_STATE = checkSelfPermission(Manifest.permission.READ_PHONE_STATE);
-            if(permissionCheckREAD_PHONE_STATE != PackageManager.PERMISSION_GRANTED)
-            {
-                requestPermissions(new String[]{Manifest.permission.READ_PHONE_STATE}, MY_REQUEST_CODE);
-            }
-        }
 
         processorid = getIntent().getStringExtra("processorid");
         userid = getIntent().getStringExtra("userid");
@@ -1589,7 +1602,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                                     }).show();
                             alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.RED);
                         }
-                    } else if (isqc.equals("N")) {
+                    }
+                    else if (isqc.equals("N")) {
                         if (isOnline()) {
                             JSONObject jsonObject = new JSONObject();
                             try {
@@ -3188,16 +3202,16 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                             }
                         }
 
-                        GridLayoutManager layoutManager = new GridLayoutManager(this, 3);
-                        layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-                            @Override
-                            public int getSpanSize(int position) {
-                                int type = itemList.get(position).getType();
-                                return (type == MainImage_Data_Object.TYPE_IMAGE) ? 1 : 3; // logo and title span full width
-                            }
-                        });
-
-                        recyclerView.setLayoutManager(layoutManager);
+//                        GridLayoutManager layoutManager = new GridLayoutManager(this, 3);
+//                        layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+//                            @Override
+//                            public int getSpanSize(int position) {
+//                                int type = itemList.get(position).getType();
+//                                return (type == MainImage_Data_Object.TYPE_IMAGE) ? 1 : 3; // logo and title span full width
+//                            }
+//                        });
+//
+//                        recyclerView.setLayoutManager(layoutManager);
                         mAdapter = new MainImage_Adapter(this, itemList, (item, position) -> {
 //                            Toast.makeText(this, "Clicked: " + item.getimage_name(), Toast.LENGTH_SHORT).show();
                             Log.e("Bipin","item.getimage_name() :" +item.getimage_name());
@@ -3217,7 +3231,30 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                                 startActivity(intent);
                                 finish();
                             }
-                            else if (item.getimage_name().equals("Multi Bundle QR USB Reader")) {
+//                            else if (item.getimage_name().equals("Multi Bundle QR USB Reader")) {
+                            else if (item.getimage_name().equals("Bundle QR Scan Inbuilt Reader"))
+                            {
+                                Intent intent = new Intent(MainActivity.this, Inbuilt_Scanner_Selection_Barcode_Activity.class);
+                                intent.putExtra("myversionName", myversionName);
+                                intent.putExtra("name", username);
+                                intent.putExtra("userid", userid);
+                                intent.putExtra("processorid", processorid);
+                                startActivity(intent);
+                                finish();
+                            }
+                            else if (item.getimage_name().equals("Multi Bundle QR Inbuilt Reader"))
+                            {
+                                Intent intent = new Intent(MainActivity.this, Inbuilt_Scanner_Multiple_Barcode_Activity.class);
+
+                                intent.putExtra("myversionName", myversionName);
+                                intent.putExtra("name", username);
+                                intent.putExtra("userid", userid);
+                                intent.putExtra("processorid", processorid);
+                                startActivity(intent);
+                                finish();
+                            }
+                            else if (item.getimage_name().equals("Multi Bundle QR USB Reader"))
+                            {
 
                                 Intent intent = new Intent(MainActivity.this, Scanner_Multiple_Bundle_QR_Activity.class);
                                 intent.putExtra("myversionName", myversionName);
@@ -3508,7 +3545,39 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                             }
 
                         });
+
+                        GridLayoutManager layoutManager = new GridLayoutManager(this, 3);
+                        layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+                            @Override
+                            public int getSpanSize(int position) {
+                                int type = itemList.get(position).getType();
+                                return (type == MainImage_Data_Object.TYPE_IMAGE) ? 1 : 3;
+                            }
+                        });
+
+                        recyclerView.setLayoutManager(layoutManager);
+
                         recyclerView.setAdapter(mAdapter);
+
+                        mAdapter.checkHoneywellScanner(this, available -> {
+                            Log.e("Bipin", "Scanner available: : " +available);
+                            if (!available) {
+                                // ❌ Remove only Honeywell-specific icon
+                                Iterator<MainImage_Data_Object> iterator = itemList.iterator();
+                                while (iterator.hasNext()) {
+                                    MainImage_Data_Object item = iterator.next();
+                                    if ("Inbuilt_Scanner_Selection_Barcode_Activity".equals(item.getActivityname())) {
+                                        iterator.remove();
+                                    }
+                                    if ("Inbuilt_Scanner_Multiple_Barcode_Activity".equals(item.getActivityname())) {
+                                        iterator.remove();
+                                    }
+                                }
+                            }
+                            mAdapter.setHoneywellAvailable(available);
+
+                            runOnUiThread(() -> mAdapter.notifyDataSetChanged());
+                        });
 
                         if(parseInt(fabric_pendingcount)> 0)
                         {

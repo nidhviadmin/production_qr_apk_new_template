@@ -1,3 +1,4 @@
+
 package com.bipinexports.productionqr.Activity;
 
 import android.app.AlertDialog;
@@ -12,6 +13,7 @@ import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Build;
@@ -103,12 +105,12 @@ public class Scanner_Multiple_Bundle_QR_Activity extends BaseActivity implements
     TableLayout outprogramtbl;
 
     TextView txtJobNo, txtShipCode, text_Part_Name, text_Size_Name, txtStyle, txtStyleRef;
-    LinearLayout liner_bundle_details, linear_programdata, linear_layout_btn;
+    LinearLayout liner_bundle_details, linear_programdata, linear_layout_btn, linear_badge;
 
     JSONObject scan_qr_data_details;
 
-    int cick_count =0;
-    TextView[] textViewPcQr= new TextView[200];
+    int click_count =0;
+    TextView[] textViewPcQr;
 
     HashMap<Integer, Integer> text_view_hashmap = new HashMap<Integer, Integer>();
     HashMap<Integer, String> scan_date_time_hashmap = new HashMap<Integer, String>();
@@ -117,6 +119,19 @@ public class Scanner_Multiple_Bundle_QR_Activity extends BaseActivity implements
     HashMap<Integer, String> pending_qr_st_arr = new HashMap<Integer, String>();
     HashMap<Integer, String> assign_header_qr_st_arr = new HashMap<Integer, String>();
     HashMap<Integer, String> bundle_no_arr = new HashMap<Integer, String>();
+
+    TextView txt_bundlenos;
+    int current_pageNo = 1;
+
+    int maxRowcnt = 25;
+    int maxColCnt = 4;
+
+    int from_bundleno = 0;
+    int tobundle_no = 0;
+
+    int[][] bundleNosIdxArray;
+
+    String statrt_qrid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -163,6 +178,13 @@ public class Scanner_Multiple_Bundle_QR_Activity extends BaseActivity implements
 
         linear_layout_btn = content.findViewById(R.id.linear_layout_btn);
         linear_layout_btn.setVisibility(View.GONE);
+
+        linear_badge = content.findViewById(R.id.linear_badge);
+        linear_badge.setVisibility(View.GONE);
+
+        outprogramtbl = content.findViewById(R.id.AddProgramData);
+
+        txt_bundlenos = content.findViewById(R.id.txt_bundlenos);
         btnOk = content.findViewById(R.id.btnOk);
         btnCancel = content.findViewById(R.id.btnCancel);
 
@@ -203,6 +225,7 @@ public class Scanner_Multiple_Bundle_QR_Activity extends BaseActivity implements
             }
         });
     }
+
     private void versioncode() {
         if(isOnline()) {
             Context context = this;
@@ -261,13 +284,15 @@ public class Scanner_Multiple_Bundle_QR_Activity extends BaseActivity implements
             if(isOnline()) {
                 if (isqc.equals("N")) {
                     Scanner_Multiple_Bundle_QR_Activity.custPrograssbar.prograssCreate(this);
-                    if(cick_count == 0) {
+                    if(click_count == 0) {
                         JSONObject jsonObject = new JSONObject();
                         try {
                             jsonObject.put("qrid", qrid);
                             jsonObject.put("userid", userid);
                             jsonObject.put("processorid", processorid);
                             jsonObject.put("version_name", myversionName);
+
+                            statrt_qrid = qrid;
 
                             JsonParser jsonParser = new JsonParser();
                             Call<JsonObject> call = APIClient.getInterface().get_new_qr_data((JsonObject) jsonParser.parse(jsonObject.toString()));
@@ -303,14 +328,14 @@ public class Scanner_Multiple_Bundle_QR_Activity extends BaseActivity implements
             h.post(new Runnable() {
                 public void run() {
                     new AlertDialog.Builder(Scanner_Multiple_Bundle_QR_Activity.this)
-                        .setTitle("Error")
-                        .setMessage("Only Bundle Scanning is supported as of now.\nContact Admin!")
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        }).show();
+                            .setTitle("Error")
+                            .setMessage("Only Bundle Scanning is supported as of now.\nContact Admin!")
+                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            }).show();
                 }
             });
         }
@@ -327,6 +352,7 @@ public class Scanner_Multiple_Bundle_QR_Activity extends BaseActivity implements
                     toggleDrawer();
                     popup.show();
                     break;
+
                 case R.id.btnOk:
                     UpdatescanData();
                     break;
@@ -433,6 +459,7 @@ public class Scanner_Multiple_Bundle_QR_Activity extends BaseActivity implements
             {
                 JSONObject jsonObject = new JSONObject(result.toString());
                 String mStatus = jsonObject.optString("status");
+                String batch_status = jsonObject.optString("batch_status");
                 String message = jsonObject.optString("message");
 
                 if(mStatus.equals("version_check"))
@@ -475,6 +502,124 @@ public class Scanner_Multiple_Bundle_QR_Activity extends BaseActivity implements
                             else {
                                 // The previous APK file does not exist or has already been deleted
                             }
+
+                            if(batch_status.equals("batches_found"))
+                            {
+                                linear_badge.setVisibility(View.VISIBLE);
+                                linear_badge.removeAllViews(); // clear previous items
+
+                                try {
+                                    JSONObject dataObj = jsonObject.getJSONObject("batches_data");
+                                    JSONArray batchesArray = dataObj.getJSONArray("batches");
+
+                                    int current_batch_no = dataObj.getInt("current_batch_no");
+
+                                    for (int i = 0; i < batchesArray.length(); i++) {
+                                        JSONObject batchObj = batchesArray.getJSONObject(i);
+
+                                        int batch_no = batchObj.getInt("batch_no");
+                                        int from_bundle_no = batchObj.getInt("from_bundle_no");
+                                        int to_bundle_no = batchObj.getInt("to_bundle_no");
+
+
+                                        // Create a vertical layout for each page
+                                        LinearLayout badgeLayout = new LinearLayout(this);
+                                        badgeLayout.setOrientation(LinearLayout.VERTICAL);
+                                        badgeLayout.setGravity(Gravity.CENTER);
+                                        badgeLayout.setPadding(30, 20, 30, 20);
+
+                                        // Create TextViews for "Page X" and range
+                                        TextView pageTitle = new TextView(this);
+                                        pageTitle.setText("B " + batch_no);
+                                        pageTitle.setGravity(Gravity.CENTER);
+                                        pageTitle.setTextSize(16);
+                                        pageTitle.setTypeface(null, Typeface.BOLD);
+
+                                        TextView pageRange = new TextView(this);
+                                        pageRange.setText("(" + from_bundle_no + " - " + to_bundle_no + ")");
+                                        pageRange.setGravity(Gravity.CENTER);
+                                        pageRange.setTextSize(14);
+
+                                        // Add to layout
+                                        badgeLayout.addView(pageTitle);
+                                        badgeLayout.addView(pageRange);
+
+                                        // Set default background style
+                                        badgeLayout.setBackgroundResource(android.R.color.darker_gray);
+                                        pageTitle.setTextColor(Color.BLACK);
+                                        pageRange.setTextColor(Color.BLACK);
+
+                                        // Highlight Page 1 by default
+                                        if (batch_no == current_batch_no) {
+                                            from_bundleno = from_bundle_no;
+                                            tobundle_no = to_bundle_no;
+
+                                            badgeLayout.setBackgroundResource(android.R.color.holo_blue_light);
+                                            pageTitle.setTextColor(Color.WHITE);
+                                            pageRange.setTextColor(Color.WHITE);
+                                        }
+
+                                        // Add margin between pages
+                                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                                                LinearLayout.LayoutParams.WRAP_CONTENT,
+                                                LinearLayout.LayoutParams.WRAP_CONTENT);
+                                        params.setMargins(15, 10, 15, 10);
+                                        badgeLayout.setLayoutParams(params);
+
+                                        // Click listener for each page
+                                        badgeLayout.setOnClickListener(v -> {
+                                            // Reset all highlights
+                                            for (int j = 0; j < linear_badge.getChildCount(); j++) {
+                                                LinearLayout layout = (LinearLayout) linear_badge.getChildAt(j);
+                                                layout.setBackgroundResource(android.R.color.darker_gray);
+                                                for (int k = 0; k < layout.getChildCount(); k++) {
+                                                    TextView t = (TextView) layout.getChildAt(k);
+                                                    t.setTextColor(Color.BLACK);
+                                                }
+                                            }
+                                            // Highlight selected
+                                            v.setBackgroundResource(android.R.color.holo_blue_light);
+                                            for (int k = 0; k < ((LinearLayout) v).getChildCount(); k++) {
+                                                TextView t = (TextView) ((LinearLayout) v).getChildAt(k);
+                                                t.setTextColor(Color.WHITE);
+                                            }
+                                            txt_bundlenos.setText(from_bundle_no + "-" + to_bundle_no + " Bundle No Details");
+                                            outprogramtbl.removeAllViews();
+                                            callGetNewQRData(from_bundle_no, batch_no, to_bundle_no);
+
+                                            // 🔹 Call your API for selected page
+                                        });
+
+                                        // Add this page to the layout
+                                        linear_badge.addView(badgeLayout);
+                                    }
+
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            else
+                            {
+                                Scanner_Multiple_Bundle_QR_Activity.custPrograssbar.closePrograssBar();
+                                new AlertDialog.Builder(Scanner_Multiple_Bundle_QR_Activity.this)
+//                                        .setMessage(message)
+//                                        .setCancelable(false)
+//                                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//                                            public void onClick(DialogInterface arg1, int arg0) {
+//                                                arg1.dismiss();
+//                                                onBackPressed();
+//                                            }
+//                                        }).show();
+                                    .setMessage(message)
+                                    .setCancelable(false)
+                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface arg1, int arg0) {
+                                            arg1.dismiss();
+                                            onBackPressed();
+                                        }
+                                    }).show();
+                            }
+
                             JSONObject jsonObj = jsonObject.getJSONObject("data");
 
                             curr_qr_id = jsonObj.optString("id");
@@ -490,6 +635,12 @@ public class Scanner_Multiple_Bundle_QR_Activity extends BaseActivity implements
                             total_insert_count = jsonObj.optString("total_insert_count");
                             scan_qr_data_details = jsonObj.getJSONObject("bundles_array_details");
 
+                            String max_row_cnt = jsonObj.optString("max_row_cnt");
+                            String max_col_cnt = jsonObj.optString("max_col_cnt");
+
+                            maxRowcnt = Integer.parseInt(max_row_cnt);
+                            maxColCnt = Integer.parseInt(max_col_cnt);
+
                             txtJobNo.setText(joborderno);
                             txtShipCode.setText(shipcode);
                             text_Part_Name.setText(partname);
@@ -504,7 +655,7 @@ public class Scanner_Multiple_Bundle_QR_Activity extends BaseActivity implements
                             add_scan_data();
 
                             Boolean arraycontains = false;
-                            outprogramtbl = findViewById(R.id.AddProgramData);
+                            outprogramtbl.removeAllViews();
                             TableRow row;
 
                             if(scanned_qr_id_arr.size() > 0)
@@ -545,195 +696,290 @@ public class Scanner_Multiple_Bundle_QR_Activity extends BaseActivity implements
                                 btnOk.setVisibility(View.GONE);
                             }
 
-                            cick_count = 1;
+                            click_count = 1;
+                            int totalCount = Integer.parseInt(total_insert_count);
 
-                            int maxRowcnt = 25;
-                            int maxColCnt = 4;
+                            textViewPcQr = new TextView[totalCount +1];
 
-                            int currindex = 0;
-                            int indexIncrementor = 0;
+                            int currindex;
+                            int blockStart = 0;
                             int printedBundlecnt = 0;
-                            int rowCnt = 0;
-                            int colCnt = 0;
-                            for(rowCnt = 0; rowCnt< maxRowcnt;)
-                            {
+
+                            for (int rowCnt = 0; rowCnt < maxRowcnt; rowCnt++) {
+
                                 row = new TableRow(this);
-                                row.setId(index);
-                                row.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
+                                row.setLayoutParams(new TableRow.LayoutParams(
+                                        TableRow.LayoutParams.MATCH_PARENT,
+                                        TableRow.LayoutParams.WRAP_CONTENT));
                                 row.setPadding(5, 20, -10, 5);
-                                for(colCnt=0;colCnt<maxColCnt;colCnt++,indexIncrementor+=maxRowcnt)
-                                {
-                                    currindex = rowCnt + 1 + indexIncrementor;
-                                    if(currindex <= Integer.parseInt(total_insert_count))
-                                    {
-                                        int qr_id = Integer.parseInt(String.valueOf(scan_qr_id_arr.get(currindex - 1)));
-                                        textViewPcQr[currindex] = new TextView(this);
-                                        textViewPcQr[currindex].setLayoutParams(new TableRow.LayoutParams(10, TableRow.LayoutParams.WRAP_CONTENT));
-                                        textViewPcQr[currindex].setPadding(5, 20, 5, 5);
-                                        textViewPcQr[currindex].setText(String.valueOf(currindex));
-                                        textViewPcQr[currindex].setWidth(1);  // Adjust width as needed
-                                        // textViewPcQr.setPadding(5, 20, 5, 5);
-                                        textViewPcQr[currindex].setBackgroundResource(R.drawable.border_white);
-                                        textViewPcQr[currindex].setGravity(Gravity.CENTER);
-                                        textViewPcQr[currindex].setId(qr_id);
 
-                                        try
-                                        {
-                                            text_view_hashmap.put(qr_id, currindex);
-                                        }
-                                        catch(Exception e)
-                                        {
-                                            e.printStackTrace();
-                                        }
+                                int printedColCnt = 0;
 
-                                        if(totalinsert_count > 0 && Integer.parseInt(bundleno) == currindex)
-                                        {
-                                            Date c = Calendar.getInstance().getTime();
-                                            SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss");
-                                            String formattedDate = df.format(c);
+                                for (int colCnt = 0; colCnt < maxColCnt; colCnt++) {
+                                    currindex = bundleNosIdxArray[rowCnt][colCnt];
+                                    int qr_id = 0;
+                                    String bundle_no = "";
 
-                                            scan_date_time_hashmap.put(qr_id, formattedDate);
+                                    try {
+                                        if (currindex >= 0 && currindex < scan_qr_id_arr.size()) {
+                                            qr_id = Integer.parseInt(String.valueOf(scan_qr_id_arr.get(currindex)));
+                                            bundle_no = bundle_no_arr.get(Integer.parseInt(String.valueOf(qr_id).trim()));
 
-                                            textViewPcQr[currindex].setBackgroundResource(R.drawable.border);
-                                            textViewPcQr[currindex].setOnClickListener(new View.OnClickListener() {
-                                                @Override
-                                                public void onClick(View v) {
-                                                    // Show an alert (dialog) when the TextView is clicked
+                                            textViewPcQr[currindex] = new TextView(this);
+                                            TableRow.LayoutParams tvParams = new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f);
+                                            tvParams.setMargins(8, 8, 8, 8);
+                                            textViewPcQr[currindex].setLayoutParams(tvParams);
 
+                                            textViewPcQr[currindex].setPadding(10, 16, 10, 16);
+                                            textViewPcQr[currindex].setText(bundle_no);
+                                            textViewPcQr[currindex].setGravity(Gravity.CENTER);
+                                            textViewPcQr[currindex].setBackgroundResource(R.drawable.border_white);
+                                            textViewPcQr[currindex].setId(qr_id);
+
+                                            try {
+                                                text_view_hashmap.put(qr_id, currindex);
+                                            } catch (Exception e) {
+                                                e.printStackTrace();
+                                            }
+
+                                            if (totalinsert_count > 0 && Integer.parseInt(bundleno) == Integer.parseInt(bundle_no)) {
+                                                Date c = Calendar.getInstance().getTime();
+                                                SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss", Locale.getDefault());
+                                                String formattedDate = df.format(c);
+                                                scan_date_time_hashmap.put(qr_id, formattedDate);
+
+                                                textViewPcQr[currindex].setBackgroundResource(R.drawable.border);
+                                                textViewPcQr[currindex].setOnClickListener(v -> {
                                                     String clickedText = ((TextView) v).getText().toString();
                                                     int clicked_id = ((TextView) v).getId();
-                                                    AlertDialog.Builder builder = new AlertDialog.Builder(Scanner_Multiple_Bundle_QR_Activity.this);
-                                                    builder.setTitle("Already Scanned")
-                                                            .setMessage("Bundle No : "+Integer.parseInt(clickedText) +"\nScanned On : "+scan_date_time_hashmap.get(clicked_id) +"\nScanned By : "+username)
-                                                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                                                public void onClick(DialogInterface dialog, int which) {
-                                                                    // Do something when OK button is clicked
-                                                                    dialog.dismiss();
-                                                                }
-                                                            })
+                                                    new AlertDialog.Builder(Scanner_Multiple_Bundle_QR_Activity.this)
+                                                            .setTitle("Already Scanned")
+                                                            .setMessage("Bundle No :" + Integer.parseInt(clickedText)
+                                                                    + "\nScanned On : " + scan_date_time_hashmap.get(clicked_id)
+                                                                    + "\nScanned By : " + username)
+                                                            .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
                                                             .show();
-                                                }
-                                            });
-                                        }
-                                        int currentIndexId = textViewPcQr[currindex].getId();
-
-                                        if(scanned_qr_id_arr.size() > 0 )
-                                        {
-                                            if (scanned_qr_id_arr.contains(currentIndexId))
-                                            {
-                                                textViewPcQr[currindex].setBackgroundResource(R.drawable.border_green);
-                                                textViewPcQr[currindex].setOnClickListener(new View.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(View v) {
-                                                        // Show an alert (dialog) when the TextView is clicked
-                                                        int current_cilck_text_id = ((TextView) v).getId();
-                                                        if(scanned_qr_st_arr_hashmap.containsKey(current_cilck_text_id)) {
-                                                            String clickedText = ((TextView) v).getText().toString();
-                                                            AlertDialog.Builder builder = new AlertDialog.Builder(Scanner_Multiple_Bundle_QR_Activity.this);
-                                                            builder.setTitle("Already Scanned")
-                                                                    .setMessage(" Bundle No : "+Integer.parseInt(clickedText) +"\n "+String.valueOf(scanned_qr_st_arr_hashmap.get(current_cilck_text_id)))
-                                                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                                                        public void onClick(DialogInterface dialog, int which) {
-                                                                            // Do something when OK button is clicked
-                                                                            dialog.dismiss();
-                                                                        }
-                                                                    })
-                                                                    .show();
-                                                        }
-                                                    }
                                                 });
                                             }
-                                        }
 
-                                        if(pending_scan_qr_id_arr.size() > 0)
-                                        {
-                                            if (pending_scan_qr_id_arr.contains(currentIndexId))
-                                            {
-                                                textViewPcQr[currindex].setBackgroundResource(R.drawable.border_red);
-                                                textViewPcQr[currindex].setOnClickListener(new View.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(View v) {
-                                                        // Show an alert (dialog) when the TextView is clicked
-                                                        int current_cilck_text_id = ((TextView) v).getId();
-                                                        if(pending_qr_st_arr.containsKey(current_cilck_text_id)) {
+                                            int currentIndexId = textViewPcQr[currindex].getId();
+
+//                                            if (scanned_qr_id_arr != null && scanned_qr_id_arr.contains(currentIndexId)) {
+                                                if (scanned_qr_id_arr != null && scanned_qr_id_arr.contains(currentIndexId))
+                                                {
+                                                    textViewPcQr[currindex].setBackgroundResource(R.drawable.border_green);
+                                                    textViewPcQr[currindex].setOnClickListener(v -> {
+                                                        int current_click_text_id = v.getId();
+                                                        if (scanned_qr_st_arr_hashmap.containsKey(current_click_text_id)) {
                                                             String clickedText = ((TextView) v).getText().toString();
-                                                            AlertDialog.Builder builder = new AlertDialog.Builder(Scanner_Multiple_Bundle_QR_Activity.this);
-                                                            builder.setTitle(String.valueOf(assign_header_qr_st_arr.get(current_cilck_text_id)))
-                                                                    .setMessage("Bundle No : "+Integer.parseInt(clickedText) +"\n"+String.valueOf(pending_qr_st_arr.get(current_cilck_text_id)))
-                                                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                                                        public void onClick(DialogInterface dialog, int which) {
-                                                                            // Do something when OK button is clicked
-                                                                            dialog.dismiss();
-                                                                        }
-                                                                    })
+                                                            new AlertDialog.Builder(Scanner_Multiple_Bundle_QR_Activity.this)
+                                                                    .setTitle("Already Scanned")
+                                                                    .setMessage("Bundle No :" + Integer.parseInt(clickedText)
+                                                                            + "\n" + String.valueOf(scanned_qr_st_arr_hashmap.get(current_click_text_id)))
+                                                                    .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
                                                                     .show();
                                                         }
-                                                    }
-                                                });
+                                                    });
+//                                                } else if (pending_scan_qr_id_arr != null && pending_scan_qr_id_arr.contains(currentIndexId)) {
+                                                }
+                                                else if (pending_scan_qr_id_arr != null && pending_scan_qr_id_arr.contains(currentIndexId))
+                                                {
+                                                    textViewPcQr[currindex].setBackgroundResource(R.drawable.border_red);
+                                                    textViewPcQr[currindex].setOnClickListener(v -> {
+                                                        int current_click_text_id = v.getId();
+                                                        if (pending_qr_st_arr.containsKey(current_click_text_id)) {
+                                                            String clickedText = ((TextView) v).getText().toString();
+                                                            new AlertDialog.Builder(Scanner_Multiple_Bundle_QR_Activity.this)
+                                                                    .setTitle(String.valueOf(assign_header_qr_st_arr.get(current_click_text_id)))
+                                                                    .setMessage("Bundle No :" + Integer.parseInt(clickedText)
+                                                                            + "\n" + String.valueOf(pending_qr_st_arr.get(current_click_text_id)))
+                                                                    .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
+                                                                    .show();
+                                                        }
+                                                    });
+                                                }
+
+                                                row.addView(textViewPcQr[currindex]);
+                                                printedBundlecnt++;
+                                                printedColCnt++;
                                             }
+                                            else
+                                            {
+                                                TableRow.LayoutParams tvParams = new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f);
+                                                tvParams.setMargins(8, 8, 8, 8);
+                                                TextView addlTxtView = new TextView(this);
+                                                addlTxtView.setLayoutParams(tvParams);
+                                                addlTxtView.setPadding(10, 16, 10, 16);
+                                                addlTxtView.setText("");
+                                                addlTxtView.setGravity(Gravity.CENTER);
+                                                addlTxtView.setId(0);
+                                                row.addView(addlTxtView);
+                                            }
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                            Log.e("Bipin ", "bundleNosIdxArray Exception : " + e.toString());
                                         }
-                                        row.addView(textViewPcQr[currindex]);
-                                        printedBundlecnt++;
+                                    }
+
+                                    outprogramtbl.addView(row, new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
+
+                                }
+                                if(scanned_qr_id_arr.size() > 0 ) {
+                                    if (scanned_qr_id_arr.contains(Integer.parseInt(String.valueOf(curr_qr_id).trim()))) {
+                                        arraycontains = true;
+                                        String reason = scanned_qr_st_arr_hashmap.get(Integer.parseInt(String.valueOf(curr_qr_id).trim()));
+                                        bundleno = bundle_no_arr.get(Integer.parseInt(String.valueOf(curr_qr_id).trim()));
+                                        new AlertDialog.Builder(Scanner_Multiple_Bundle_QR_Activity.this)
+                                                .setTitle("Already Scanned")
+                                                .setMessage("Bundle No : "+ bundleno +"\n" +reason )
+                                                .setCancelable(false)
+                                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface arg1, int arg0) {
+                                                        arg1.dismiss();
+
+                                                    }
+                                                }).show();
                                     }
                                 }
-                                outprogramtbl.addView(row, new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
-                                if(indexIncrementor > 100)
-                                {
-                                    indexIncrementor = 100;
-                                }
-                                else
-                                {
-                                    indexIncrementor = 0;
-                                }
-                                rowCnt++;
-                                if(Integer.parseInt(total_insert_count) > 100)
-                                {
-                                    if(printedBundlecnt >= 100 &&  Integer.parseInt(total_insert_count) > printedBundlecnt)
-                                    {
-                                        rowCnt = 0;
-                                        maxRowcnt = 25;
-                                        colCnt = 0;
-                                        maxColCnt = 4;
-                                        indexIncrementor=100;
-                                        printedBundlecnt = 0;
+                                else if(pending_scan_qr_id_arr.size() > 0 ) {
+                                    if (pending_scan_qr_id_arr.contains(Integer.parseInt(String.valueOf(curr_qr_id).trim()))) {
+                                        arraycontains = true;
+                                        new AlertDialog.Builder(Scanner_Multiple_Bundle_QR_Activity.this)
+                                                .setMessage("This Bundle No" + bundleno + assign_header_qr_st_arr.get(curr_qr_id) +"!")
+                                                .setCancelable(false)
+                                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface arg1, int arg0) {
+                                                        arg1.dismiss();
+
+                                                    }
+                                                }).show();
                                     }
                                 }
+                                Scanner_Multiple_Bundle_QR_Activity.custPrograssbar.closePrograssBar();
                             }
-
-                            if(scanned_qr_id_arr.size() > 0 ) {
-                                if (scanned_qr_id_arr.contains(Integer.parseInt(String.valueOf(curr_qr_id).trim()))) {
-                                    arraycontains = true;
-                                    String reason = scanned_qr_st_arr_hashmap.get(Integer.parseInt(String.valueOf(curr_qr_id).trim()));
-                                    bundleno = bundle_no_arr.get(Integer.parseInt(String.valueOf(curr_qr_id).trim()));
-                                    new AlertDialog.Builder(Scanner_Multiple_Bundle_QR_Activity.this)
-                                            .setTitle("Already Scanned")
-                                            .setMessage("Bundle No : "+ bundleno +"\n" +reason )
-                                            .setCancelable(false)
-                                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                                public void onClick(DialogInterface arg1, int arg0) {
-                                                    arg1.dismiss();
-
-                                                }
-                                            }).show();
-                                }
-                            }
-                            else if(pending_scan_qr_id_arr.size() > 0 ) {
-                                if (pending_scan_qr_id_arr.contains(Integer.parseInt(String.valueOf(curr_qr_id).trim()))) {
-                                    arraycontains = true;
-                                    new AlertDialog.Builder(Scanner_Multiple_Bundle_QR_Activity.this)
-                                            .setMessage("This Bundle No" + bundleno + assign_header_qr_st_arr.get(curr_qr_id) +"!")
-                                            .setCancelable(false)
-                                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                                public void onClick(DialogInterface arg1, int arg0) {
-                                                    arg1.dismiss();
-
-                                                }
-                                            }).show();
-                                }
-                            }
-                            Scanner_Multiple_Bundle_QR_Activity.custPrograssbar.closePrograssBar();
-                        }
                         else
+                            {
+                                Scanner_Multiple_Bundle_QR_Activity.custPrograssbar.closePrograssBar();
+                                new AlertDialog.Builder(Scanner_Multiple_Bundle_QR_Activity.this)
+                                        .setMessage(message)
+                                        .setCancelable(false)
+                                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface arg1, int arg0) {
+                                                arg1.dismiss();
+                                            }
+                                        }).show();
+                            }
+                        }
+//                        else if (mStatus.equalsIgnoreCase("batches_found"))
+//                        {
+//                            if(message.equals("batches found"))
+//                            {
+//                                linear_badge.setVisibility(View.VISIBLE);
+//                                linear_badge.removeAllViews(); // clear previous items
+//
+//                                try {
+//                                    JSONObject dataObj = jsonObject.getJSONObject("data");
+//                                    JSONArray batchesArray = dataObj.getJSONArray("batches");
+//
+//                                    for (int i = 0; i < batchesArray.length(); i++) {
+//                                        JSONObject batchObj = batchesArray.getJSONObject(i);
+//
+//                                        int batch_no = batchObj.getInt("batch_no");
+//                                        int from_bundle_no = batchObj.getInt("from_bundle_no");
+//                                        int to_bundle_no = batchObj.getInt("to_bundle_no");
+//
+//                                        // Create a vertical layout for each page
+//                                        LinearLayout badgeLayout = new LinearLayout(this);
+//                                        badgeLayout.setOrientation(LinearLayout.VERTICAL);
+//                                        badgeLayout.setGravity(Gravity.CENTER);
+//                                        badgeLayout.setPadding(30, 20, 30, 20);
+//
+//                                        // Create TextViews for "Page X" and range
+//                                        TextView pageTitle = new TextView(this);
+//                                        pageTitle.setText("P " + batch_no);
+//                                        pageTitle.setGravity(Gravity.CENTER);
+//                                        pageTitle.setTextSize(16);
+//                                        pageTitle.setTypeface(null, Typeface.BOLD);
+//
+//                                        TextView pageRange = new TextView(this);
+//                                        pageRange.setText("(" + from_bundle_no + " - " + to_bundle_no + ")");
+//                                        pageRange.setGravity(Gravity.CENTER);
+//                                        pageRange.setTextSize(14);
+//
+//                                        // Add to layout
+//                                        badgeLayout.addView(pageTitle);
+//                                        badgeLayout.addView(pageRange);
+//
+//                                        // Set default background style
+//                                        badgeLayout.setBackgroundResource(android.R.color.darker_gray);
+//                                        pageTitle.setTextColor(Color.BLACK);
+//                                        pageRange.setTextColor(Color.BLACK);
+//
+//                                        // Highlight Page 1 by default
+//                                        if (batch_no == 1) {
+//                                            badgeLayout.setBackgroundResource(android.R.color.holo_blue_light);
+//                                            pageTitle.setTextColor(Color.WHITE);
+//                                            pageRange.setTextColor(Color.WHITE);
+//                                        }
+//
+//                                        // Add margin between pages
+//                                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+//                                                LinearLayout.LayoutParams.WRAP_CONTENT,
+//                                                LinearLayout.LayoutParams.WRAP_CONTENT);
+//                                        params.setMargins(15, 10, 15, 10);
+//                                        badgeLayout.setLayoutParams(params);
+//
+//                                        // Click listener for each page
+//                                        badgeLayout.setOnClickListener(v -> {
+//                                            // Reset all highlights
+//                                            for (int j = 0; j < linear_badge.getChildCount(); j++) {
+//                                                LinearLayout layout = (LinearLayout) linear_badge.getChildAt(j);
+//                                                layout.setBackgroundResource(android.R.color.darker_gray);
+//                                                for (int k = 0; k < layout.getChildCount(); k++) {
+//                                                    TextView t = (TextView) layout.getChildAt(k);
+//                                                    t.setTextColor(Color.BLACK);
+//                                                }
+//                                            }
+//                                            // Highlight selected
+//                                            v.setBackgroundResource(android.R.color.holo_blue_light);
+//                                            for (int k = 0; k < ((LinearLayout) v).getChildCount(); k++) {
+//                                                TextView t = (TextView) ((LinearLayout) v).getChildAt(k);
+//                                                t.setTextColor(Color.WHITE);
+//                                            }
+//                                            txt_bundlenos.setText(from_bundle_no + "-" + to_bundle_no + " Bundle No Details");
+//
+//                                            // 🔹 Call your API for selected page
+//                                            callGetNewQRData(from_bundle_no, batch_no, to_bundle_no);
+//                                        });
+//
+//                                        // Add this page to the layout
+//                                        linear_badge.addView(badgeLayout);
+//                                    }
+//
+//                                    // Trigger first page click automatically
+//                                    if (linear_badge.getChildCount() > 0) {
+//                                        linear_badge.getChildAt(0).performClick();
+//                                    }
+//
+//                                } catch (JSONException e) {
+//                                    e.printStackTrace();
+//                                }
+//                            }
+//                            else
+//                            {
+//                                Scanner_Multiple_Bundle_QR_Activity.custPrograssbar.closePrograssBar();
+//                                new AlertDialog.Builder(Scanner_Multiple_Bundle_QR_Activity.this)
+//                                        .setMessage(message)
+//                                        .setCancelable(false)
+//                                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//                                            public void onClick(DialogInterface arg1, int arg0) {
+//                                                arg1.dismiss();
+//                                                onBackPressed();
+//                                            }
+//                                        }).show();
+//                            }
+//                        }
+                        else if (mStatus.equalsIgnoreCase("error"))
                         {
                             Scanner_Multiple_Bundle_QR_Activity.custPrograssbar.closePrograssBar();
                             new AlertDialog.Builder(Scanner_Multiple_Bundle_QR_Activity.this)
@@ -742,25 +988,12 @@ public class Scanner_Multiple_Bundle_QR_Activity extends BaseActivity implements
                                     .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface arg1, int arg0) {
                                             arg1.dismiss();
+                                            onBackPressed();
                                         }
                                     }).show();
                         }
                     }
-                    else if (mStatus.equalsIgnoreCase("error"))
-                    {
-                        Scanner_Multiple_Bundle_QR_Activity.custPrograssbar.closePrograssBar();
-                        new AlertDialog.Builder(Scanner_Multiple_Bundle_QR_Activity.this)
-                                .setMessage(message)
-                                .setCancelable(false)
-                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface arg1, int arg0) {
-                                        arg1.dismiss();
-                                        onBackPressed();
-                                    }
-                                }).show();
-                    }
                 }
-            }
             else if(callNo.equalsIgnoreCase("update_qr_scan_queue_bundwisewise"))
             {
                 JSONObject jsonObject = new JSONObject(result.toString());
@@ -791,153 +1024,220 @@ public class Scanner_Multiple_Bundle_QR_Activity extends BaseActivity implements
                             }).show();
                 }
             }
-        }
+            }
         catch (Exception e) {
         }
-    }
+        }
 
-    private void UpdatescanData() {
-        // Upload Audio and update qc scan status
-        // Create new table to update qc data
-        if (isOnline()){
-            Scanner_Multiple_Bundle_QR_Activity.custPrograssbar.prograssCreate(this);
-
-            JSONObject jsonObject = new JSONObject();
+        private void callGetNewQRData(int from_bundle_no, int pageNo, int to_bundle_no) {
             try {
 
-                if (qr_id_arr != null && qr_id_arr.size() > 0)
-                {
-                    for (int i = 0; i < totalinsert_count; i++) {
-                        QR_ID_Array.put(qr_id_arr.get(i));
-                    }
-                }
+                JSONObject jsonObject = new JSONObject();
+//                jsonObject.put("qrid", qrid);
+                jsonObject.put("qrid", statrt_qrid);
                 jsonObject.put("userid", userid);
                 jsonObject.put("processorid", processorid);
-                jsonObject.put("bundle_qr_id_array", QR_ID_Array);
+                jsonObject.put("version_name", myversionName);
+                jsonObject.put("from_bundle_no", from_bundle_no);
+                jsonObject.put("batch_no", pageNo);
+
+                current_pageNo = pageNo;
+                from_bundleno = from_bundle_no;
+                tobundle_no = to_bundle_no;
+
+                Scanner_Multiple_Bundle_QR_Activity.custPrograssbar.prograssCreate(this);
+
                 JsonParser jsonParser = new JsonParser();
-                Call<JsonObject> call = APIClient.getInterface().update_qr_scan_queue_bundwisewise((JsonObject) jsonParser.parse(jsonObject.toString()));
+                Call<JsonObject> call = APIClient.getInterface().get_new_qr_data(
+                        (JsonObject) jsonParser.parse(jsonObject.toString()));
+
                 GetResult getResult = new GetResult();
                 getResult.setMyListener(this);
-                getResult.callForLogin(call, "update_qr_scan_queue_bundwisewise");
+                getResult.callForLogin(call, "get_new_qr_data");
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
-        else {
-            new AlertDialog.Builder(Scanner_Multiple_Bundle_QR_Activity.this)
-                    .setMessage("No internet connection!")
-                    .setCancelable(false)
-                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface d, int arg0) {
-                            d.dismiss();
-                        }
-                    }).show();
-        }
-    }
 
-    public void add_scan_data() {
-        try {
-            if (scan_qr_data_details.length() > 0) {
-                Iterator<String> sc_data = scan_qr_data_details.keys();
-                while (sc_data.hasNext()) {
-                    String key = sc_data.next();
-                    if (scan_qr_data_details.get(key) instanceof JSONObject) {
-                        int qrid = Integer.parseInt(((JSONObject) scan_qr_data_details.get(key)).getString("qrid"));
-                        String scan_status = ((JSONObject) scan_qr_data_details.get(key)).getString("scan_status");
-                        String bundleno = ((JSONObject) scan_qr_data_details.get(key)).getString("bundleno");
-                        String scan_ts = ((JSONObject) scan_qr_data_details.get(key)).getString("scan_ts");
-                        String assigned_header = ((JSONObject) scan_qr_data_details.get(key)).getString("assigned_header");
-                        String assigned_msg = ((JSONObject) scan_qr_data_details.get(key)).getString("assigned_msg");
-                        if(scan_status.equals("N"))
-                        {
-                            scan_qr_id_arr.add(qrid);
-                            bundle_no_arr.put(qrid,bundleno);
+        private void UpdatescanData() {
+            // Upload Audio and update qc scan status
+            // Create new table to update qc data
+            if (isOnline()){
+                Scanner_Multiple_Bundle_QR_Activity.custPrograssbar.prograssCreate(this);
+
+                JSONObject jsonObject = new JSONObject();
+                try {
+
+                    if (qr_id_arr != null && qr_id_arr.size() > 0)
+                    {
+                        for (int i = 0; i < totalinsert_count; i++) {
+                            QR_ID_Array.put(qr_id_arr.get(i));
                         }
-                        else if(scan_status.equals("P"))
-                        {
-                            scan_qr_id_arr.add(qrid);
-                            pending_scan_qr_id_arr.add(qrid);
-                            pending_qr_st_arr.put(qrid,assigned_msg);
-                            assign_header_qr_st_arr.put(qrid,assigned_header);
-                            bundle_no_arr.put(qrid,bundleno);
-                        }
-                        else if(scan_status.equals("Y"))
-                        {
-                            scan_qr_id_arr.add(qrid);
-                            scanned_qr_id_arr.add(qrid);
-                            scanned_qr_st_arr_hashmap.put(qrid,scan_ts);
-                            bundle_no_arr.put(qrid,bundleno);
+                    }
+                    jsonObject.put("userid", userid);
+                    jsonObject.put("processorid", processorid);
+                    jsonObject.put("bundle_qr_id_array", QR_ID_Array);
+                    JsonParser jsonParser = new JsonParser();
+                    Call<JsonObject> call = APIClient.getInterface().update_qr_scan_queue_bundwisewise((JsonObject) jsonParser.parse(jsonObject.toString()));
+                    GetResult getResult = new GetResult();
+                    getResult.setMyListener(this);
+                    getResult.callForLogin(call, "update_qr_scan_queue_bundwisewise");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            else {
+                new AlertDialog.Builder(Scanner_Multiple_Bundle_QR_Activity.this)
+                        .setMessage("No internet connection!")
+                        .setCancelable(false)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface d, int arg0) {
+                                d.dismiss();
+                            }
+                        }).show();
+            }
+        }
+
+        public void add_scan_data() {
+
+            scan_qr_id_arr.clear();
+            bundle_no_arr.clear();
+            pending_scan_qr_id_arr.clear();
+            pending_qr_st_arr.clear();
+            assign_header_qr_st_arr.clear();
+            scanned_qr_st_arr_hashmap.clear();
+
+            text_view_hashmap.clear();
+            qr_id_arr.clear();
+
+            if (bundleNosIdxArray != null && bundleNosIdxArray.length > 0) {
+                bundleNosIdxArray = null;
+            }
+            try {
+                if (scan_qr_data_details.length() > 0) {
+                    Iterator<String> sc_data = scan_qr_data_details.keys();
+                    while (sc_data.hasNext()) {
+                        String key = sc_data.next();
+                        if (scan_qr_data_details.get(key) instanceof JSONObject) {
+                            int qrid = Integer.parseInt(((JSONObject) scan_qr_data_details.get(key)).getString("qrid"));
+                            String scan_status = ((JSONObject) scan_qr_data_details.get(key)).getString("scan_status");
+                            String bundleno = ((JSONObject) scan_qr_data_details.get(key)).getString("bundleno");
+                            String scan_ts = ((JSONObject) scan_qr_data_details.get(key)).getString("scan_ts");
+                            String assigned_header = ((JSONObject) scan_qr_data_details.get(key)).getString("assigned_header");
+                            String assigned_msg = ((JSONObject) scan_qr_data_details.get(key)).getString("assigned_msg");
+                            if(scan_status.equals("N"))
+                            {
+                                scan_qr_id_arr.add(qrid);
+                                bundle_no_arr.put(qrid,bundleno);
+                            }
+                            else if(scan_status.equals("P"))
+                            {
+                                scan_qr_id_arr.add(qrid);
+                                pending_scan_qr_id_arr.add(qrid);
+                                pending_qr_st_arr.put(qrid,assigned_msg);
+                                assign_header_qr_st_arr.put(qrid,assigned_header);
+                                bundle_no_arr.put(qrid,bundleno);
+                            }
+                            else if(scan_status.equals("Y"))
+                            {
+                                scan_qr_id_arr.add(qrid);
+                                scanned_qr_id_arr.add(qrid);
+                                scanned_qr_st_arr_hashmap.put(qrid,scan_ts);
+                                bundle_no_arr.put(qrid,bundleno);
+                            }
                         }
                     }
                 }
             }
+            catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            bundleNosIdxArray = new int[maxRowcnt][maxColCnt];
+
+            int rowCnt = 0;
+            int curIdx = 0;
+            int rowIdx = 0;
+            for (int colIdx = 0; colIdx < maxColCnt; colIdx++)
+            {
+                rowCnt = (((colIdx+1)*maxRowcnt) - maxRowcnt);
+                for (curIdx = rowCnt, rowIdx=0; rowIdx < maxRowcnt; curIdx++, rowIdx++)
+                {
+                    bundleNosIdxArray[rowIdx][colIdx] = curIdx;
+                }
+            }
         }
-        catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
 
 
-    public void data_added() {
+        public void data_added() {
 
-        Boolean arraycontain_data = false;
-        Boolean startcontain_data = false;
-        Boolean not_allow_contain_data = false;
-        String reason = "";
-        String header = "";
-        String bundleno = "";
+            Boolean arraycontain_data = false;
+            Boolean startcontain_data = false;
+            Boolean not_allow_contain_data = false;
+            String reason = "";
+            String header = "";
+            String bundleno = "";
 
-        if (qr_id_arr.contains(curr_qr_id))
-        {
-            startcontain_data = true;
-            reason = scan_date_time_hashmap.get(Integer.parseInt(String.valueOf(curr_qr_id).trim()));
-            bundleno = bundle_no_arr.get(Integer.parseInt(String.valueOf(curr_qr_id).trim()));
-        }
-        if (pending_scan_qr_id_arr.contains(Integer.parseInt(String.valueOf(curr_qr_id).trim())))
-        {
-            not_allow_contain_data = true;
+            if (qr_id_arr.contains(curr_qr_id))
+            {
+                startcontain_data = true;
+                reason = scan_date_time_hashmap.get(Integer.parseInt(String.valueOf(curr_qr_id).trim()));
+                bundleno = bundle_no_arr.get(Integer.parseInt(String.valueOf(curr_qr_id).trim()));
+            }
+            if (pending_scan_qr_id_arr.contains(Integer.parseInt(String.valueOf(curr_qr_id).trim())))
+            {
+                not_allow_contain_data = true;
 
-            reason = pending_qr_st_arr.get(Integer.parseInt(String.valueOf(curr_qr_id).trim()));
-            header = assign_header_qr_st_arr.get(Integer.parseInt(String.valueOf(curr_qr_id).trim()));
-            bundleno = bundle_no_arr.get(Integer.parseInt(String.valueOf(curr_qr_id).trim()));
-        }
-        if (scanned_qr_id_arr.contains(Integer.parseInt(String.valueOf(curr_qr_id).trim())))
-        {
-            arraycontain_data = true;
-            reason = scanned_qr_st_arr_hashmap.get(Integer.parseInt(String.valueOf(curr_qr_id).trim()));
-            bundleno = bundle_no_arr.get(Integer.parseInt(String.valueOf(curr_qr_id).trim()));
-        }
-        if(startcontain_data)
-        {
-            Scanner_Multiple_Bundle_QR_Activity.custPrograssbar.closePrograssBar();
-            new AlertDialog.Builder(Scanner_Multiple_Bundle_QR_Activity.this)
-                    .setTitle("Already Scanned")
-                    .setMessage("Bundle No : "+ bundleno +"\n"+"Scanned On : "+ reason +"\nScanned By : "+username)
-                    .setCancelable(false)
-                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface arg1, int arg0) {
-                            arg1.dismiss();
-                        }
-                    }).show();
-        }
-        else if(not_allow_contain_data)
-        {
-            Scanner_Multiple_Bundle_QR_Activity.custPrograssbar.closePrograssBar();
-            new AlertDialog.Builder(Scanner_Multiple_Bundle_QR_Activity.this)
-                    .setTitle(header)
-                    .setMessage("Bundle No : "+ bundleno +"\n"+ reason)
-                    .setCancelable(false)
-                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface arg1, int arg0) {
-                            arg1.dismiss();
-                        }
-                    }).show();
-        }
-        else if(arraycontain_data)
-        {
-            Scanner_Multiple_Bundle_QR_Activity.custPrograssbar.closePrograssBar();
-            new AlertDialog.Builder(Scanner_Multiple_Bundle_QR_Activity.this)
-                    .setTitle("Already Scanned")
+                reason = pending_qr_st_arr.get(Integer.parseInt(String.valueOf(curr_qr_id).trim()));
+                header = assign_header_qr_st_arr.get(Integer.parseInt(String.valueOf(curr_qr_id).trim()));
+                bundleno = bundle_no_arr.get(Integer.parseInt(String.valueOf(curr_qr_id).trim()));
+            }
+            if (scanned_qr_id_arr.contains(Integer.parseInt(String.valueOf(curr_qr_id).trim())))
+            {
+                arraycontain_data = true;
+                reason = scanned_qr_st_arr_hashmap.get(Integer.parseInt(String.valueOf(curr_qr_id).trim()));
+                bundleno = bundle_no_arr.get(Integer.parseInt(String.valueOf(curr_qr_id).trim()));
+            }
+            if(startcontain_data)
+            {
+                Scanner_Multiple_Bundle_QR_Activity.custPrograssbar.closePrograssBar();
+                new AlertDialog.Builder(Scanner_Multiple_Bundle_QR_Activity.this)
+                        .setTitle("Already Scanned")
+                        .setMessage("Bundle No : "+ bundleno +"\n"+"Scanned On : "+ reason +"\nScanned By : "+username)
+                        .setCancelable(false)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface arg1, int arg0) {
+                                arg1.dismiss();
+                            }
+                        }).show();
+            }
+            else if(not_allow_contain_data)
+            {
+                Scanner_Multiple_Bundle_QR_Activity.custPrograssbar.closePrograssBar();
+                new AlertDialog.Builder(Scanner_Multiple_Bundle_QR_Activity.this)
+                        .setTitle(header)
+                        .setMessage("Bundle No : "+ bundleno +"\n"+ reason)
+                        .setCancelable(false)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface arg1, int arg0) {
+                                arg1.dismiss();
+                            }
+                        }).show();
+            }
+            else if(arraycontain_data)
+            {
+                Scanner_Multiple_Bundle_QR_Activity.custPrograssbar.closePrograssBar();
+                new AlertDialog.Builder(Scanner_Multiple_Bundle_QR_Activity.this)
+//                        .setTitle("Already Scanned")
+//                        .setMessage("Bundle No : "+ bundleno +"\n" +reason )
+//                        .setCancelable(false)
+//                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//                            public void onClick(DialogInterface arg1, int arg0) {
+//                                arg1.dismiss();
+//                            }
+//                        }).show();
+                .setTitle("Already Scanned")
                     .setMessage("Bundle No : "+ bundleno +"\n" +reason )
                     .setCancelable(false)
                     .setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -945,62 +1245,56 @@ public class Scanner_Multiple_Bundle_QR_Activity extends BaseActivity implements
                             arg1.dismiss();
                         }
                     }).show();
-        }
-        else {
-            if(text_view_hashmap.containsKey(Integer.parseInt(String.valueOf(curr_qr_id).trim())))
-            {
-                int current_index = text_view_hashmap.get(Integer.parseInt(String.valueOf(curr_qr_id).trim()));
-                Date c = Calendar.getInstance().getTime();
-                SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss");
-                String formattedDate = df.format(c);
-                scan_date_time_hashmap.put(Integer.parseInt(String.valueOf(curr_qr_id).trim()), formattedDate);
-                textViewPcQr[current_index].setBackgroundResource(R.drawable.border);
-                textViewPcQr[current_index].setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        // Show an alert (dialog) when the TextView is clicked
-                        String clickedText = ((TextView) v).getText().toString();
-                        int clicked_id = ((TextView) v).getId();
-                        AlertDialog.Builder builder = new AlertDialog.Builder(Scanner_Multiple_Bundle_QR_Activity.this);
-                        builder.setTitle("Bundle Scanned On")
-                                .setMessage("Bundle No : "+Integer.parseInt(clickedText) +"\nScanned On : " + scan_date_time_hashmap.get(clicked_id) +"\nScanned By : " +username)
-                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        // Do something when OK button is clicked
-                                        dialog.dismiss();
-                                    }
-                                })
-                                .show();
-                    }
-                });
-                qr_id_arr.add(curr_qr_id);
-                totalinsert_count++;
-                btnOk.setVisibility(View.VISIBLE);
-                Scanner_Multiple_Bundle_QR_Activity.custPrograssbar.closePrograssBar();
             }
-            else
-            {
-                Scanner_Multiple_Bundle_QR_Activity.custPrograssbar.closePrograssBar();
-//                AlertDialog alertDialog = new AlertDialog.Builder(Scanner_Multiple_Bundle_QR_Activity.this)
-//                        .setMessage("This Bundle # Not Avilable in This Size / Please Scan Valid QR!")
-//                        .setCancelable(false)
-//                        .setNegativeButton("Exit", new DialogInterface.OnClickListener() {
-//                            public void onClick(DialogInterface arg1, int arg0) {
-//                                arg1.dismiss();
-//                            }
-//                        }).show();
-//                alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.RED);
+            else {
+
+
+                if(text_view_hashmap.containsKey(Integer.parseInt(String.valueOf(curr_qr_id).trim())))
+                {
+                    int current_index = text_view_hashmap.get(Integer.parseInt(String.valueOf(curr_qr_id).trim()));
+                    Date c = Calendar.getInstance().getTime();
+                    SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss");
+                    String formattedDate = df.format(c);
+                    scan_date_time_hashmap.put(Integer.parseInt(String.valueOf(curr_qr_id).trim()), formattedDate);
+                    textViewPcQr[current_index].setBackgroundResource(R.drawable.border);
+                    textViewPcQr[current_index].setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            // Show an alert (dialog) when the TextView is clicked
+                            String clickedText = ((TextView) v).getText().toString();
+                            int clicked_id = ((TextView) v).getId();
+                            AlertDialog.Builder builder = new AlertDialog.Builder(Scanner_Multiple_Bundle_QR_Activity.this);
+                            builder.setTitle("Bundle Scanned On")
+                                    .setMessage("Bundle No : "+Integer.parseInt(clickedText) +"\nScanned On : " + scan_date_time_hashmap.get(clicked_id) +"\nScanned By : " +username)
+                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            // Do something when OK button is clicked
+                                            dialog.dismiss();
+                                        }
+                                    })
+                                    .show();
+                        }
+                    });
+                    qr_id_arr.add(curr_qr_id);
+                    totalinsert_count++;
+                    btnOk.setVisibility(View.VISIBLE);
+                    Scanner_Multiple_Bundle_QR_Activity.custPrograssbar.closePrograssBar();
+                }
+                else
+                {
+                    Log.e("Bipin","text_view_hashmap : " +text_view_hashmap);
+                    Scanner_Multiple_Bundle_QR_Activity.custPrograssbar.closePrograssBar();
+                }
             }
         }
+
+        @Override
+        public void onBackPressed() {
+            Intent intent = new Intent(Scanner_Multiple_Bundle_QR_Activity.this, MainActivity.class);
+            intent.putExtra("username", username);
+            intent.putExtra("processorid", processorid);
+            intent.putExtra("userid", userid);
+            startActivity(intent);
+            finish();
+        }
     }
-    
-    @Override
-    public void onBackPressed() {
-        Intent intent = new Intent(Scanner_Multiple_Bundle_QR_Activity.this, MainActivity.class);
-        intent.putExtra("username", username);
-        intent.putExtra("processorid", processorid);
-        intent.putExtra("userid", userid);
-        startActivity(intent);
-        finish();
-    }
-}
