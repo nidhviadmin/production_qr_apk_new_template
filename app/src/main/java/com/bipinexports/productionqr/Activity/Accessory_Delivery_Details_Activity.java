@@ -108,6 +108,10 @@ public class Accessory_Delivery_Details_Activity extends BaseActivity implements
 
         imageView.setOnClickListener(this);
 
+        setupNotifications();
+
+        handleNotificationIntent(getIntent());
+
         text_PO_No = content.findViewById(R.id.text_PO_No);
         text_PO_Date = content.findViewById(R.id.text_PO_Date);
         text_Vendor_Name = content.findViewById(R.id.text_Vendor_Name);

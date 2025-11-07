@@ -185,6 +185,8 @@ public class Rollwise_QR_Scan_Activity extends BaseActivity implements View.OnCl
         getvalue();
         hideKeyboard();
         imageView.setOnClickListener(this);
+        setupNotifications();
+        handleNotificationIntent(getIntent());
         Scanning();
 
         FetchData = content.findViewById(R.id.FetchData);

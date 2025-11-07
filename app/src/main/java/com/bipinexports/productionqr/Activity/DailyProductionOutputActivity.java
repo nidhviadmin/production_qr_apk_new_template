@@ -105,6 +105,8 @@ public class DailyProductionOutputActivity extends BaseActivity implements View.
 
         txtDate.setText("OutputDate  - " + selecteddate);
         imageView.setOnClickListener(this);
+        setupNotifications();
+        handleNotificationIntent(getIntent());
 
         getvalue();
         fetchDailyoutputDetails();

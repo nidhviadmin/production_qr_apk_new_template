@@ -158,6 +158,8 @@ public class Sharptool_QR_Scanview_Activity extends BaseActivity implements View
         hideKeyboard();
         get_scan_sharptools();
         imageView.setOnClickListener(this);
+        setupNotifications();
+        handleNotificationIntent(getIntent());
         btnCancel.setOnClickListener(this);
     }
 

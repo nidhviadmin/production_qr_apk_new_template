@@ -96,6 +96,9 @@ public class Machie_Service_Verification_Details_Activity extends BaseActivity i
         notes = getIntent().getStringExtra("notes");
 
         imageView.setOnClickListener(this);
+        setupNotifications();
+
+        handleNotificationIntent(getIntent());
 
         text_MachineNo = content.findViewById(R.id.text_MachineNo);
         text_Machine_Type = content.findViewById(R.id.text_Machine_Type);

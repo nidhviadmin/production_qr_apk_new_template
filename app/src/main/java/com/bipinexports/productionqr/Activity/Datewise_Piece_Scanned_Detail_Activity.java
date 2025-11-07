@@ -120,6 +120,9 @@ public class Datewise_Piece_Scanned_Detail_Activity extends BaseActivity impleme
 
         imageView.setOnClickListener(this);
 
+        setupNotifications();
+        handleNotificationIntent(getIntent());
+
         Date c = Calendar.getInstance().getTime();
         SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
         String formattedDate = df.format(c);

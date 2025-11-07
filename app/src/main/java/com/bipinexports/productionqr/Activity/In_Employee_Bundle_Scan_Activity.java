@@ -97,6 +97,9 @@ public class In_Employee_Bundle_Scan_Activity extends BaseActivity implements Vi
         selected_type = "Bundle_Mapp";
         imageView.setOnClickListener(this);
 
+        setupNotifications();
+
+        handleNotificationIntent(getIntent());
         Date date = new Date(); // or any Date object
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy", Locale.ENGLISH);
         String formattedDate = formatter.format(date);

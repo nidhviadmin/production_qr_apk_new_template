@@ -133,6 +133,8 @@ public class Overall_Datewise_Piece_Scanned_Activity extends BaseActivity implem
         txt_empty = content.findViewById(R.id.txt_empty);
 
         imageView.setOnClickListener(this);
+        setupNotifications();
+        handleNotificationIntent(getIntent());
 
         Date c = Calendar.getInstance().getTime();
         System.out.println("Current time => " + c);

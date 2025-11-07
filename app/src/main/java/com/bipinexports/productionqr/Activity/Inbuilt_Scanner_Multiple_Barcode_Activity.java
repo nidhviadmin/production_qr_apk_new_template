@@ -83,7 +83,7 @@ import java.util.Map;
 import retrofit2.Call;
 
 
-public class Inbuilt_Scanner_Multiple_Barcode_Activity extends AppCompatActivity implements
+public class Inbuilt_Scanner_Multiple_Barcode_Activity extends BaseActivity implements
         BarcodeReader.BarcodeListener, BarcodeReader.TriggerListener, OnClickListener, GetResult.MyListener {
 
     private com.honeywell.aidc.AidcManager mAidcManager;
@@ -160,7 +160,14 @@ public class Inbuilt_Scanner_Multiple_Barcode_Activity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_bt_scanner_multiple_qr);
+//        setContentView(R.layout.activity_in_employee_operation_mapping);
+        setContentView(R.layout.activity_base);
+        setupDrawer();
+        View content = getLayoutInflater().inflate(
+                R.layout.activity_bt_scanner_multiple_qr,   // <-- your current XML
+                findViewById(R.id.content_frame),
+                true
+        );
 
         versioncode();
 
@@ -178,9 +185,12 @@ public class Inbuilt_Scanner_Multiple_Barcode_Activity extends AppCompatActivity
 
         custPrograssbar_new = new CustPrograssbar_new();
 
-        imageView = findViewById(R.id.imgd);
+        imageView = content.findViewById(R.id.imgd);
         imageView.setOnClickListener(this);
-        txtUser = findViewById(R.id.txtUser);
+        setupNotifications();
+
+        handleNotificationIntent(getIntent());
+        txtUser = content.findViewById(R.id.txtUser);
 
         session = new SessionManagement(getApplicationContext());
         HashMap<String, String> user = session.getUserDetails();
@@ -188,33 +198,33 @@ public class Inbuilt_Scanner_Multiple_Barcode_Activity extends AppCompatActivity
         unitid = user.get(SessionManagement.KEY_UNITID);
         txtUser.setText("Hello " + this.User);
 
-        txtJobNo = findViewById(R.id.txtJobNo);
-        txtShipCode = findViewById(R.id.txtShipCode);
-        text_Part_Name =findViewById(R.id.text_Part_Name);
-        text_Size_Name = findViewById(R.id.text_Size_Name);
-        txtStyle = findViewById(R.id.txtStyle);
-        txtStyleRef = findViewById(R.id.text_Color);
+        txtJobNo = content.findViewById(R.id.txtJobNo);
+        txtShipCode = content.findViewById(R.id.txtShipCode);
+        text_Part_Name = content.findViewById(R.id.text_Part_Name);
+        text_Size_Name = content.findViewById(R.id.text_Size_Name);
+        txtStyle = content.findViewById(R.id.txtStyle);
+        txtStyleRef = content.findViewById(R.id.text_Color);
 
-        title_name  = findViewById(R.id.title_name);
+        title_name  = content.findViewById(R.id.title_name);
         title_name.setVisibility(View.GONE);
 
-        liner_bundle_details = findViewById(R.id.liner_bundle_details);
+        liner_bundle_details = content.findViewById(R.id.liner_bundle_details);
         liner_bundle_details.setVisibility(View.GONE);
 
-        linear_programdata = findViewById(R.id.linear_programdata);
+        linear_programdata = content.findViewById(R.id.linear_programdata);
         linear_programdata.setVisibility(View.GONE);
 
-        linear_layout_btn = findViewById(R.id.linear_layout_btn);
+        linear_layout_btn = content.findViewById(R.id.linear_layout_btn);
         linear_layout_btn.setVisibility(View.GONE);
 
-        linear_badge = findViewById(R.id.linear_badge);
+        linear_badge = content.findViewById(R.id.linear_badge);
         linear_badge.setVisibility(View.GONE);
 
-        outprogramtbl = findViewById(R.id.AddProgramData);
+        outprogramtbl = content.findViewById(R.id.AddProgramData);
 
-        txt_bundlenos = findViewById(R.id.txt_bundlenos);
-        btnOk = findViewById(R.id.btnOk);
-        btnCancel = findViewById(R.id.btnCancel);
+        txt_bundlenos = content.findViewById(R.id.txt_bundlenos);
+        btnOk = content.findViewById(R.id.btnOk);
+        btnCancel = content.findViewById(R.id.btnCancel);
 
         btnOk.setOnClickListener(this);
         btnCancel.setOnClickListener(this);
@@ -286,18 +296,7 @@ public class Inbuilt_Scanner_Multiple_Barcode_Activity extends AppCompatActivity
         {
             switch (v.getId()) {
                 case R.id.imgd:
-                    PopupMenu popup = new PopupMenu(Inbuilt_Scanner_Multiple_Barcode_Activity.this, imageView);
-                    popup.getMenuInflater().inflate(R.menu.menu_chgpswd, popup.getMenu());
-                    popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                        public boolean onMenuItemClick(MenuItem item) {
-                            if (item.getItemId() == R.id.logout) {
-                                session.logoutUser();
-                                finish();
-                            }
-                            return true;
-                        }
-                    });
-                    popup.show();
+                    toggleDrawer();
                     break;
                 case R.id.btnOk:
                     UpdatescanData();

@@ -211,6 +211,9 @@ public class Fabric_Delivery_Details_Activity extends BaseActivity implements Vi
         type = getIntent().getStringExtra("status");
 
         imageView.setOnClickListener(this);
+        setupNotifications();
+
+        handleNotificationIntent(getIntent());
 
         Fabric_Spec = content.findViewById(R.id.Fabric_Spec);
 

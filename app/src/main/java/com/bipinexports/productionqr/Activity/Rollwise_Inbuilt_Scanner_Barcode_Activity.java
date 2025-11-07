@@ -167,6 +167,8 @@ public class Rollwise_Inbuilt_Scanner_Barcode_Activity extends BaseActivity impl
 
         imageView = content.findViewById(R.id.imgd);
         imageView.setOnClickListener(this);
+        setupNotifications();
+        handleNotificationIntent(getIntent());
         txtUser = content.findViewById(R.id.txtUser);
 
         session = new SessionManagement(getApplicationContext());

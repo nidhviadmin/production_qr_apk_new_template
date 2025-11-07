@@ -92,6 +92,9 @@ public class In_Employee_Operation_Mapping_Activity extends BaseActivity impleme
         myversionName = getIntent().getStringExtra("myversionName");
         selected_type = getIntent().getStringExtra("selected_type");
         imageView.setOnClickListener(this);
+        setupNotifications();
+
+        handleNotificationIntent(getIntent());
 
         getvalue();
         fetch_employee_Details();

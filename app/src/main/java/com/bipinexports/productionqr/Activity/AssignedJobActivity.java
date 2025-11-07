@@ -56,6 +56,10 @@ public class AssignedJobActivity extends BaseActivity implements View.OnClickLis
         txtUser.setText("Hello " + username);
 
         imageView.setOnClickListener(this);
+
+        setupNotifications();
+
+        handleNotificationIntent(getIntent());
         processorid = getIntent().getStringExtra("processorid");
 
         mRecyclerView = content.findViewById(R.id.my_recycler_view);

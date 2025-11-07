@@ -104,6 +104,9 @@ public class Delivery_Details_Activity extends BaseActivity implements View.OnCl
         type = getIntent().getStringExtra("type");
 
         imageView.setOnClickListener(this);
+        setupNotifications();
+
+        handleNotificationIntent(getIntent());
 
         text_PO_No = content.findViewById(R.id.text_PO_No);
         text_PO_Date = content.findViewById(R.id.text_PO_Date);

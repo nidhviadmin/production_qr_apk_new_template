@@ -106,6 +106,10 @@ public class DatewiseOutputActivity extends BaseActivity implements View.OnClick
 
         imageView.setOnClickListener(this);  // Toggle drawer
 
+        setupNotifications();
+
+        handleNotificationIntent(getIntent());
+
         txtFromDate = content.findViewById(R.id.txtFromDate);
         txttoDate = content.findViewById(R.id.txttoDate);
         FetchData = content.findViewById(R.id.FetchData);

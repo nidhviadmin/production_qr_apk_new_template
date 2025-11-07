@@ -124,6 +124,8 @@ public class ScannerSelectionBarcodeActivity extends BaseActivity implements
 
         imageView = content.findViewById(R.id.imgd);
         imageView.setOnClickListener(this);
+        setupNotifications();
+        handleNotificationIntent(getIntent());
         txtUser = content.findViewById(R.id.txtUser);
 
         session = new SessionManagement(getApplicationContext());

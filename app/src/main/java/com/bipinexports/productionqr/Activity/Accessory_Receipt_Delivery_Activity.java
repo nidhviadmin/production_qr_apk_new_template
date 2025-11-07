@@ -99,6 +99,9 @@ public class Accessory_Receipt_Delivery_Activity extends BaseActivity implements
 
         processorid = getIntent().getStringExtra("processorid");
         imageView.setOnClickListener(this);
+        setupNotifications();
+
+        handleNotificationIntent(getIntent());
         vendors = getIntent().getStringExtra("vendors");
         pendingcount = getIntent().getStringExtra("pendingcount");
         vendorname = getIntent().getStringExtra("vendorname");

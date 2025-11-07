@@ -205,6 +205,8 @@ public class Multiple_Bundle_QR_Scan_Activity extends BaseActivity implements Vi
         getvalue();
         hideKeyboard();
         imageView.setOnClickListener(this);
+        setupNotifications();
+        handleNotificationIntent(getIntent());
         Scanning();
 
         FetchData = content.findViewById(R.id.FetchData);

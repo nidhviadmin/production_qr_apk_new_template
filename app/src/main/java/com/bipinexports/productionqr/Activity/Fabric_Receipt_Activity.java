@@ -97,6 +97,9 @@ public class Fabric_Receipt_Activity extends BaseActivity implements View.OnClic
 
         processorid = getIntent().getStringExtra("processorid");
         imageView.setOnClickListener(this);
+        setupNotifications();
+
+        handleNotificationIntent(getIntent());
 
         delivery = getIntent().getStringExtra("delivery");
         pendingcount = getIntent().getStringExtra("pendingcount");

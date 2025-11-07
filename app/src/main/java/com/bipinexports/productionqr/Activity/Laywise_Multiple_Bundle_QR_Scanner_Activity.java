@@ -135,6 +135,9 @@ public class Laywise_Multiple_Bundle_QR_Scanner_Activity extends BaseActivity im
 
         imageView = content.findViewById(R.id.imgd);
         imageView.setOnClickListener(this);
+        setupNotifications();
+
+        handleNotificationIntent(getIntent());
         txtUser = content.findViewById(R.id.txtUser);
 
         session = new SessionManagement(getApplicationContext());

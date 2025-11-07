@@ -85,6 +85,10 @@ public class Absent_Employee_Operation_Mapping_Activity extends BaseActivity imp
 
         imageView.setOnClickListener(this);
 
+        setupNotifications();
+
+        handleNotificationIntent(getIntent());
+
         getvalue();
         fetch_employee_Details();
 

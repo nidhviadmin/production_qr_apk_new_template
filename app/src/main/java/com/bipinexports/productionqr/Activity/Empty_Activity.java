@@ -55,6 +55,9 @@ public class Empty_Activity extends BaseActivity implements View.OnClickListener
         txtUser.setText("Hello " + username);
 
         imageView.setOnClickListener(this);
+        setupNotifications();
+
+        handleNotificationIntent(getIntent());
         app_type = getIntent().getStringExtra("empty_type");
         startdate = getIntent().getStringExtra("fromdate");
         enddate = getIntent().getStringExtra("todate");

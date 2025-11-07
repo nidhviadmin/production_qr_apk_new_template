@@ -83,6 +83,8 @@ public class Select_Employee_Detail_Activity extends BaseActivity implements Vie
         type = getIntent().getStringExtra("type");
         myversionName = getIntent().getStringExtra("myversionName");
         imageView.setOnClickListener(this);
+        setupNotifications();
+        handleNotificationIntent(getIntent());
 
         btn_indetails = content.findViewById(R.id.btn_indetails);
         btn_outdetails = content.findViewById(R.id.btn_outdetails);

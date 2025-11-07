@@ -5,35 +5,66 @@
     tools:context=".Activity.Empty_Activity">
 
     <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
-        android:gravity="center_vertical">
+        android:background="@color/colorPrimary">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/txtUser"
-            android:textStyle="bold"
-            android:textColor="#0f0f0f"
-            android:textSize="20dp"/>
-
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="right">
+            android:padding="8dp">
 
             <ImageView
                 android:id="@+id/imgd"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:scaleX="0.45"
-                android:scaleY="0.45"
-                android:src="@drawable/ic_menu"/>
+                android:src="@drawable/ic_menu_icon"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true" />
 
-        </LinearLayout>
+            <TextView
+                android:id="@+id/txtUser"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Hello User"
+                android:textStyle="bold"
+                android:textColor="#0f0f0f"
+                android:textSize="20sp"
+                android:layout_toEndOf="@id/imgd"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="16dp" />
 
+            <!-- Notification Icon with Dot -->
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="16dp">
+
+                <!-- Bell icon -->
+                <ImageView
+                    android:id="@+id/notify"
+                    android:layout_width="25dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/ic_notify"
+                    android:contentDescription="Notifications" />
+
+                <TextView
+                    android:id="@+id/notificationCount"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_gravity="top|end"
+                    android:gravity="center"
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp"
+                    android:background="@drawable/red_badge_round"
+                    android:visibility="gone" />
+            </FrameLayout>
+
+
+        </RelativeLayout>
     </androidx.appcompat.widget.Toolbar>
 
     <ProgressBar

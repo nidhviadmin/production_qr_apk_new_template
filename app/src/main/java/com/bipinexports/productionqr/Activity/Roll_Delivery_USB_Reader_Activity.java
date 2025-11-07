@@ -104,6 +104,8 @@ public class Roll_Delivery_USB_Reader_Activity extends BaseActivity implements V
 
         imageView = content.findViewById(R.id.imgd);
         imageView.setOnClickListener(this);
+        setupNotifications();
+        handleNotificationIntent(getIntent());
         txtUser = content.findViewById(R.id.txtUser);
         custPrograssbar = new CustPrograssbar();
 

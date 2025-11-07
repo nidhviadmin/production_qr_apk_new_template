@@ -118,6 +118,8 @@ public class Piecewise_Scan_Details_Activity extends BaseActivity implements Vie
 
         imageView.setOnClickListener(this);
 
+        setupNotifications();
+        handleNotificationIntent(getIntent());
         text_Job_Refer = content.findViewById(R.id.text_Job_Refer);
         text_Shipcode = content.findViewById(R.id.text_Shipcode);
         text_Part_Name = content.findViewById(R.id.text_Part_Name);

@@ -72,6 +72,9 @@ public class Employee_Bundle_Mapping_Activity extends BaseActivity implements Vi
         txtUser.setText("Hello " + username);
 
         imageView.setOnClickListener(this);
+        setupNotifications();
+
+        handleNotificationIntent(getIntent());
         processorid = getIntent().getStringExtra("processorid");
         empcode = getIntent().getStringExtra("empcode");
         type = getIntent().getStringExtra("type");

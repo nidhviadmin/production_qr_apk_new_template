@@ -103,7 +103,8 @@ public class OuputSummaryActivity extends BaseActivity implements View.OnClickLi
 
         processorid = getIntent().getStringExtra("processorid");
         imageView.setOnClickListener(this);
-
+        setupNotifications();
+        handleNotificationIntent(getIntent());
 
         txtFromDate = content.findViewById(R.id.txtFromDate);
         txttoDate = content.findViewById(R.id.txttoDate);

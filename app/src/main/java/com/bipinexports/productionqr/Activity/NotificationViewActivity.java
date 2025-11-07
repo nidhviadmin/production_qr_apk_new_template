@@ -26,7 +26,7 @@ public class NotificationViewActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     NotificationAdapter adapter;
     List<NotificationModel> list = new ArrayList<>();
-    ImageView backBtn, clearAllBtn;
+//    ImageView clearAllBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +34,7 @@ public class NotificationViewActivity extends AppCompatActivity {
         setContentView(R.layout.activity_notification_view);
 
         recyclerView = findViewById(R.id.recyclerNotifications);
-        backBtn = findViewById(R.id.imgd);
+//        backBtn = findViewById(R.id.imgd);
 //        clearAllBtn = findViewById(R.id.imgClearAll);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -43,25 +43,25 @@ public class NotificationViewActivity extends AppCompatActivity {
         adapter = new NotificationAdapter(this, list);
         recyclerView.setAdapter(adapter);
 
-        backBtn.setOnClickListener(v -> {
-            Intent intent = new Intent(NotificationViewActivity.this, MainActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            startActivity(intent);
-            finish();
-        });
-
-        clearAllBtn.setOnClickListener(v -> {
-            new AlertDialog.Builder(this)
-                    .setTitle("Delete All Notifications")
-                    .setMessage("Are you sure you want to clear all notifications?")
-                    .setPositiveButton("Yes", (dialog, which) -> {
-                        clearAllNotifications();
-                        list.clear();
-                        adapter.notifyDataSetChanged();
-                    })
-                    .setNegativeButton("Cancel", null)
-                    .show();
-        });
+//        backBtn.setOnClickListener(v -> {
+//            Intent intent = new Intent(NotificationViewActivity.this, MainActivity.class);
+//            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+//            startActivity(intent);
+//            finish();
+//        });
+//
+//        clearAllBtn.setOnClickListener(v -> {
+//            new AlertDialog.Builder(this)
+//                    .setTitle("Delete All Notifications")
+//                    .setMessage("Are you sure you want to clear all notifications?")
+//                    .setPositiveButton("Yes", (dialog, which) -> {
+//                        clearAllNotifications();
+//                        list.clear();
+//                        adapter.notifyDataSetChanged();
+//                    })
+//                    .setNegativeButton("Cancel", null)
+//                    .show();
+//        });
     }
 
     private void loadNotifications() {
@@ -86,12 +86,12 @@ public class NotificationViewActivity extends AppCompatActivity {
         }
     }
 
-    private void clearAllNotifications() {
-        NotificationHelper.clearAllNotifications(this);
-        list.clear();
-        adapter.notifyDataSetChanged();
-        Log.d("NotificationView", "All notifications cleared");
-    }
+//    private void clearAllNotifications() {
+//        NotificationHelper.clearAllNotifications(this);
+//        list.clear();
+//        adapter.notifyDataSetChanged();
+//        Log.d("NotificationView", "All notifications cleared");
+//    }
 
     @Override
     protected void onResume() {

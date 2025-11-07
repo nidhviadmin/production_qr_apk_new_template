@@ -121,6 +121,8 @@ public class Datewise_Bundle_Scanned_Detail_Activity extends BaseActivity implem
 
         imageView.setOnClickListener(this);
 
+        setupNotifications();
+        handleNotificationIntent(getIntent());
         // Set date formatting
         Date c = Calendar.getInstance().getTime();
         SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());

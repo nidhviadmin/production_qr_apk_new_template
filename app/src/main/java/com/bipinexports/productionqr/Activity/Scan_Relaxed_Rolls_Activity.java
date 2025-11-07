@@ -173,6 +173,8 @@ public class Scan_Relaxed_Rolls_Activity extends BaseActivity implements View.On
         getvalue();
         hideKeyboard();
         imageView.setOnClickListener(this);
+        setupNotifications();
+        handleNotificationIntent(getIntent());
         Scanning();
 
         btnOk.setOnClickListener(this);

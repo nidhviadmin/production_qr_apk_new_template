@@ -89,7 +89,7 @@ import static java.lang.Integer.parseInt;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener, GetResult.MyListener {
 
-   SlideImageAdapter slideImageAdapter;
+    SlideImageAdapter slideImageAdapter;
     ViewPager2 viewPagerSlider;
     List<SlideImage_Data_object> slideImageList = new ArrayList<>();
 
@@ -249,7 +249,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         txt_machine_details = content.findViewById(R.id.txt_machine_details);
         txt_bundle_mapping = content.findViewById(R.id.txt_bundle_mapping);
 
-        int underlineThickness = 8; // Thickness in pixels
+        int underlineThickness = 8;
 
         int color_bundleqr = ContextCompat.getColor(this, R.color.colorAccent);
         SpannableString spannableString = new SpannableString(txt_bundleqr.getText().toString());

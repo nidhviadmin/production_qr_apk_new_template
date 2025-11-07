@@ -190,6 +190,8 @@ public class Scan_Inward_Rolls_Activity extends BaseActivity implements View.OnC
         getvalue();
         hideKeyboard();
         imageView.setOnClickListener(this);
+        setupNotifications();
+        handleNotificationIntent(getIntent());
         Scanning();
 
         btnOk.setOnClickListener(this);

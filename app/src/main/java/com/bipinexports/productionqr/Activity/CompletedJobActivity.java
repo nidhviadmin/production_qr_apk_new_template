@@ -59,6 +59,8 @@ public class CompletedJobActivity extends BaseActivity implements View.OnClickLi
         txtUser.setText("Hello " + username);
 
         imageView.setOnClickListener(this);
+        setupNotifications();
+        handleNotificationIntent(getIntent());
         processorid = getIntent().getStringExtra("processorid");
 
         mRecyclerView = content.findViewById(R.id.my_recycler_view);

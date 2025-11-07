@@ -188,6 +188,9 @@ public class Machine_QR_Scanview_Activity extends BaseActivity implements View.O
         hideKeyboard();
         get_scan_machine();
         imageView.setOnClickListener(this);
+        setupNotifications();
+
+        handleNotificationIntent(getIntent());
         FetchData = content.findViewById(R.id.FetchData);
         machine_count = content.findViewById(R.id.machine_count);
 

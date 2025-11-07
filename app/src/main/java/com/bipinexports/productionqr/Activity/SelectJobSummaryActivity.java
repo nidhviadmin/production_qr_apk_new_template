@@ -84,6 +84,8 @@ public class SelectJobSummaryActivity extends BaseActivity implements View.OnCli
 
         processorid = getIntent().getStringExtra("processorid");
         imageView.setOnClickListener(this);
+        setupNotifications();
+        handleNotificationIntent(getIntent());
 
         btn_AssignedJobs = content.findViewById(R.id.btn_AssignedJobs);
         btn_PendingJobs = content.findViewById(R.id.btn_PendingJobs);

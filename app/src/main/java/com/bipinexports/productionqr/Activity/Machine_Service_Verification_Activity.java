@@ -91,6 +91,9 @@ public class Machine_Service_Verification_Activity extends BaseActivity implemen
 
         processorid = getIntent().getStringExtra("processorid");
         imageView.setOnClickListener(this);
+        setupNotifications();
+
+        handleNotificationIntent(getIntent());
 
         mac_service_verification = getIntent().getStringExtra("mac_service_verification");
         mac_service_verification_count = getIntent().getStringExtra("mac_service_verification_count");

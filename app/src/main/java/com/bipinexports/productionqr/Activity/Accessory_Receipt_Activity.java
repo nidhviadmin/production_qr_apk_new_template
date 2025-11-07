@@ -75,6 +75,9 @@ public class Accessory_Receipt_Activity extends BaseActivity implements View.OnC
 
         txtUser = (TextView) content.findViewById(R.id.txtUser);
         imageView = (ImageView) content.findViewById(R.id.imgd);
+        setupNotifications();
+
+        handleNotificationIntent(getIntent());
         progress = (ProgressBar) content.findViewById(R.id.progress);
         custPrograssbar = new CustPrograssbar();
 

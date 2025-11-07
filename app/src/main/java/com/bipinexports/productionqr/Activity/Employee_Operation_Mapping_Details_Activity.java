@@ -150,6 +150,9 @@ public class Employee_Operation_Mapping_Details_Activity extends BaseActivity im
         style_count = "0";
 
         imageView.setOnClickListener(this);
+        setupNotifications();
+
+        handleNotificationIntent(getIntent());
 
         EmpCode = content.findViewById(R.id.txtEmpCode);
         txtEmpName = content.findViewById(R.id.txtEmpName);

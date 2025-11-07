@@ -191,6 +191,9 @@ public class Laywise_Bundle_QR_Scan_Activity extends BaseActivity implements Vie
         getvalue();
         hideKeyboard();
         imageView.setOnClickListener(this);
+        setupNotifications();
+
+        handleNotificationIntent(getIntent());
         Scanning();
 
         FetchData = content.findViewById(R.id.FetchData);

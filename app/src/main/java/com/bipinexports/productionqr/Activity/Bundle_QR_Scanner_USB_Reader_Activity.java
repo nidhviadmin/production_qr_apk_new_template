@@ -87,6 +87,8 @@ public class Bundle_QR_Scanner_USB_Reader_Activity extends BaseActivity implemen
 
         imageView = content.findViewById(R.id.imgd);
         imageView.setOnClickListener(this);
+        setupNotifications();
+        handleNotificationIntent(getIntent());
         txtUser = content.findViewById(R.id.txtUser);
 
         HashMap<String, String> user = session.getUserDetails();

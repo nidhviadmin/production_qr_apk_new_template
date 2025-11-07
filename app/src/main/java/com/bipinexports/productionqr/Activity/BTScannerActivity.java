@@ -108,6 +108,8 @@ public class BTScannerActivity extends BaseActivity implements View.OnClickListe
         hideKeyboard();
 
         content.findViewById(R.id.imgd).setOnClickListener(this);
+        setupNotifications();
+        handleNotificationIntent(getIntent());
 
         txtScanData.setOnKeyListener((v, keyCode, event) -> {
             if ((event.getAction() == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_ENTER)

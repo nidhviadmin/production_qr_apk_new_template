@@ -73,7 +73,7 @@ import java.util.Map;
 import retrofit2.Call;
 
 
-public class Inbuilt_Scanner_Selection_Barcode_Activity extends AppCompatActivity implements
+public class Inbuilt_Scanner_Selection_Barcode_Activity extends BaseActivity implements
         BarcodeReader.BarcodeListener, BarcodeReader.TriggerListener, OnClickListener, GetResult.MyListener {
 
     private com.honeywell.aidc.AidcManager mAidcManager;
@@ -106,7 +106,13 @@ public class Inbuilt_Scanner_Selection_Barcode_Activity extends AppCompatActivit
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_bt_scanner_qr);
+        setContentView(R.layout.activity_base);
+        setupDrawer();
+        View content = getLayoutInflater().inflate(
+                R.layout.activity_bt_scanner_qr,
+                findViewById(R.id.content_frame),
+                true
+        );
 
         versioncode();
 
@@ -124,9 +130,12 @@ public class Inbuilt_Scanner_Selection_Barcode_Activity extends AppCompatActivit
 
         custPrograssbar_new = new CustPrograssbar_new();
 
-        imageView = findViewById(R.id.imgd);
+        imageView =  content.findViewById(R.id.imgd);
         imageView.setOnClickListener(this);
-        txtUser = findViewById(R.id.txtUser);
+        setupNotifications();
+
+        handleNotificationIntent(getIntent());
+        txtUser =  content.findViewById(R.id.txtUser);
 
         session = new SessionManagement(getApplicationContext());
         HashMap<String, String> user = session.getUserDetails();
@@ -198,20 +207,7 @@ public class Inbuilt_Scanner_Selection_Barcode_Activity extends AppCompatActivit
         {
             switch (v.getId()) {
                 case R.id.imgd:
-                    PopupMenu popup = new PopupMenu(Inbuilt_Scanner_Selection_Barcode_Activity.this, imageView);
-                    popup.getMenuInflater().inflate(R.menu.menu_chgpswd, popup.getMenu());
-                    popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                        public boolean onMenuItemClick(MenuItem item) {
-                            if (item.getItemId() == R.id.logout) {
-                                session.logoutUser();
-                                finish();
-                            }
-                            return true;
-                        }
-                    });
-                    popup.show();
-                    break;
-                default:
+                    toggleDrawer();
                     break;
             }
         }

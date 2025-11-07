@@ -61,6 +61,8 @@ public class PendingJobActivity extends BaseActivity implements View.OnClickList
         txtUser.setText("Hello " + username);
 
         imageView.setOnClickListener(this);
+        setupNotifications();
+        handleNotificationIntent(getIntent());
         processorid = getIntent().getStringExtra("processorid");
 
         mRecyclerView = (RecyclerView) content.findViewById(R.id.my_recycler_view);

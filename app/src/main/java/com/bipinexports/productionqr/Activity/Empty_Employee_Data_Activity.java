@@ -50,6 +50,9 @@ public class Empty_Employee_Data_Activity extends BaseActivity implements View.O
         txtUser.setText("Hello " + username);
 
         imageView.setOnClickListener(this);
+        setupNotifications();
+
+        handleNotificationIntent(getIntent());
         processorid = getIntent().getStringExtra("processorid");
         type = getIntent().getStringExtra("type");
         myversionName = getIntent().getStringExtra("myversionName");
