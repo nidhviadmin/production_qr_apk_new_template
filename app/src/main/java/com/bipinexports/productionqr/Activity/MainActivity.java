@@ -182,6 +182,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         imageView = (ImageView) content.findViewById(R.id.imgd);
         viewPagerSlider = content.findViewById(R.id.viewPagerSlider);
 
+        slideImageAdapter = new SlideImageAdapter(this, slideImageList, (item, position) -> {
+            Log.e("Bipin", "Clicked slide image: " + item.getImgpath());
+        });
+
         viewPagerSlider.setAdapter(slideImageAdapter);
         homebtn = (ImageView) content.findViewById(R.id.home);
         gridView = (GridView) content.findViewById(R.id.grid);
