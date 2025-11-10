@@ -1,6 +1,5 @@
 package com.bipinexports.productionqr.Activity;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -26,7 +25,7 @@ public class NotificationViewActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     NotificationAdapter adapter;
     List<NotificationModel> list = new ArrayList<>();
-//    ImageView clearAllBtn;
+    ImageView clearAllBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,8 +33,7 @@ public class NotificationViewActivity extends AppCompatActivity {
         setContentView(R.layout.activity_notification_view);
 
         recyclerView = findViewById(R.id.recyclerNotifications);
-//        backBtn = findViewById(R.id.imgd);
-//        clearAllBtn = findViewById(R.id.imgClearAll);
+        clearAllBtn = findViewById(R.id.imgClearAll);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
@@ -43,25 +41,18 @@ public class NotificationViewActivity extends AppCompatActivity {
         adapter = new NotificationAdapter(this, list);
         recyclerView.setAdapter(adapter);
 
-//        backBtn.setOnClickListener(v -> {
-//            Intent intent = new Intent(NotificationViewActivity.this, MainActivity.class);
-//            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-//            startActivity(intent);
-//            finish();
-//        });
-//
-//        clearAllBtn.setOnClickListener(v -> {
-//            new AlertDialog.Builder(this)
-//                    .setTitle("Delete All Notifications")
-//                    .setMessage("Are you sure you want to clear all notifications?")
-//                    .setPositiveButton("Yes", (dialog, which) -> {
-//                        clearAllNotifications();
-//                        list.clear();
-//                        adapter.notifyDataSetChanged();
-//                    })
-//                    .setNegativeButton("Cancel", null)
-//                    .show();
-//        });
+        clearAllBtn.setOnClickListener(v -> {
+            new AlertDialog.Builder(this)
+                    .setTitle("Delete All Notifications")
+                    .setMessage("Are you sure you want to clear all notifications?")
+                    .setPositiveButton("Yes", (dialog, which) -> {
+                        NotificationHelper.clearAllNotifications(this);
+                        list.clear();
+                        adapter.notifyDataSetChanged();
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
+        });
     }
 
     private void loadNotifications() {
@@ -80,18 +71,10 @@ public class NotificationViewActivity extends AppCompatActivity {
                         obj.optBoolean("isRead", false)
                 ));
             }
-            Log.d("NotificationView", "Loaded " + list.size() + " notifications");
         } catch (Exception e) {
             Log.e("NotificationView", "Error loading notifications: " + e.getMessage());
         }
     }
-
-//    private void clearAllNotifications() {
-//        NotificationHelper.clearAllNotifications(this);
-//        list.clear();
-//        adapter.notifyDataSetChanged();
-//        Log.d("NotificationView", "All notifications cleared");
-//    }
 
     @Override
     protected void onResume() {

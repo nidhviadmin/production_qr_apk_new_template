@@ -56,23 +56,23 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Setup notifications with dot indicator
-     */
-    protected void setupNotificationsWithDot(View notificationDot) {
-        session = new SessionManagement(getApplicationContext());
-        HashMap<String, String> user = session.getUserDetails();
-        String userid = user.get(SessionManagement.KEY_USER_ID);
-
-        notificationManager = new NotificationManager(this);
-
-        ImageView notifyIcon = findViewById(R.id.notify);
-        TextView notificationCount = findViewById(R.id.notificationCount);
-
-        if (notifyIcon != null && notificationCount != null) {
-            notificationManager.setupWithDot(notifyIcon, notificationCount, notificationDot, userid);
-        }
-    }
+//    /**
+//     * Setup notifications with dot indicator
+//     */
+//    protected void setupNotificationsWithDot(View notificationDot) {
+//        session = new SessionManagement(getApplicationContext());
+//        HashMap<String, String> user = session.getUserDetails();
+//        String userid = user.get(SessionManagement.KEY_USER_ID);
+//
+//        notificationManager = new NotificationManager(this);
+//
+//        ImageView notifyIcon = findViewById(R.id.notify);
+//        TextView notificationCount = findViewById(R.id.notificationCount);
+//
+//        if (notifyIcon != null && notificationCount != null) {
+//            notificationManager.setupWithDot(notifyIcon, notificationCount, notificationDot, userid);
+//        }
+//    }
 
     /**
      * Handle notification intent

@@ -1,5 +1,6 @@
 package com.bipinexports.productionqr.Activity;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
@@ -39,7 +40,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         NotificationModel item = list.get(position);
         holder.txtTitle.setText(item.title);
 
-        // Change card background based on read/unread
+        // Change background based on read/unread
         int bgColor = item.isRead
                 ? context.getResources().getColor(android.R.color.white)
                 : context.getResources().getColor(android.R.color.darker_gray);
@@ -63,6 +64,19 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             intent.putExtra("imageUrl", item.imageUrl);
             context.startActivity(intent);
         });
+
+//        holder.deleteBtn.setOnClickListener(v -> {
+//            new AlertDialog.Builder(context)
+//                    .setTitle("Delete Notification")
+//                    .setMessage("Are you sure?")
+//                    .setPositiveButton("Yes", (dialog, which) -> {
+//                        NotificationHelper.deleteNotification(context, position);
+//                        list.remove(position);
+//                        notifyItemRemoved(position);
+//                    })
+//                    .setNegativeButton("Cancel", null)
+//                    .show();
+//        });
     }
 
     @Override
@@ -73,6 +87,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     static class ViewHolder extends RecyclerView.ViewHolder {
         TextView txtTitle;
         ImageView imgNotification;
+//        ImageView deleteBtn;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);

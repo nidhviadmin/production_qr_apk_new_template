@@ -113,4 +113,36 @@ public class NotificationHelper {
         Log.d(TAG, "All notifications cleared and unread count reset");
     }
 
+    /**
+     * Delete a specific notification by index
+     */
+    public static void deleteNotification(Context context, int index) {
+        try {
+            SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+            String existing = prefs.getString(KEY_LIST, "[]");
+
+            JSONArray array = new JSONArray(existing);
+
+            if (index >= 0 && index < array.length()) {
+
+                JSONObject obj = array.getJSONObject(index);
+
+                if (!obj.optBoolean("isRead", false)) {
+                    int unreadCount = prefs.getInt(KEY_UNREAD_COUNT, 0);
+                    prefs.edit().putInt(KEY_UNREAD_COUNT, Math.max(unreadCount - 1, 0)).apply();
+                }
+
+                JSONArray newArray = new JSONArray();
+                for (int i = 0; i < array.length(); i++) {
+                    if (i != index) newArray.put(array.getJSONObject(i));
+                }
+
+                prefs.edit().putString(KEY_LIST, newArray.toString()).apply();
+                Log.d(TAG, "Notification deleted at index: " + index);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error deleting notification: " + e.getMessage());
+        }
+    }
+
 }

@@ -164,7 +164,7 @@ public class Inbuilt_Scanner_Multiple_Barcode_Activity extends BaseActivity impl
         setContentView(R.layout.activity_base);
         setupDrawer();
         View content = getLayoutInflater().inflate(
-                R.layout.activity_bt_scanner_multiple_qr,   // <-- your current XML
+                R.layout.activity_bt_scanner_multiple_qr,
                 findViewById(R.id.content_frame),
                 true
         );
